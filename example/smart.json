@@ -1,0 +1,10 @@
+{
+    "packages": {
+        "meteor-test-runner": {
+            "path": "../"
+        },
+        "mocha-web": {
+            "git": "https://github.com/mad-eye/meteor-mocha-web"
+        }
+    }
+}

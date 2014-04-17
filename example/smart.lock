@@ -1,0 +1,24 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "meteor-test-runner": {
+        "path": ".."
+      },
+      "mocha-web": {
+        "git": "https://github.com/mad-eye/meteor-mocha-web",
+        "branch": "master"
+      }
+    },
+    "packages": {
+      "meteor-test-runner": {
+        "path": ".."
+      },
+      "mocha-web": {
+        "git": "https://github.com/mad-eye/meteor-mocha-web",
+        "branch": "master",
+        "commit": "cc58d823457944334ed70e2569147856bbc2ef66"
+      }
+    }
+  }
+}
