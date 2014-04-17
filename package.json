@@ -1,58 +1,58 @@
 {
-    "name": "meteor-test-runner",
-    "version": "0.0.0",
-    "description": "A test runner for Meteor ",
-    "bin": {
-        "mtr": "bin/mtr",
-        "wdmgr": "bin/webdriver-manager"
+  "name": "meteor-test-runner",
+  "version": "0.0.1",
+  "description": "A test runner for Meteor ",
+  "bin": {
+    "mtr": "bin/mtr",
+    "wdmgr": "bin/webdriver-manager"
+  },
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/xolvio/meteor-test-runner.git"
+  },
+  "keywords": [
+    "meteor",
+    "test",
+    "tests",
+    "testing",
+    "unit",
+    "functional",
+    "integration",
+    "acceptance",
+    "e2e",
+    "end2end",
+    "end-to-end",
+    "wd",
+    "webdriver",
+    "webdriverjs"
+  ],
+  "author": {
+    "name": "Sam Hatoum",
+    "email": "sam@xolv.io",
+    "url": "https://github.com/samhatoum"
+  },
+  "contributors": [
+    {
+      "name": "Adrian Lanning",
+      "email": "alanning@gmail.com",
+      "url": "https://github.com/alanning"
     },
-    "main": "main.js",
-    "scripts": {
-        "test": "node main.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/xolvio/meteor-test-runner.git"
-    },
-    "keywords": [
-        "meteor",
-        "test",
-        "tests",
-        "testing",
-        "unit",
-        "functional",
-        "integration",
-        "acceptance",
-        "e2e",
-        "end2end",
-        "end-to-end",
-        "wd",
-        "webdriver",
-        "webdriverjs"
-    ],
-    "author": {
-        "name": "Sam Hatoum",
-        "email": "sam@xolv.io",
-        "url": "https://github.com/samhatoum"
-    },
-    "contributors": [
-        {
-            "name": "Adrian Lanning",
-            "email": "alanning@gmail.com",
-            "url": "https://github.com/alanning"
-        },
-        {
-            "name": "Michael Risse",
-            "email": "rissem@gmail.com",
-            "url": "https://github.com/rissem"
-        }
-    ],
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/xolvio/meteor-test-runner/issues"
-    },
-    "dependencies": {
-        "lodash": "~2.4.1",
-        "async-walker": "~0.0.4"
+    {
+      "name": "Michael Risse",
+      "email": "rissem@gmail.com",
+      "url": "https://github.com/rissem"
     }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xolvio/meteor-test-runner/issues"
+  },
+  "dependencies": {
+    "lodash": "~2.4.1",
+    "async-walker": "~0.0.4"
+  }
 }
