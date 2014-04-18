@@ -1,28 +1,66 @@
 <body>
 <style>
     #__mtr_report_overlay__ {
-        top: 10px;
-        right: 10px;
-        padding: 5px;
         background: rgba(0, 0, 0, .1);
         position: absolute;
+        bottom: 10px;
+        right: 10px;
+        padding: 0px;
         font-size: 13px;
+        z-index: 2147483647;
     }
-    #__mtr_report_overlay__ p {
-        margin: 0;
+
+    #__mtr_report_overlay__ table {
+
+        border-collapse: separate;
+        border-spacing: 5px;
     }
+
+    #__mtr_report_overlay__ th, #__mtr_report_overlay__ td {
+        background: rgba(0, 0, 0, .1);
+        text-align: left;
+        padding: 2px;
+    }
+
+    #__mtr_report_overlay__ tfoot {
+        background: rgba(0, 0, 0, .2);
+    }
+
 </style>
 {{> __mtr_report__}}
 </body>
 
 <template name="__mtr_report__">
-    <div id="__mtr_report_overlay__" style="">
-        {{#each testFiles}}
-        {{> __mtr_report_test_file__}}
-        {{/each}}
+    <div id="__mtr_report_overlay__">
+        <table>
+            <tr>
+                <th>
+                    File
+                </th>
+                <th>
+                    Completed
+                </th>
+                <th>
+                    Simulate
+                </th>
+            </tr>
+            {{#each testFiles}}
+            {{> __mtr_report_test_file__}}
+            {{/each}}
+            <tfoot>
+            <td>All Tests Have Run</td>
+            <td colspan="2">{{allTestsHaveRun}}</td>
+            </tfoot>
+        </table>
     </div>
 </template>
 
 <template name="__mtr_report_test_file__">
-    <p><input {{checked}} type="checkbox" onclick="return false" /> {{name}}</p>
+    <tr>
+        <td>{{name}}</td>
+        <td>{{testCompleted}}</td>
+        <td>
+            <button>Run</button>
+        </td>
+    </tr>
 </template>
