@@ -1,17 +1,48 @@
 <head>
     <style>
+        @-webkit-keyframes in-progress
+        {
+            0%   {background-color: rgba(0,0,0,.5);}
+            100% {background-color: rgba(0,0,0,.2);}
+        }
+        #__mtr_status_widget__ {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 10px;
+            width: 15px;
+            height: 15px;
+            background: rgba(0, 0, 0, .3);
+            -webkit-animation-name: in-progress;
+            -webkit-animation-duration: 2s;
+            -webkit-animation-timing-function: linear;
+            -webkit-animation-iteration-count: infinite;
+            -webkit-animation-direction: alternate;
+            -webkit-animation-play-state: running;
+        }
+        #__mtr_status_widget__.pass {
+            -webkit-animation-name: none;
+            background-color: rgba(0, 128, 0, .4);
+        }
+        #__mtr_status_widget__.fail {
+            -webkit-animation-name: none;
+            background-color: rgba(255, 0, 0, .7);
+        }
         #__mtr_report_overlay__ {
+            display: none;
             background: rgba(255, 255, 255, .9);
             color: black;
             position: absolute;
-            top: 10px;
+            top: 40px;
             right: 10px;
             padding: 0px;
             font-size: 13px;
             z-index: 2147483647;
         }
-        #__mtr_report_overlay__ table {
+        #__mtr_report_overlay__ {
 
+        }
+        #__mtr_report_overlay__ table {
             border-collapse: separate;
             border-spacing: 5px;
         }
@@ -23,7 +54,7 @@
         #__mtr_report_overlay__ tfoot {
             background: rgba(0, 0, 0, .2);
         }
-        #__mtr_report_overlay__ .pass {
+        #__mtr_report_overlay__ .pass{
             background-color: lightgreen;
         }
         #__mtr_report_overlay__ .fail {
@@ -36,6 +67,7 @@
 </body>
 
 <template name="__mtr_report__">
+    <div id="__mtr_status_widget__" class="{{runnerResult}}"></div>
     <div id="__mtr_report_overlay__">
         <table>
             <tr>
