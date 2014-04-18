@@ -13,6 +13,7 @@ Package.on_use(function (api) {
 
     api.add_files('lib/collections.js', ['client', 'server']);
     api.export('__MTR_TESTS__', ['client', 'server']);
+    api.export('__MTR_REPORTS__', ['client', 'server']);
 
 
     api.add_files('lib/main.js', 'server');
