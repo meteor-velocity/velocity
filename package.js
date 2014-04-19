@@ -12,9 +12,9 @@ Package.on_use(function (api) {
     api.use(['templating'], 'client');
 
     api.add_files('lib/collections.js', ['client', 'server']);
-    api.export('__MTR_TESTS__', ['client', 'server']);
-    api.export('__MTR_REPORTS__', ['client', 'server']);
-
+    api.export('MeteorTestRunnerTestFiles', ['client', 'server']);
+    api.export('MeteorTestRunnerTestReports', ['client', 'server']);
+    api.export('MeteorTestRunnerAggregateReports', ['client', 'server']);
 
     api.add_files('lib/main.js', 'server');
 

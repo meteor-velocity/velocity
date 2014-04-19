@@ -1,99 +1,118 @@
 <head>
     <style>
-        @-webkit-keyframes in-progress
-        {
-            0%   {background-color: rgba(0,0,0,.5);}
-            100% {background-color: rgba(0,0,0,.2);}
-        }
-        #__mtr_status_widget__ {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            border-radius: 10px;
-            width: 15px;
-            height: 15px;
-            background: rgba(0, 0, 0, .3);
-            -webkit-animation-name: in-progress;
-            -webkit-animation-duration: 2s;
-            -webkit-animation-timing-function: linear;
-            -webkit-animation-iteration-count: infinite;
-            -webkit-animation-direction: alternate;
-            -webkit-animation-play-state: running;
-        }
-        #__mtr_status_widget__.pass {
-            -webkit-animation-name: none;
-            background-color: rgba(0, 128, 0, .4);
-        }
-        #__mtr_status_widget__.fail {
-            -webkit-animation-name: none;
-            background-color: rgba(255, 0, 0, .7);
-        }
-        #__mtr_report_overlay__ {
-            display: none;
+
+        #meteor-test-runner-overlay {
             background: rgba(255, 255, 255, .9);
             color: black;
             position: absolute;
-            top: 40px;
+            top: 10px;
             right: 10px;
             padding: 0px;
             font-size: 13px;
             z-index: 2147483647;
         }
-        #__mtr_report_overlay__ {
+
+        #meteor-test-runner-overlay {
 
         }
-        #__mtr_report_overlay__ table {
+
+        #meteor-test-runner-overlay table {
             border-collapse: separate;
             border-spacing: 5px;
         }
-        #__mtr_report_overlay__ th, #__mtr_report_overlay__ td {
+
+        #meteor-test-runner-overlay th, #meteor-test-runner-overlay td {
             background: rgba(0, 0, 0, .1);
             text-align: left;
             padding: 2px;
         }
-        #__mtr_report_overlay__ tfoot {
+
+        #meteor-test-runner-overlay tfoot {
             background: rgba(0, 0, 0, .2);
-        }
-        #__mtr_report_overlay__ .pass{
-            background-color: lightgreen;
-        }
-        #__mtr_report_overlay__ .fail {
-            background-color: lightpink;
         }
     </style>
 </head>
 <body>
-    {{> __mtr_report__}}
+{{> meteorTestRunner}}
 </body>
 
-<template name="__mtr_report__">
-    <div id="__mtr_status_widget__" class="{{runnerResult}}"></div>
-    <div id="__mtr_report_overlay__">
-        <table>
-            <tr>
-                <th>File</th>
-                <th>Target Framework</th>
-                <th>Result</th>
-                <th>Simulate <button class="reset">Reset</button></th>
-            </tr>
-            {{#each testFiles}}
-            {{> __mtr_report_test_file__}}
-            {{/each}}
-            <tfoot class="{{runnerResult}}">
-                <tr>
-                    <td>Runner Result (server side)</td>
-                    <td colspan="3">{{runnerResult}}</td>
-                </tr>
-            </tfoot>
-        </table>
+<template name="meteorTestRunner">
+    <div id="meteor-test-runner-overlay">
+
+        <h1>Test Files</h1>
+        {{> meteorTestRunnerTestFiles}}
+        <h1>Test Reports</h1>
+        {{> meteorTestRunnerTestReports}}
+        <h1>Aggregate Reports</h1>
+        {{> meteorTestRunnerAggregateReports}}
+
     </div>
 </template>
 
-<template name="__mtr_report_test_file__">
+<template name="meteorTestRunnerTestFiles">
+    <table>
+        <tr>
+            <th>File</th>
+            <th>Target Framework</th>
+            <th>Last Modified</th>
+        </tr>
+        {{#each testFiles}}
+        {{> meteorTestRunnerTestFile}}
+        {{/each}}
+    </table>
+</template>
+<template name="meteorTestRunnerTestFile">
     <tr class="{{result}}">
         <td>{{relativePath}}</td>
         <td>{{targetFramework}}</td>
+        <td>{{lastModified}}</td>
+    </tr>
+</template>
+
+<template name="meteorTestRunnerTestReports">
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Framework</th>
+            <th>Result</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Duration</th>
+        </tr>
+        {{#each testReports}}
+        {{> meteorTestRunnerTestReport}}
+        {{/each}}
+    </table>
+</template>
+<template name="meteorTestRunnerTestReport">
+    <tr class="{{result}}">
+        <td>{{_id}}</td>
+        <td>{{title}}</td>
+        <td>{{framework}}</td>
         <td>{{result}}</td>
-        <td><button class="pass">Pass</button><button class="fail">Fail</button></td>
+        <td>{{startTime}}</td>
+        <td>{{endTime}}</td>
+        <td>{{duration}}</td>
+    </tr>
+</template>
+
+<template name="meteorTestRunnerAggregateReports">
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Result</th>
+        </tr>
+        {{#each aggregateReports}}
+        {{> meteorTestRunnerAggregateReport}}
+        {{/each}}
+    </table>
+</template>
+<template name="meteorTestRunnerAggregateReport">
+    <tr class="{{result}}">
+        <td>{{_id}}</td>
+        <td>{{name}}</td>
+        <td>{{result}}</td>
     </tr>
 </template>
