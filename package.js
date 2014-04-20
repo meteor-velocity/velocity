@@ -9,7 +9,7 @@ Npm.depends({
 
 Package.on_use(function (api) {
 
-    api.use(['templating'], 'client');
+    api.use(['templating', 'amplify'], 'client');
 
     api.add_files('lib/collections.js', ['client', 'server']);
     api.export('MeteorTestRunnerTestFiles', ['client', 'server']);
@@ -18,7 +18,7 @@ Package.on_use(function (api) {
 
     api.add_files('lib/main.js', 'server');
 
-    api.add_files('lib/report.js', 'client');
-    api.add_files('lib/report.html', 'client');
+    api.add_files('lib/client-report.js', 'client');
+    api.add_files('lib/client-report.html', 'client');
 
 });

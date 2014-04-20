@@ -1,34 +1,42 @@
 <head>
     <style>
-
+        /* TODO: Make widget positions configurable */
+        #meteor-test-runner-status-widget {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            z-index: 2147483647;
+        }
         #meteor-test-runner-overlay {
-            background: rgba(255, 255, 255, .9);
+            background: rgba(255, 255, 255, 1);
             color: black;
             position: absolute;
             top: 10px;
             right: 10px;
-            padding: 0px;
-            font-size: 13px;
+            font-size: 12px;
             z-index: 2147483647;
         }
-
-        #meteor-test-runner-overlay {
-
-        }
-
         #meteor-test-runner-overlay table {
             border-collapse: separate;
             border-spacing: 5px;
         }
-
-        #meteor-test-runner-overlay th, #meteor-test-runner-overlay td {
+        #meteor-test-runner-overlay th,
+        #meteor-test-runner-overlay td {
             background: rgba(0, 0, 0, .1);
             text-align: left;
             padding: 2px;
         }
-
-        #meteor-test-runner-overlay tfoot {
+        .pending {
             background: rgba(0, 0, 0, .2);
+        }
+        .pass {
+            background: rgba(0, 192, 0, .5);
+        }
+        .fail {
+            background: rgba(255, 0, 0, .5);
         }
     </style>
 </head>
@@ -37,16 +45,18 @@
 </body>
 
 <template name="meteorTestRunner">
-    <div id="meteor-test-runner-overlay">
 
+    <div id="meteor-test-runner-overlay" style="display: {{overlayVisibility}}">
         <h1>Test Files</h1>
         {{> meteorTestRunnerTestFiles}}
         <h1>Test Reports</h1>
         {{> meteorTestRunnerTestReports}}
         <h1>Aggregate Reports</h1>
         {{> meteorTestRunnerAggregateReports}}
-
     </div>
+
+    <a id="meteor-test-runner-status-widget" class="{{aggregateResult.result}}" href="javascript:void(0);"></a>
+
 </template>
 
 <template name="meteorTestRunnerTestFiles">
@@ -61,6 +71,7 @@
         {{/each}}
     </table>
 </template>
+
 <template name="meteorTestRunnerTestFile">
     <tr class="{{result}}">
         <td>{{relativePath}}</td>
@@ -85,6 +96,7 @@
         {{/each}}
     </table>
 </template>
+
 <template name="meteorTestRunnerTestReport">
     <tr class="{{result}}">
         <td>{{_id}}</td>
@@ -109,6 +121,7 @@
         {{/each}}
     </table>
 </template>
+
 <template name="meteorTestRunnerAggregateReport">
     <tr class="{{result}}">
         <td>{{_id}}</td>
