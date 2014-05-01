@@ -5,6 +5,10 @@
         },
         "mocha-web": {
             "git": "https://github.com/mad-eye/meteor-mocha-web"
+        },
+        "rtd-unit": {
+            "git": "https://github.com/xolvio/rtd-unit.git",
+            "-path": "../../rtd-unit"
         }
     }
 }
