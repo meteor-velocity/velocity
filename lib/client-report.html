@@ -49,10 +49,10 @@
     <div id="meteor-test-runner-overlay" style="display: {{overlayVisibility}}">
         <h1>Test Files</h1>
         {{> meteorTestRunnerTestFiles}}
-        <h1>Test Reports</h1>
-        {{> meteorTestRunnerTestReports}}
         <h1>Aggregate Reports</h1>
         {{> meteorTestRunnerAggregateReports}}
+        <h1>Test Reports</h1>
+        {{> meteorTestRunnerTestReports}}
     </div>
 
     <a id="meteor-test-runner-status-widget" class="{{aggregateResult.result}}" href="javascript:void(0);"></a>
@@ -62,7 +62,8 @@
 <template name="meteorTestRunnerTestFiles">
     <table>
         <tr>
-            <th>File</th>
+            <th>ID</th>
+            <th>Relative Path</th>
             <th>Target Framework</th>
             <th>Last Modified</th>
         </tr>
@@ -74,6 +75,7 @@
 
 <template name="meteorTestRunnerTestFile">
     <tr class="{{result}}">
+        <td>{{_id}}</td>
         <td>{{relativePath}}</td>
         <td>{{targetFramework}}</td>
         <td>{{lastModified}}</td>
@@ -93,7 +95,8 @@
             <th>Async</th>
             <th>TimeOut</th>
             <th>Pending</th>
-            <th>ErrorMessage</th>
+            <th>FailureType</th>
+            <th>FailureMessage</th>
         </tr>
         {{#each testReports}}
         {{> meteorTestRunnerTestReport}}
@@ -113,7 +116,8 @@
         <td>{{async}}</td>
         <td>{{timeOut}}</td>
         <td>{{pending}}</td>
-        <td>{{errorMessage}}</td>
+        <td>{{failureType}}</td>
+        <td>{{failureMessage}}</td>
     </tr>
 </template>
 
