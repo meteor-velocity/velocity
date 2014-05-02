@@ -7,7 +7,7 @@
       },
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
-        "branch": "master"
+        "branch": "mtr"
       },
       "rtd-unit": {
         "git": "https://github.com/xolvio/rtd-unit.git",
@@ -20,8 +20,8 @@
       },
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
-        "branch": "master",
-        "commit": "97194bc90ea9b32047973ff44562a3da3b4e7477"
+        "branch": "mtr",
+        "commit": "4ab6b1ef5697e5c7d03538282801a5ab13e14316"
       },
       "rtd-unit": {
         "git": "https://github.com/xolvio/rtd-unit.git",

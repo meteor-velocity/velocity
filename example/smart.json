@@ -4,7 +4,8 @@
             "path": "../"
         },
         "mocha-web": {
-            "git": "https://github.com/mad-eye/meteor-mocha-web"
+            "git": "https://github.com/mad-eye/meteor-mocha-web",
+            "branch": "mtr"
         },
         "rtd-unit": {
             "git": "https://github.com/xolvio/rtd-unit.git",
