@@ -12,9 +12,9 @@
                 expect(options.sort.name).toBe(1);
                 return someLocalCollectionCursor;
             };
+//            expect(Template.leaderboard.players()).toBe(null);
             expect(Template.leaderboard.players()).toBe(someLocalCollectionCursor);
         });
-
     });
 
     describe("Template.leaderboard.selected_name", function () {
