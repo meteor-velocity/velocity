@@ -26,7 +26,7 @@
       "rtd-unit": {
         "git": "https://github.com/xolvio/rtd-unit.git",
         "branch": "master",
-        "commit": "6b39193437327ac951167187687ccc14af8c3ad9"
+        "commit": "9cf1a7bdd1cb8cd879aa3c5236fab4b11811d7d0"
       }
     }
   }
