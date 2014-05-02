@@ -1,11 +1,12 @@
 {
     "packages": {
-        "meteor-test-runner": {
+        "velocity": {
             "path": "../"
         },
         "mocha-web": {
-            "git": "https://github.com/mad-eye/meteor-mocha-web",
-            "branch": "mtr"
+            "git": "https://github.com/samhatoum/meteor-mocha-web",
+            "branch": "mtr",
+            "-path": "../../meteor-mocha-web"
         },
         "rtd-unit": {
             "git": "https://github.com/xolvio/rtd-unit.git",

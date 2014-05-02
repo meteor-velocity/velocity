@@ -1,5 +1,5 @@
 Package.describe({
-    summary: "Meteor Test Runner "
+    summary: "Velocity, a Meteor specific test-runner"
 });
 
 Npm.depends({
@@ -12,9 +12,9 @@ Package.on_use(function (api) {
     api.use(['templating', 'amplify'], 'client');
 
     api.add_files('lib/collections.js', ['client', 'server']);
-    api.export('MeteorTestRunnerTestFiles', ['client', 'server']);
-    api.export('MeteorTestRunnerTestReports', ['client', 'server']);
-    api.export('MeteorTestRunnerAggregateReports', ['client', 'server']);
+    api.export('VelocityTestFiles', ['client', 'server']);
+    api.export('VelocityTestReports', ['client', 'server']);
+    api.export('VelocityAggregateReports', ['client', 'server']);
 
     api.add_files('lib/main.js', 'server');
 

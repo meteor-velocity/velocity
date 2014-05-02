@@ -1,0 +1,8 @@
+{
+    "name": "velocity",
+    "description": "A Meteor specific test-runner",
+    "homepage": "https://github.com/xolvio/meteor-test-runner",
+    "author": "Sam Hatoum",
+    "version": "0.1.0",
+    "git": "https://github.com/xolvio/meteor-test-runner.git"
+}

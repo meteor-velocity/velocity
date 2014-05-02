@@ -2,11 +2,11 @@
   "meteor": {},
   "dependencies": {
     "basePackages": {
-      "meteor-test-runner": {
+      "velocity": {
         "path": ".."
       },
       "mocha-web": {
-        "git": "https://github.com/mad-eye/meteor-mocha-web",
+        "git": "https://github.com/samhatoum/meteor-mocha-web",
         "branch": "mtr"
       },
       "rtd-unit": {
@@ -15,18 +15,18 @@
       }
     },
     "packages": {
-      "meteor-test-runner": {
+      "velocity": {
         "path": ".."
       },
       "mocha-web": {
-        "git": "https://github.com/mad-eye/meteor-mocha-web",
+        "git": "https://github.com/samhatoum/meteor-mocha-web",
         "branch": "mtr",
-        "commit": "4ab6b1ef5697e5c7d03538282801a5ab13e14316"
+        "commit": "a6410060ef1203d9813bef6da7462573628b257b"
       },
       "rtd-unit": {
         "git": "https://github.com/xolvio/rtd-unit.git",
         "branch": "master",
-        "commit": "9cf1a7bdd1cb8cd879aa3c5236fab4b11811d7d0"
+        "commit": "af0e69b1d68885e6f49e7fa1ad9fb3a44e9a61d2"
       }
     }
   }

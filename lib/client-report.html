@@ -1,7 +1,7 @@
 <head>
     <style>
         /* TODO: Make widget positions configurable */
-        #meteor-test-runner-status-widget {
+        #velocity-status-widget {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -10,7 +10,7 @@
             border-radius: 10px;
             z-index: 2147483647;
         }
-        #meteor-test-runner-overlay {
+        #velocity-overlay {
             background: rgba(255, 255, 255, 1);
             color: black;
             position: absolute;
@@ -19,12 +19,12 @@
             font-size: 12px;
             z-index: 2147483647;
         }
-        #meteor-test-runner-overlay table {
+        #velocity-overlay table {
             border-collapse: separate;
             border-spacing: 5px;
         }
-        #meteor-test-runner-overlay th,
-        #meteor-test-runner-overlay td {
+        #velocity-overlay th,
+        #velocity-overlay td {
             background: rgba(0, 0, 0, .1);
             text-align: left;
             padding: 2px;
@@ -32,34 +32,34 @@
         .pending {
             background: rgba(0, 0, 0, .2);
         }
-        .pass {
+        .passed {
             background: rgba(0, 192, 0, .5);
         }
-        .fail {
+        .failed {
             background: rgba(255, 0, 0, .5);
         }
     </style>
 </head>
 <body>
-{{> meteorTestRunner}}
+{{> velocity}}
 </body>
 
-<template name="meteorTestRunner">
+<template name="velocity">
 
-    <div id="meteor-test-runner-overlay" style="display: {{overlayVisibility}}">
+    <div id="velocity-overlay" style="display: {{overlayVisibility}}">
         <h1>Test Files</h1>
-        {{> meteorTestRunnerTestFiles}}
+        {{> velocityTestFiles}}
         <h1>Aggregate Reports</h1>
-        {{> meteorTestRunnerAggregateReports}}
+        {{> velocityAggregateReports}}
         <h1>Test Reports</h1>
-        {{> meteorTestRunnerTestReports}}
+        {{> velocityTestReports}}
     </div>
 
-    <a id="meteor-test-runner-status-widget" class="{{aggregateResult.result}}" href="javascript:void(0);"></a>
+    <a id="velocity-status-widget" class="{{aggregateResult.result}}" href="javascript:void(0);"></a>
 
 </template>
 
-<template name="meteorTestRunnerTestFiles">
+<template name="velocityTestFiles">
     <table>
         <tr>
             <th>ID</th>
@@ -68,12 +68,12 @@
             <th>Last Modified</th>
         </tr>
         {{#each testFiles}}
-        {{> meteorTestRunnerTestFile}}
+        {{> velocityTestFile}}
         {{/each}}
     </table>
 </template>
 
-<template name="meteorTestRunnerTestFile">
+<template name="velocityTestFile">
     <tr class="{{result}}">
         <td>{{_id}}</td>
         <td>{{relativePath}}</td>
@@ -82,7 +82,7 @@
     </tr>
 </template>
 
-<template name="meteorTestRunnerTestReports">
+<template name="velocityTestReports">
     <table>
         <tr>
             <th>ID</th>
@@ -99,12 +99,12 @@
             <th>FailureMessage</th>
         </tr>
         {{#each testReports}}
-        {{> meteorTestRunnerTestReport}}
+        {{> velocityTestReport}}
         {{/each}}
     </table>
 </template>
 
-<template name="meteorTestRunnerTestReport">
+<template name="velocityTestReport">
     <tr class="{{result}}">
         <td>{{_id}}</td>
         <td>{{name}}</td>
@@ -121,7 +121,7 @@
     </tr>
 </template>
 
-<template name="meteorTestRunnerAggregateReports">
+<template name="velocityAggregateReports">
     <table>
         <tr>
             <th>ID</th>
@@ -129,12 +129,12 @@
             <th>Result</th>
         </tr>
         {{#each aggregateReports}}
-        {{> meteorTestRunnerAggregateReport}}
+        {{> velocityAggregateReport}}
         {{/each}}
     </table>
 </template>
 
-<template name="meteorTestRunnerAggregateReport">
+<template name="velocityAggregateReport">
     <tr class="{{result}}">
         <td>{{_id}}</td>
         <td>{{name}}</td>
