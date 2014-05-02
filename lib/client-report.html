@@ -84,12 +84,16 @@
     <table>
         <tr>
             <th>ID</th>
-            <th>Title</th>
+            <th>Name</th>
             <th>Framework</th>
             <th>Result</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Duration</th>
+            <th>Ancestors</th>
+            <th>Timestamp</th>
+            <th>Time</th>
+            <th>Async</th>
+            <th>TimeOut</th>
+            <th>Pending</th>
+            <th>ErrorMessage</th>
         </tr>
         {{#each testReports}}
         {{> meteorTestRunnerTestReport}}
@@ -100,12 +104,16 @@
 <template name="meteorTestRunnerTestReport">
     <tr class="{{result}}">
         <td>{{_id}}</td>
-        <td>{{title}}</td>
+        <td>{{name}}</td>
         <td>{{framework}}</td>
         <td>{{result}}</td>
-        <td>{{startTime}}</td>
-        <td>{{endTime}}</td>
-        <td>{{duration}}</td>
+        <td>{{ancestors}}</td>
+        <td>{{timestamp}}</td>
+        <td>{{time}}</td>
+        <td>{{async}}</td>
+        <td>{{timeOut}}</td>
+        <td>{{pending}}</td>
+        <td>{{errorMessage}}</td>
     </tr>
 </template>
 
