@@ -4,7 +4,7 @@
             "path": "../"
         },
         "mocha-web": {
-            "git": "https://github.com/samhatoum/meteor-mocha-web",
+            "git": "https://github.com/mad-eye/meteor-mocha-web",
             "branch": "mtr",
             "-path": "../../meteor-mocha-web"
         },
