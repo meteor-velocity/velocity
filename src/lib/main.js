@@ -12,7 +12,10 @@ var gaze = Npm.require('gaze'),
     ABSOLUTE_TESTS_DIR = process.env.PWD + TESTS_DIR,
     FILE_WATCHER_MATCHING_PATTERN = _.map(SOURCE_CODE_FILE_EXTENSIONS, function (extension) {
         return '**/*.' + extension
-    });
+    });//,
+//    coffee = Npm.require('karma-coffee-preprocessor');
+
+//console.log(coffee);
 
 gaze(FILE_WATCHER_MATCHING_PATTERN, {cwd: ABSOLUTE_TESTS_DIR}, Meteor.bindEnvironment(function (err, watcher) {
 

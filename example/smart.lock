@@ -3,20 +3,19 @@
   "dependencies": {
     "basePackages": {
       "velocity": {
-        "path": ".."
+        "path": "../src"
       },
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "mtr"
       },
       "rtd-unit": {
-        "git": "https://github.com/xolvio/rtd-unit.git",
-        "branch": "master"
+        "path": "../../rtd-unit"
       }
     },
     "packages": {
       "velocity": {
-        "path": ".."
+        "path": "../src"
       },
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
@@ -24,9 +23,7 @@
         "commit": "44a47d87437558d623709ee99b21a82cb54dcd43"
       },
       "rtd-unit": {
-        "git": "https://github.com/xolvio/rtd-unit.git",
-        "branch": "master",
-        "commit": "af0e69b1d68885e6f49e7fa1ad9fb3a44e9a61d2"
+        "path": "../../rtd-unit"
       }
     }
   }
