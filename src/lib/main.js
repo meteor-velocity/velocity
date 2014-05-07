@@ -1,7 +1,7 @@
 "use strict";
 
 // TODO Externalize these to a conf file
-var FRAMEWORKS = ['rtd-unit', 'mocha-web'],
+var FRAMEWORKS = ['jasmine-unit', 'mocha-web'],
     SOURCE_CODE_FILE_EXTENSIONS = ['js', 'coffee'],
     TESTS_DIR = '/tests';
 

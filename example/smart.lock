@@ -9,9 +9,8 @@
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "mtr"
       },
-      "rtd-unit": {
-        "git": "https://github.com/xolvio/rtd-unit.git",
-        "branch": "master"
+      "velocity-jasmine-unit": {
+        "path": "../../velocity-jasmine-unit"
       }
     },
     "packages": {
@@ -23,10 +22,8 @@
         "branch": "mtr",
         "commit": "44a47d87437558d623709ee99b21a82cb54dcd43"
       },
-      "rtd-unit": {
-        "git": "https://github.com/xolvio/rtd-unit.git",
-        "branch": "master",
-        "commit": "ee3e35dc8f22c7e26e37dd387b2813dd9135af77"
+      "velocity-jasmine-unit": {
+        "path": "../../velocity-jasmine-unit"
       }
     }
   }

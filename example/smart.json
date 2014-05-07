@@ -8,9 +8,9 @@
             "branch": "mtr",
             "-path": "../../meteor-mocha-web"
         },
-        "rtd-unit": {
-            "git": "https://github.com/xolvio/rtd-unit.git",
-            "-path": "../../rtd-unit"
+        "velocity-jasmine-unit": {
+            "-git": "https://github.com/xolvio/velocity-jasmine-unit.git",
+            "path": "../../velocity-jasmine-unit"
         }
     }
 }
