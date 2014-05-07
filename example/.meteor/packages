@@ -8,5 +8,5 @@ autopublish
 insecure
 velocity
 mocha-web
-velocity-jasmine-unit
 coffeescript
+velocity-jasmine-unit

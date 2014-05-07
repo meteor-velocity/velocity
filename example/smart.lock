@@ -9,9 +9,7 @@
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "mtr"
       },
-      "velocity-jasmine-unit": {
-        "path": "../../velocity-jasmine-unit"
-      }
+      "velocity-jasmine-unit": {}
     },
     "packages": {
       "velocity": {
@@ -23,7 +21,9 @@
         "commit": "44a47d87437558d623709ee99b21a82cb54dcd43"
       },
       "velocity-jasmine-unit": {
-        "path": "../../velocity-jasmine-unit"
+        "git": "https://github.com/xolvio/velocity-jasmine-unit.git",
+        "tag": "v0.1.0",
+        "commit": "3e7da16742f31250c67fb8b2f581b93824c6e9d6"
       }
     }
   }

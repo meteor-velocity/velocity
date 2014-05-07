@@ -1,16 +1,15 @@
 {
-    "packages": {
-        "velocity": {
-            "path": "../src"
-        },
-        "mocha-web": {
-            "git": "https://github.com/mad-eye/meteor-mocha-web",
-            "branch": "mtr",
-            "-path": "../../meteor-mocha-web"
-        },
-        "velocity-jasmine-unit": {
-            "git": "https://github.com/xolvio/velocity-jasmine-unit.git",
-            "-path": "../../velocity-jasmine-unit"
-        }
+  "packages": {
+    "velocity": {
+      "path": "../src"
+    },
+    "mocha-web": {
+      "git": "https://github.com/mad-eye/meteor-mocha-web",
+      "branch": "mtr",
+      "-path": "../../meteor-mocha-web"
+    },
+    "velocity-jasmine-unit": {
+        "-path": "../../velocity-jasmine-unit"
     }
+  }
 }
