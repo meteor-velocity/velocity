@@ -10,6 +10,7 @@
     },
     "velocity-jasmine-unit": {
         "-path": "../../velocity-jasmine-unit"
-    }
+    },
+    "moment": {}
   }
 }

@@ -9,7 +9,8 @@
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "mtr"
       },
-      "velocity-jasmine-unit": {}
+      "velocity-jasmine-unit": {},
+      "moment": {}
     },
     "packages": {
       "velocity": {
@@ -24,6 +25,11 @@
         "git": "https://github.com/xolvio/velocity-jasmine-unit.git",
         "tag": "v0.1.0",
         "commit": "3e7da16742f31250c67fb8b2f581b93824c6e9d6"
+      },
+      "moment": {
+        "git": "https://github.com/acreeger/meteor-moment.git",
+        "tag": "v2.6.0",
+        "commit": "26156df681750fd6e6ed77043eef32b6653ebbdf"
       }
     }
   }
