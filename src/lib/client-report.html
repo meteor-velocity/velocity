@@ -38,6 +38,130 @@
         .failed {
             background: rgba(255, 0, 0, .5);
         }
+        #velocity-status-widget.failed:after {
+            content: " ";
+            position: absolute;
+            z-index: 2147483648;
+            top: -25px;
+            left: -25px;
+            width: 50px;
+            height: 50px;
+            border-radius: 60px;
+            border: 10px solid rgba(255, 0, 0, .5);
+            opacity: 0;
+            animation: pulse 5s ease-out;
+            -webkit-animation: pulse 5s ease-out;
+            -moz-animation: pulse 5s ease-out;
+            -o-animation: pulse 5s ease-out;
+            animation-iteration-count: infinite;
+            -webkit-animation-iteration-count: infinite;
+            -moz-animation-iteration-count: infinite;
+            -o-animation-iteration-count: infinite;
+        }
+        @keyframes "pulse" {
+            0% {
+                -webkit-transform: scale(0);
+                opacity: 0.0;
+            }
+            50% {
+                -webkit-transform: scale(0.1);
+                opacity: 0.0;
+            }
+            70% {
+                -webkit-transform: scale(0.3);
+                opacity: 0.2;
+            }
+            80% {
+                -webkit-transform: scale(0.6);
+                opacity: 0.3;
+            }
+            90% {
+                -webkit-transform: scale(0.8);
+                opacity: 0.1;
+            }
+            100% {
+                -webkit-transform: scale(1);
+                opacity: 0.0;
+            }
+        }
+        @-webkit-keyframes "pulse" {
+            0% {
+                -webkit-transform: scale(0);
+                opacity: 0.0;
+            }
+            50% {
+                -webkit-transform: scale(0.1);
+                opacity: 0.0;
+            }
+            70% {
+                -webkit-transform: scale(0.3);
+                opacity: 0.2;
+            }
+            80% {
+                -webkit-transform: scale(0.6);
+                opacity: 0.3;
+            }
+            90% {
+                -webkit-transform: scale(0.8);
+                opacity: 0.1;
+            }
+            100% {
+                -webkit-transform: scale(1);
+                opacity: 0.0;
+            }
+        }
+        @-moz-keyframes "pulse" {
+            0% {
+                -moz-transform: scale(0);
+                opacity: 0.0;
+            }
+            50% {
+                -moz-transform: scale(0.1);
+                opacity: 0.0;
+            }
+            70% {
+                -moz-transform: scale(0.3);
+                opacity: 0.2;
+            }
+            80% {
+                -moz-transform: scale(0.6);
+                opacity: 0.3;
+            }
+            90% {
+                -moz-transform: scale(0.8);
+                opacity: 0.1;
+            }
+            100% {
+                -moz-transform: scale(1);
+                opacity: 0.0;
+            }
+        }
+        @-o-keyframes "pulse" {
+            0% {
+                -o-transform: scale(0);
+                opacity: 0.0;
+            }
+            50% {
+                -o-transform: scale(0.1);
+                opacity: 0.0;
+            }
+            70% {
+                -o-transform: scale(0.3);
+                opacity: 0.2;
+            }
+            80% {
+                -o-transform: scale(0.6);
+                opacity: 0.3;
+            }
+            90% {
+                -o-transform: scale(0.8);
+                opacity: 0.1;
+            }
+            100% {
+                -o-transform: scale(1);
+                opacity: 0.0;
+            }
+        }
     </style>
 </head>
 <body>
