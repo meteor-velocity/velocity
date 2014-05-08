@@ -10,3 +10,5 @@ velocity
 mocha-web
 coffeescript
 velocity-jasmine-unit
+coffeescript
+moment
