@@ -3,7 +3,7 @@ Package.describe({
 });
 
 Npm.depends({
-    "gaze": "0.6.4",
+    "chokidar": "0.8.2",
     "lodash": "2.4.1"
 });
 
