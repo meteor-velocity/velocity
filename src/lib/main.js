@@ -85,6 +85,17 @@ Meteor.methods({
         VelocityTestReports.remove(query);
         updateAggregateReports();
     },
+    postLog: function (options) {
+        if (!options || !options.type || !options.message || !options.framework) {
+            throw new Error('type, message and framework are required fields.')
+        }
+        VelocityLogs.insert({
+            timestamp: options.timestamp ? options.timestamp : Date.now(),
+            type: options.type,
+            message: options.message,
+            framework: options.framework
+        });
+    },
     postResult: function (options) {
 
         if (!options || !options.id || !options.name || !options.framework || !options.result) {
@@ -107,19 +118,10 @@ Meteor.methods({
             'failureStackTrace',
             'ancestors'
         ], function (option) {
-            if (options[option]) {
-                result[option] = options[option];
-            } else {
-                result[option] = '';
-            }
+            result[option] = options[option] ? options[option] : '';
         });
 
-        var existingResult = VelocityTestReports.findOne(options.id);
-        if (existingResult) {
-            VelocityTestReports.update(options.id, {$set: result});
-        } else {
-            VelocityTestReports.insert(_.extend(result, {_id: options.id}));
-        }
+        VelocityTestReports.upsert(options.id, {$set: result});
         updateAggregateReports();
     }
 });

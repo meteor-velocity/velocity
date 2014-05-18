@@ -10,6 +10,7 @@
             border-radius: 10px;
             z-index: 2147483647;
         }
+
         #velocity-overlay {
             background: rgba(255, 255, 255, 1);
             color: black;
@@ -19,25 +20,31 @@
             font-size: 12px;
             z-index: 2147483647;
         }
+
         #velocity-overlay table {
             border-collapse: separate;
             border-spacing: 5px;
         }
+
         #velocity-overlay th,
         #velocity-overlay td {
             background: rgba(0, 0, 0, .1);
             text-align: left;
             padding: 2px;
         }
+
         .pending, .undefined {
             background: rgba(255, 255, 51, .6);
         }
+
         .passed {
             background: rgba(0, 192, 0, .5);
         }
+
         .failed {
             background: rgba(255, 0, 0, .5);
         }
+
         #velocity-status-widget.failed:after {
             content: " ";
             position: absolute;
@@ -58,6 +65,7 @@
             -moz-animation-iteration-count: infinite;
             -o-animation-iteration-count: infinite;
         }
+
         @keyframes "pulse" {
             0% {
                 transform: scale(0);
@@ -84,6 +92,7 @@
                 opacity: 0.0;
             }
         }
+
         @-webkit-keyframes "pulse" {
             0% {
                 -webkit-transform: scale(0);
@@ -110,6 +119,7 @@
                 opacity: 0.0;
             }
         }
+
         @-moz-keyframes "pulse" {
             0% {
                 -moz-transform: scale(0);
@@ -136,6 +146,7 @@
                 opacity: 0.0;
             }
         }
+
         @-o-keyframes "pulse" {
             0% {
                 -o-transform: scale(0);
@@ -177,6 +188,8 @@
         {{> velocityAggregateReports}}
         <h1>Test Reports</h1>
         {{> velocityTestReports}}
+        <h1>Logs</h1>
+        {{> velocityLogs}}
     </div>
 
     <a id="velocity-status-widget" class="{{aggregateResult.result}}" href="javascript:void(0);"></a>
@@ -263,5 +276,28 @@
         <td>{{_id}}</td>
         <td>{{name}}</td>
         <td>{{result}}</td>
+    </tr>
+</template>
+
+<template name="velocityLogs">
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>Type</th>
+            <th>Message</th>
+            <th>Framework</th>
+        </tr>
+        {{#each logs}}
+        {{> velocityLog}}
+        {{/each}}
+    </table>
+</template>
+
+<template name="velocityLog">
+    <tr class="{{result}}">
+        <td>{{timestamp}}</td>
+        <td>{{type}}</td>
+        <td>{{message}}</td>
+        <td>{{framework}}</td>
     </tr>
 </template>

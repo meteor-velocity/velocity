@@ -12,6 +12,10 @@ Meteor.startup(function () {
         return VelocityAggregateReports.find();
     };
 
+    Template.velocityLogs.logs = function () {
+        return VelocityLogs.find();
+    };
+
     Template.velocity.aggregateResult = function () {
         return VelocityAggregateReports.findOne('result');
     };
@@ -27,5 +31,6 @@ Meteor.startup(function () {
             amplify.store('velocityOverlayIsVisible', $overlay.is(':visible'));
         }
     });
+
 
 });
