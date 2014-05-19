@@ -1,0 +1,5 @@
+{
+  "frameworks": ["jasmine-unit", "mocha-web"],
+  "regex": ".(js|coffee)",
+  "testDirs": ["tests"]
+}
