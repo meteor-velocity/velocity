@@ -8,8 +8,8 @@
       "branch": "velocity",
       "-path": "../../meteor-mocha-web"
     },
-    "velocity-jasmine-unit": {
-        "-path": "../../velocity-jasmine-unit"
+    "jasmine-unit": {
+        "-path": "../../jasmine-unit"
     },
     "moment": {}
   }
