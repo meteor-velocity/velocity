@@ -4,7 +4,8 @@ Package.describe({
 
 Npm.depends({
     "chokidar": "0.8.2",
-    "lodash": "2.4.1"
+    "lodash": "2.4.1",
+    "glob": "3.2.9"
 });
 
 Package.on_use(function (api) {
