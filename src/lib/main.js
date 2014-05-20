@@ -112,8 +112,7 @@ Meteor.methods({
    *                   ancestors
    */
   postResult: function (data) {
-    var requiredFields = ['id', 'name', 'framework', 'result'],
-        data = {};
+    var requiredFields = ['id', 'name', 'framework', 'result'];
 
     data = data || {};
 
