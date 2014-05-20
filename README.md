@@ -20,7 +20,7 @@ Try to modify the tests and watch the tests update reactively in the browser.
 The currently available testing frameworks are:
 
 * [mocha-web](https://github.com/mad-eye/meteor-mocha-web/tree/mtr) - A Velocity version of [mocha-web](https://github.com/mad-eye/meteor-mocha-web) (in progress)
-* [velocity-jasmine-unit](https://github.com/xolvio/velocity-jasmine-unit) - Unit testing extracted from [RTD](http://rtd.xolv.io/) (in progress)
+* [jasmine-unit](https://github.com/xolvio/jasmine-unit) - Unit testing extracted from [RTD](http://rtd.xolv.io/) (in progress)
 * [meteor-cucumber](https://github.com/xdissent/meteor-cucumber) - Velocity-compatible [CucumberJS](https://github.com/cucumber/cucumber-js) runner for Meteor
 
 We are collaborating with an all-star team on unifying the Meteor testing landscape:

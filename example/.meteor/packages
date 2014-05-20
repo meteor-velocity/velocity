@@ -9,6 +9,6 @@ insecure
 velocity
 mocha-web
 coffeescript
-velocity-jasmine-unit
+jasmine-unit
 coffeescript
 moment
