@@ -156,14 +156,14 @@ function _checkRequired (requiredFields, target) {
  * data.
  *
  * @example
- *     // in `velocity-jasmine-unit` package's `smart.json`:
+ *     // in `jasmine-unit` package's `smart.json`:
  *     {
- *       "name": "velocity-jasmine-unit",
+ *       "name": "jasmine-unit",
  *       "description": "Velocity-compatible jasmine unit test package",
- *       "homepage": "https://github.com/xolvio/velocity-jasmine-unit",
+ *       "homepage": "https://github.com/xolvio/jasmine-unit",
  *       "author": "Sam Hatoum",
  *       "version": "0.1.1",
- *       "git": "https://github.com/xolvio/velocity-jasmine-unit.git",
+ *       "git": "https://github.com/xolvio/jasmine-unit.git",
  *       "test-package": true,
  *       "regex": "-jasmine-unit.(js|coffee)"
  *     }
@@ -262,7 +262,7 @@ function _initWatcher (config) {
       };
 
       // ### TEMPORARY HACK
-      if (targetFramework.name == 'velocity-jasmine-unit') {
+      if (targetFramework.name == 'jasmine-unit') {
         data.targetFramework = 'jasmine-unit';
       }
 
