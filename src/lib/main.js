@@ -7,19 +7,14 @@ var _ = Npm.require('lodash'),
     _ = Npm.require('lodash'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
-    VELOCITY_CONFIG_FILE = 'velocity.json',
-    defaultConfig = {
-      frameworks: ['jasmine-unit', 'mocha-web'],
-      regex: '.(js|coffee)',
-      testDirs: ['tests']
-    },
+    TEST_DIR = 'tests',
     _config,
     watcher;
 
 
 DEBUG && console.log('PWD', process.env.PWD);
 
-_config = _loadConfig();
+_config = _loadTestPackageConfigs();
 DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
 // kick-off everything
@@ -96,16 +91,17 @@ Meteor.methods({
 
   /**
    * Meteor method: postResult
+   * Record the results of a test run.
    * 
    * @method postResult
-   * @param {Object} options Required parameters:
+   * @param {Object} data Required fields:
    *                   id - String
    *                   name - String
    *                   framework - String  ex. 'jasmine-unit'
-   *                   result - String
+   *                   result - String.  ex. 'failed', 'passed'
    *                 
-   *                 Suggested optional parameters:
-   *                   timestamp - Date
+   *                 Suggested fields:
+   *                   timestamp
    *                   time
    *                   async
    *                   timeOut
@@ -115,19 +111,15 @@ Meteor.methods({
    *                   failureStackTrace
    *                   ancestors
    */
-  postResult: function (options) {
+  postResult: function (data) {
     var requiredFields = ['id', 'name', 'framework', 'result'],
         data = {};
 
-    options = options || {};
+    data = data || {};
 
-    _checkRequired (requiredFields, options);
+    _checkRequired (requiredFields, data);
 
-    for (var fieldName in options) {
-      data[fieldName] = options[fieldName];
-    }
-
-    VelocityTestReports.upsert(options.id, {$set: data});
+    VelocityTestReports.upsert(data.id, {$set: data});
     _updateAggregateReports();
   }  // end postResult
 
@@ -158,90 +150,90 @@ function _checkRequired (requiredFields, target) {
   })
 }
 
+
+
 /**
- * Attempts to load velocity configuration information.
- * First checks for a `velocity.json` file in the app directory.
- * Then checks `Meteor.settings.velocity`.  Then uses the default config
- * if none of the others are found.
- *
- * NOTE: Contents of this config are subject to frequent change until
- *       `velocity`s design is more stable. 
+ * Locate all velocity-compatible test packages and return their config
+ * data.
  *
  * @example
+ *     // in `velocity-jasmine-unit` package's `smart.json`:
  *     {
- *       "frameworks": ["jasmine-unit", "mocha-web"],
- *       "regex": ".(js|coffee)",
- *       "testDirs": ["tests"]
+ *       "name": "velocity-jasmine-unit",
+ *       "description": "Velocity-compatible jasmine unit test package",
+ *       "homepage": "https://github.com/xolvio/velocity-jasmine-unit",
+ *       "author": "Sam Hatoum",
+ *       "version": "0.1.1",
+ *       "git": "https://github.com/xolvio/velocity-jasmine-unit.git",
+ *       "test-package": true,
+ *       "regex": "-jasmine-unit.(js|coffee)"
  *     }
- * 
- * @method _loadConfig
- * @return {Object} the configuration object
+ *
+ * @method _loadTestPackageConfigs
+ * @return {Object} Hash of test package names and their normalized config data.
  * @private
  */
-function _loadConfig () {
-  var config,
-      velocityConfigFile,
-      Meteor = Meteor || {settings: {}};
+function _loadTestPackageConfigs () {
+  var pwd = process.env.PWD,
+      smartJsons = glob.sync('packages/**/smart.json', {cwd: pwd}),
+      testConfigDictionary;
 
-  velocityConfigFile = path.join(process.env.PWD, VELOCITY_CONFIG_FILE);
+  DEBUG && console.log('Check for test package configs...', smartJsons);
 
-  try {
-    config = fs.readFileSync(velocityConfigFile).toString();
-    config = JSON.parse(config);
-    DEBUG && console.log("Checking for velocity config file '",
-                          VELOCITY_CONFIG_FILE, "'...found!");
-  } 
-  catch (ex) { 
-    DEBUG && console.log(ex);
-    DEBUG && console.log("Checking for velocity config file '",
-                          VELOCITY_CONFIG_FILE, "'...not found");
-  }
+  testConfigDictionary = _.reduce(smartJsons, function (memo, smartJsonPath) {
+    var contents,
+        config;
 
-  if (!config) {
-    config = Meteor.settings.velocity;
-    if (config) {
-      DEBUG && console.log('  checking Meteor.settings.velocity...found!');
-    } else {
-      DEBUG && console.log('  checking Meteor.settings.velocity...not found');
+    try {
+      contents = fs.readFileSync(path.join(pwd, smartJsonPath));
+      config = JSON.parse(contents);
+      if (config.name && config.testPackage) {
+
+        // add smart.json contents to our dictionary
+        memo[config.name] = config
+
+        if ('undefined' === typeof memo[config.name].regex) {
+          // if test package hasn't defined an explicit regex for the file
+          // watcher, default to the package name as a suffix. 
+          // Ex. name = "mocha-web"
+          //     regex = "-mocha-web.js"
+          memo[config.name].regex = '-' + config.name + '.js';
+        }
+
+        // create a regexp obj for use in file watching
+        memo[config.name]._regexp = new RegExp(memo[config.name].regex);
+      }
+    } catch (ex) {
+      DEBUG && console.log('Error reading file:', smartJsonPath, ex);
     }
-  }
+    return memo;
+  }, {});
 
-  if (!config) {
-    DEBUG && console.log('  using default velocity config');
-    config = defaultConfig;
-  }
-
-  return config;
-}  // end _loadConfig
-
+  return testConfigDictionary;
+}  // end _loadTestPackageConfigs 
 
  
 /**
  * Initialize the directory/file watcher.
  *
  * @method _initWatcher
- * @param {Object} config  See `_loadConfig`.
+ * @param {Object} config  See `_loadTestPackageConfigs`.
  * @private
  */
 function _initWatcher (config) {
-  var absoluteTestDirs,
-      _watcher,
-      testFileRegex = '-(' + config.frameworks.join('|') + ')' + 
-                      config.regex;
-  
-  DEBUG && console.log('Velocity testFileRegex', testFileRegex);
+  var testDir,
+      _watcher;
 
-  absoluteTestDirs = _.map(config.testDirs, function (testDir) {
-    return path.join(process.env.PWD, testDir);
-  });
+  testDir = path.join(process.env.PWD, TEST_DIR);
 
-  _watcher = chokidar.watch(absoluteTestDirs, {ignored: /[\/\\]\./});
+  _watcher = chokidar.watch(testDir, {ignored: /[\/\\]\./});
 
 
   _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
     var relativePath,
         filename,
         targetFramework,
+        data;
 
     filePath = path.normalize(filePath);
 
@@ -249,26 +241,34 @@ function _initWatcher (config) {
 
     filename = path.basename(filePath);
 
-    if (filename.match(testFileRegex)) {
-      targetFramework = _.filter(config.frameworks, function (framework) {
-        return filename.match('-' + framework + config.regex);
-      })[0];
+    targetFramework = _.find(config, function (framework) {
+      return framework._regexp.test(filename);
+    });
 
-      DEBUG && console.log(targetFramework, ' <= ', filePath)
+    if (targetFramework) {
+      DEBUG && console.log(targetFramework.name, ' <= ', filePath);
 
       relativePath = filePath.substring(process.env.PWD.length);
       if (relativePath[0] === path.sep) {
-        relativePath = relativePath.substring(1)
+        relativePath = relativePath.substring(1);
       }
 
-      VelocityTestFiles.insert({
+      data = {
         _id: filePath,
         name: filename,
         absolutePath: filePath,
         relativePath: relativePath,
-        targetFramework: targetFramework,
+        targetFramework: targetFramework.name,
         lastModified: Date.now()
-      });
+      };
+
+      // ### TEMPORARY HACK
+      if (targetFramework.name == 'velocity-jasmine-unit') {
+        data.targetFramework = 'jasmine-unit';
+      }
+
+      //DEBUG && console.log('data', data);
+      VelocityTestFiles.insert(data);
     }
   }));  // end watcher.on 'add'
 
@@ -298,7 +298,7 @@ function _initWatcher (config) {
  * Re-init file watcher and clear all test results.
  *
  * @method _reset
- * @param {Object} config  See `_loadConfig`.
+ * @param {Object} config  See `_loadTestPackageConfigs`.
  * @private
  */
 function _reset (config) {
