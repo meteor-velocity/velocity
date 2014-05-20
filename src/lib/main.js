@@ -11,17 +11,17 @@ var _ = Npm.require('lodash'),
       regex: '.(js|coffee)',
       testDirs: ['tests']
     },
-    config,
+    _config,
     watcher;
 
 
 DEBUG && console.log('PWD', process.env.PWD);
 
-config = _loadConfig();
-DEBUG && console.log('velocity config =', JSON.stringify(config, null, 2));
+_config = _loadConfig();
+DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
 // kick-off everything
-_reset();
+_reset(_config);
 
 
 
@@ -31,10 +31,29 @@ _reset();
 
 Meteor.methods({
 
+  /**
+   * Meteor method: reset
+   * Re-init file watcher and clear all test results.
+   *
+   * @method reset
+   */
   reset: function () {
-    _reset();
+    _reset(_config);
   },
 
+  /**
+   * Meteor method: resetReports
+   * Clear all test results.
+   *
+   * @method resetReports
+   * @param {Object} [options] Optional, specify specific framework to clear
+   *                 and/or define a list of tests to keep.
+   *                 ex.
+   *                 {
+   *                   framework: "jasmine-unit",
+   *                   notIn: ['tests/auth-jasmine-unit.js']
+   *                 }
+   */
   resetReports: function (options) {
     var query = {};
     if (options.framework) {
@@ -47,10 +66,24 @@ Meteor.methods({
     _updateAggregateReports();
   },
 
+  /**
+   * Meteor method: postLog
+   * Log a method to the central Velocity log store.
+   *
+   * @method postLog
+   * @param {Object} options Required parameters:
+   *                   type - String
+   *                   message - String
+   *                   framework - String  ex. 'jasmine-unit'
+   *                 
+   *                 Optional parameters:
+   *                   timestamp - Date
+   */
   postLog: function (options) {
-    if (!options || !options.type || !options.message || !options.framework) {
-      throw new Error('type, message and framework are required fields.')
-    }
+    var requiredFields = ['type', 'message', 'framework']
+
+    _checkRequired (requiredFields, options);
+
     VelocityLogs.insert({
       timestamp: options.timestamp ? options.timestamp : Date.now(),
       type: options.type,
@@ -59,36 +92,40 @@ Meteor.methods({
     });
   },
 
+  /**
+   * Meteor method: postResult
+   * 
+   * @method postResult
+   * @param {Object} options Required parameters:
+   *                   id - String
+   *                   name - String
+   *                   framework - String  ex. 'jasmine-unit'
+   *                   result - String
+   *                 
+   *                 Suggested optional parameters:
+   *                   timestamp - Date
+   *                   time
+   *                   async
+   *                   timeOut
+   *                   pending
+   *                   failureType
+   *                   failureMessage
+   *                   failureStackTrace
+   *                   ancestors
+   */
   postResult: function (options) {
     var requiredFields = ['id', 'name', 'framework', 'result'],
-        optionalFields = [
-          'timestamp',
-          'time',
-          'async',
-          'timeOut',
-          'pending',
-          'failureType',
-          'failureMessage',
-          'failureStackTrace',
-          'ancestors'
-        ],
-        result;
+        data = {};
 
     options = options || {};
 
     _checkRequired (requiredFields, options);
 
-    result = {
-      name: options.name,
-      framework: options.framework,
-      result: options.result
-    };
+    for (var fieldName in options) {
+      data[fieldName] = options[fieldName];
+    }
 
-    _.each(optionalFields, function (option) {
-      result[option] = options[option] ? options[option] : '';
-    });
-
-    VelocityTestReports.upsert(options.id, {$set: result});
+    VelocityTestReports.upsert(options.id, {$set: data});
     _updateAggregateReports();
   }  // end postResult
 
@@ -101,6 +138,15 @@ Meteor.methods({
 // Private functions
 //
 
+/**
+ * Ensures that each require field is found on the target object.
+ * Throws exception if a required field is undefined, null or an empty string.
+ *
+ * @method _checkRequired
+ * @param {Array} requiredFields - list of required field names
+ * @param {Object} target - target object to check
+ * @private
+ */
 function _checkRequired (requiredFields, target) {
   _.each(requiredFields, function (name) {
     if (!target[name]) {
@@ -110,6 +156,26 @@ function _checkRequired (requiredFields, target) {
   })
 }
 
+/**
+ * Attempts to load velocity configuration information.
+ * First checks for a `velocity.json` file in the app directory.
+ * Then checks `Meteor.settings.velocity`.  Then uses the default config
+ * if none of the others are found.
+ *
+ * NOTE: Contents of this config are subject to frequent change until
+ *       `velocity`s design is more stable. 
+ *
+ * @example
+ *     {
+ *       "frameworks": ["jasmine-unit", "mocha-web"],
+ *       "regex": ".(js|coffee)",
+ *       "testDirs": ["tests"]
+ *     }
+ * 
+ * @method _loadConfig
+ * @return {Object} the configuration object
+ * @private
+ */
 function _loadConfig () {
   var config,
       velocityConfigFile,
@@ -148,7 +214,14 @@ function _loadConfig () {
 
 
  
-function _initWatcher () {
+/**
+ * Initialize the directory/file watcher.
+ *
+ * @method _initWatcher
+ * @param {Object} config  See `_loadConfig`.
+ * @private
+ */
+function _initWatcher (config) {
   var absoluteTestDirs,
       _watcher,
       testFileRegex = '-(' + config.frameworks.join('|') + ')' + 
@@ -164,8 +237,6 @@ function _initWatcher () {
 
 
   _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
-    'use strict';
-
     var relativePath,
         filename,
         targetFramework,
@@ -214,14 +285,21 @@ function _initWatcher () {
     // just that file. This required changing the postResult API and we could 
     // do it, but the brute force method of reset() will do the trick until we 
     // want to optimize VelocityTestFiles.remove(filePath);
-    _reset();
+    _reset(config);
   }));
 
   return _watcher;
 }  // end _initWatcher 
 
 
-function _reset () {
+/**
+ * Re-init file watcher and clear all test results.
+ *
+ * @method _reset
+ * @param {Object} config  See `_loadConfig`.
+ * @private
+ */
+function _reset (config) {
   if (watcher) {
     watcher.close();
   }
@@ -235,9 +313,15 @@ function _reset () {
     result: 'pending'
   });
 
-  watcher = _initWatcher();
+  watcher = _initWatcher(config);
 }
 
+/**
+ * If any one test has failed, mark the aggregate test result as failed.
+ *
+ * @method _updateAggregateReports 
+ * @private
+ */
 function _updateAggregateReports () {
   var failedResult,
       result;
