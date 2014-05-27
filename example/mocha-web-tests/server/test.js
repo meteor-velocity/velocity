@@ -1,10 +1,9 @@
-MochaWeb.testOnly(function(){
-  var assert = Npm.require("assert");
-
-  describe("The First Group", function(){
-    it("The First Test", function(){
-      console.log("mocha-web: First test executed");
-      assert(true, "a very true test");
-    })
+if (!(typeof MochaWeb === 'undefined')){
+  MochaWeb.testOnly(function(){
+    describe("Server initialization", function(){
+      it("should insert 6 players into the database after server start", function(){
+        chai.assert.equal(Players.find().count(), 6);
+      });
+    });
   });
-});
+}
