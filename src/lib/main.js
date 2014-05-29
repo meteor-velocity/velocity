@@ -4,7 +4,6 @@ var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),
     chokidar = Npm.require('chokidar'),
-    _ = Npm.require('lodash'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
     TEST_DIR = 'tests',
@@ -72,14 +71,14 @@ Meteor.methods({
    *                   type - String
    *                   message - String
    *                   framework - String  ex. 'jasmine-unit'
-   *                 
+   *
    *                 Optional parameters:
    *                   timestamp - Date
    */
   postLog: function (options) {
-    var requiredFields = ['type', 'message', 'framework']
+    var requiredFields = ['type', 'message', 'framework'];
 
-    _checkRequired (requiredFields, options);
+    _checkRequired(requiredFields, options);
 
     VelocityLogs.insert({
       timestamp: options.timestamp ? options.timestamp : Date.now(),
@@ -92,14 +91,14 @@ Meteor.methods({
   /**
    * Meteor method: postResult
    * Record the results of a test run.
-   * 
+   *
    * @method postResult
    * @param {Object} data Required fields:
    *                   id - String
    *                   name - String
    *                   framework - String  ex. 'jasmine-unit'
    *                   result - String.  ex. 'failed', 'passed'
-   *                 
+   *
    *                 Suggested fields:
    *                   timestamp
    *                   time
@@ -116,7 +115,7 @@ Meteor.methods({
 
     data = data || {};
 
-    _checkRequired (requiredFields, data);
+    _checkRequired(requiredFields, data);
 
     VelocityTestReports.upsert(data.id, {$set: data});
     _updateAggregateReports();
@@ -144,7 +143,7 @@ function _checkRequired (requiredFields, target) {
   _.each(requiredFields, function (name) {
     if (!target[name]) {
       throw new Error("Required field '" + name + "' is missing." +
-                      "Result not posted.")
+        "Result not posted.")
     }
   })
 }
@@ -189,11 +188,11 @@ function _loadTestPackageConfigs () {
       if (config.name && config.testPackage) {
 
         // add smart.json contents to our dictionary
-        memo[config.name] = config
+        memo[config.name] = config;
 
         if ('undefined' === typeof memo[config.name].regex) {
           // if test package hasn't defined an explicit regex for the file
-          // watcher, default to the package name as a suffix. 
+          // watcher, default to the package name as a suffix.
           // Ex. name = "mocha-web"
           //     regex = "-mocha-web.js"
           memo[config.name].regex = '-' + config.name + '.js';
@@ -211,7 +210,7 @@ function _loadTestPackageConfigs () {
   return testConfigDictionary;
 }  // end _loadTestPackageConfigs 
 
- 
+
 /**
  * Initialize the directory/file watcher.
  *
@@ -226,7 +225,6 @@ function _initWatcher (config) {
   testDir = path.join(process.env.PWD, TEST_DIR);
 
   _watcher = chokidar.watch(testDir, {ignored: /[\/\\]\./});
-
 
   _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
     var relativePath,
@@ -283,8 +281,8 @@ function _initWatcher (config) {
   _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
     DEBUG && console.log('File removed:', filePath);
     // If we only remove the file, we also need to remove the test results for
-    // just that file. This required changing the postResult API and we could 
-    // do it, but the brute force method of reset() will do the trick until we 
+    // just that file. This required changing the postResult API and we could
+    // do it, but the brute force method of reset() will do the trick until we
     // want to optimize VelocityTestFiles.remove(filePath);
     _reset(config);
   }));
@@ -320,7 +318,7 @@ function _reset (config) {
 /**
  * If any one test has failed, mark the aggregate test result as failed.
  *
- * @method _updateAggregateReports 
+ * @method _updateAggregateReports
  * @private
  */
 function _updateAggregateReports () {
@@ -328,8 +326,8 @@ function _updateAggregateReports () {
       result;
 
   if (!VelocityTestReports.findOne({result: ''})) {
-    failedResult = VelocityTestReports.findOne({result: 'failed'})
-    result = failedResult ?  'failed' : 'passed'
+    failedResult = VelocityTestReports.findOne({result: 'failed'});
+    result = failedResult ? 'failed' : 'passed';
 
     VelocityAggregateReports.update('result', {$set: {result: result}});
   }
