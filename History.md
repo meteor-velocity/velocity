@@ -1,3 +1,8 @@
+## v0.1.5
+
+Fix for report overlay when used in conjunction with accounts-*
+
+
 ## v0.1.4
 
 Auto-detect velocity-compatible packages via `testPackages:true` in their smart.json files.
