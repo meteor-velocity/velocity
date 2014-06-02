@@ -119,7 +119,27 @@ Meteor.methods({
 
     VelocityTestReports.upsert(data.id, {$set: data});
     _updateAggregateReports();
-  }  // end postResult
+  },  // end postResult
+
+  /**
+   * Meteor method: completed
+   * Frameworks must call this method to inform Velocity they have completed
+   * their current test runs. Velocity uses this flag when running in CI mode.
+   *
+   * @method completed
+   * @param {Object} data Required fields:
+   *                   framework - String  ex. 'jasmine-unit'
+   *
+   */
+  completed: function (data) {
+    var requiredFields = ['framework'];
+
+    data = data || {};
+
+    _checkRequired(requiredFields, data);
+
+    VelocityAggregateReports.upsert({'framework': data.framework}, {$set: {'completed': true}});
+  }  // end completed
 
 });  // end Meteor methods
 
