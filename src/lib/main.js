@@ -8,12 +8,14 @@ var _ = Npm.require('lodash'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
     TEST_DIR = 'tests',
     _config,
+    _testFrameworks,
     watcher;
 
 
 DEBUG && console.log('PWD', process.env.PWD);
 
 _config = _loadTestPackageConfigs();
+_testFrameworks = _.pluck(_config, function (config) { return config.name; });
 DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
 // kick-off everything
@@ -60,6 +62,21 @@ Meteor.methods({
     }
     VelocityTestReports.remove(query);
     _updateAggregateReports();
+  },
+
+  /**
+   * Meteor method: resetLogs
+   * Clear all log entried.
+   *
+   * @method resetLogs
+   * @param {Object} [options] Optional, specify specific framework to clear
+   */
+  resetLogs: function (options) {
+    var query = {};
+    if (options.framework) {
+      query.framework = options.framework;
+    }
+    VelocityLogs.remove(query);
   },
 
   /**
@@ -138,7 +155,8 @@ Meteor.methods({
 
     _checkRequired(requiredFields, data);
 
-    VelocityAggregateReports.upsert({'framework': data.framework}, {$set: {'completed': true}});
+    VelocityAggregateReports.upsert({'name': data.framework}, {$set: {'result': 'completed'}});
+    _updateAggregateReports();
   }  // end completed
 
 });  // end Meteor methods
@@ -325,11 +343,21 @@ function _reset (config) {
 
   VelocityTestFiles.remove({});
   VelocityTestReports.remove({});
+  VelocityLogs.remove({});
   VelocityAggregateReports.remove({});
   VelocityAggregateReports.insert({
-    _id: 'result',
-    name: 'Aggregate Result',
+    name: 'aggregateResult',
     result: 'pending'
+  });
+  VelocityAggregateReports.insert({
+    name: 'aggregateComplete',
+    result: 'pending'
+  });
+  _.each(_testFrameworks, function (testFramework) {
+    VelocityAggregateReports.insert({
+      name: testFramework,
+      result: 'pending'
+    });
   });
 
   watcher = _initWatcher(config);
@@ -342,6 +370,7 @@ function _reset (config) {
  * @private
  */
 function _updateAggregateReports () {
+
   var failedResult,
       result;
 
@@ -349,6 +378,14 @@ function _updateAggregateReports () {
     failedResult = VelocityTestReports.findOne({result: 'failed'});
     result = failedResult ? 'failed' : 'passed';
 
-    VelocityAggregateReports.update('result', {$set: {result: result}});
+    VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: result}});
   }
+
+  // if all test frameworks have completed, upsert an aggregate completed record
+  var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
+
+  if (_testFrameworks.length === completedFrameworksCount) {
+    VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+  }
+
 }

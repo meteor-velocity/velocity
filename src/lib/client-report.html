@@ -9,7 +9,6 @@
             height: 20px;
             border-radius: 10px;
             z-index: 2147483647;
-            background-color: #aaa;
         }
 
         #velocity-overlay {
@@ -38,7 +37,7 @@
             background: rgba(255, 255, 51, .6);
         }
 
-        .passed {
+        .passed, .completed {
             background: rgba(0, 192, 0, .5);
         }
 
@@ -193,7 +192,7 @@
         {{> velocityLogs}}
     </div>
 
-    <a id="velocity-status-widget" class="{{aggregateResult.result}}"
+    <a id="velocity-status-widget" class="{{statusWidgetClass}}"
        href="javascript:void(0);"></a>
 
 </template>

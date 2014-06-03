@@ -14,8 +14,19 @@ Template.velocityLogs.logs = function () {
   return VelocityLogs.find();
 };
 
-Template.velocity.aggregateResult = function () {
-  return VelocityAggregateReports.findOne('result');
+Template.velocity.statusWidgetClass = function () {
+  var aggregateResult = VelocityAggregateReports.findOne({name: 'aggregateResult'})
+  console.log('aggregateResult', aggregateResult);
+  if (aggregateResult && aggregateResult.result === 'failed') {
+    return  'failed';
+  }
+
+  var aggregateComplete = VelocityAggregateReports.findOne({name: 'aggregateComplete'});
+  if (aggregateComplete && aggregateResult.result === 'passed' && aggregateComplete.result === 'completed') {
+    return 'passed';
+  }
+  console.log('pending');
+  return 'pending';
 };
 
 Template.velocity.overlayVisibility = function () {
