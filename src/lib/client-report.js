@@ -16,7 +16,6 @@ Template.velocityLogs.logs = function () {
 
 Template.velocity.statusWidgetClass = function () {
   var aggregateResult = VelocityAggregateReports.findOne({name: 'aggregateResult'})
-  console.log('aggregateResult', aggregateResult);
   if (aggregateResult && aggregateResult.result === 'failed') {
     return  'failed';
   }
@@ -25,18 +24,31 @@ Template.velocity.statusWidgetClass = function () {
   if (aggregateComplete && aggregateResult.result === 'passed' && aggregateComplete.result === 'completed') {
     return 'passed';
   }
-  console.log('pending');
   return 'pending';
 };
 
-Template.velocity.overlayVisibility = function () {
+Template.velocity.overlayIsVisible = function () {
   return amplify.store('velocityOverlayIsVisible') ? 'block' : 'none';
 };
 
+Template.velocityAggregateReports.isVisible = function () {
+  return amplify.store('velocityAggregateReportsIsVisible') ? 'block' : 'none';
+};
+Template.velocityTestReports.isVisible = function () {
+  return amplify.store('velocityTestReportsIsVisible') ? 'block' : 'none';
+};
+Template.velocityTestFiles.isVisible = function () {
+  return amplify.store('velocityTestFilesIsVisible') ? 'block' : 'none';
+};
+Template.velocityLogs.isVisible = function () {
+  return amplify.store('velocityLogsIsVisible') ? 'block' : 'none';
+};
+
 Template.velocity.events({
-  'click #velocity-status-widget': function () {
-    var $overlay = $('#velocity-overlay');
-    $overlay.toggle();
-    amplify.store('velocityOverlayIsVisible', $overlay.is(':visible'));
+  'click .display-toggle': function (ev) {
+    var targetId = $(ev.target).data('target'),
+        $target = $('#' + targetId);
+    $target.toggle();
+    amplify.store(targetId + 'IsVisible', $target.is(':visible'));
   }
 });
