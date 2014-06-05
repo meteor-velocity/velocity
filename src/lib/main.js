@@ -1,5 +1,10 @@
 "use strict";
 
+if (!(process.env.NODE_ENV == "development")){
+  // console.log("Not adding velocity code");
+  return
+}
+
 var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),
