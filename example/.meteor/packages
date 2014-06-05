@@ -12,3 +12,4 @@ coffeescript
 jasmine-unit
 coffeescript
 moment
+velocity-html-reporter

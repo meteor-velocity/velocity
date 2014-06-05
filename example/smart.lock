@@ -10,7 +10,11 @@
         "branch": "velocity"
       },
       "jasmine-unit": {},
-      "moment": {}
+      "moment": {},
+      "velocity-html-reporter": {
+        "git": "https://github.com/rissem/velocity-html-reporter",
+        "branch": "master"
+      }
     },
     "packages": {
       "velocity": {
@@ -23,13 +27,18 @@
       },
       "jasmine-unit": {
         "git": "https://github.com/xolvio/jasmine-unit.git",
-        "tag": "v0.1.4",
-        "commit": "8fb5b609a8eee5759ef160106b700748a2d4a7a5"
+        "tag": "v0.1.6",
+        "commit": "9ee65111bd67a881299ad4eee2860b7337304f91"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
         "tag": "v2.6.0",
         "commit": "26156df681750fd6e6ed77043eef32b6653ebbdf"
+      },
+      "velocity-html-reporter": {
+        "git": "https://github.com/rissem/velocity-html-reporter",
+        "branch": "master",
+        "commit": "56617514ccec3622b94a71165940e8fccddd8175"
       },
       "mirror": {
         "git": "https://github.com/xdissent/meteor-mirror.git",
