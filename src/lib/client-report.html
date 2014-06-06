@@ -11,12 +11,12 @@
             z-index: 2147483647;
         }
 
-        #velocity-overlay {
+        #velocityOverlay {
             background: rgba(255, 255, 255, 1);
             color: black;
             position: absolute;
             top: 10px;
-            right: 10px;
+            left: 10px;
             font-size: 12px;
             z-index: 2147483647;
         }
@@ -37,7 +37,7 @@
             background: rgba(255, 255, 51, .6);
         }
 
-        .passed {
+        .passed, .completed {
             background: rgba(0, 192, 0, .5);
         }
 
@@ -181,46 +181,57 @@
 
 <template name="velocity">
 
-    <div id="velocity-overlay" style="display: {{overlayVisibility}}">
-        <h1>Test Files</h1>
-        {{> velocityTestFiles}}
-        <h1>Aggregate Reports</h1>
+    <div id="velocityOverlay" style="display: {{overlayIsVisible}};">
+        <h3>Aggregate Reports
+            <a class="display-toggle" data-target="velocityAggregateReports"
+               href="javascript:void(0);">(show/hide)</a></h3>
         {{> velocityAggregateReports}}
-        <h1>Test Reports</h1>
+        <h3>Test Reports
+            <a class="display-toggle" data-target="velocityTestReports"
+               href="javascript:void(0);">(show/hide)</a></h3>
         {{> velocityTestReports}}
-        <h1>Logs</h1>
+        <h3>Logs
+            <a class="display-toggle" data-target="velocityLogs"
+               href="javascript:void(0);">(show/hide)</a></h3>
         {{> velocityLogs}}
+        <h3>Test Files
+            <a class="display-toggle" data-target="velocityTestFiles"
+               href="javascript:void(0);">(show/hide)</a></h3>
+        {{> velocityTestFiles}}
     </div>
 
-    <a id="velocity-status-widget" class="{{aggregateResult.result}}" href="javascript:void(0);"></a>
+    <a id="velocity-status-widget"
+       class="{{statusWidgetClass}} display-toggle"
+       data-target="velocityOverlay"
+       href="javascript:void(0);"></a>
 
 </template>
 
-<template name="velocityTestFiles">
-    <table>
+<template name="velocityAggregateReports">
+    <table id="velocityAggregateReports"
+           style="display: {{isVisible}};">
         <tr>
             <th>ID</th>
-            <th>Relative Path</th>
-            <th>Target Framework</th>
-            <th>Last Modified</th>
+            <th>Name</th>
+            <th>Result</th>
         </tr>
-        {{#each testFiles}}
-        {{> velocityTestFile}}
+        {{#each aggregateReports}}
+        {{> velocityAggregateReport}}
         {{/each}}
     </table>
 </template>
 
-<template name="velocityTestFile">
+<template name="velocityAggregateReport">
     <tr class="{{result}}">
         <td>{{_id}}</td>
-        <td>{{relativePath}}</td>
-        <td>{{targetFramework}}</td>
-        <td>{{lastModified}}</td>
+        <td>{{name}}</td>
+        <td>{{result}}</td>
     </tr>
 </template>
 
 <template name="velocityTestReports">
-    <table>
+    <table id="velocityTestReports"
+           style="display: {{isVisible}};">
         <tr>
             <th>ID</th>
             <th>Name</th>
@@ -258,29 +269,8 @@
     </tr>
 </template>
 
-<template name="velocityAggregateReports">
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Result</th>
-        </tr>
-        {{#each aggregateReports}}
-        {{> velocityAggregateReport}}
-        {{/each}}
-    </table>
-</template>
-
-<template name="velocityAggregateReport">
-    <tr class="{{result}}">
-        <td>{{_id}}</td>
-        <td>{{name}}</td>
-        <td>{{result}}</td>
-    </tr>
-</template>
-
 <template name="velocityLogs">
-    <table>
+    <table id="velocityLogs" style="display: {{isVisible}};">
         <tr>
             <th>Timestamp</th>
             <th>Type</th>
@@ -299,5 +289,29 @@
         <td>{{type}}</td>
         <td>{{message}}</td>
         <td>{{framework}}</td>
+    </tr>
+</template>
+
+<template name="velocityTestFiles">
+    <table id="velocityTestFiles"
+           style="display: {{isVisible}};">
+        <tr>
+            <th>ID</th>
+            <th>Relative Path</th>
+            <th>Target Framework</th>
+            <th>Last Modified</th>
+        </tr>
+        {{#each testFiles}}
+        {{> velocityTestFile}}
+        {{/each}}
+    </table>
+</template>
+
+<template name="velocityTestFile">
+    <tr class="{{result}}">
+        <td>{{_id}}</td>
+        <td>{{relativePath}}</td>
+        <td>{{targetFramework}}</td>
+        <td>{{lastModified}}</td>
     </tr>
 </template>

@@ -1,20 +1,26 @@
 "use strict";
 
+if (!(process.env.NODE_ENV == "development")){
+  // console.log("Not adding velocity code");
+  return
+}
+
 var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),
     chokidar = Npm.require('chokidar'),
-    _ = Npm.require('lodash'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
     TEST_DIR = 'tests',
     _config,
+    _testFrameworks,
     watcher;
 
 
 DEBUG && console.log('PWD', process.env.PWD);
 
 _config = _loadTestPackageConfigs();
+_testFrameworks = _.pluck(_config, function (config) { return config.name; });
 DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
 // kick-off everything
@@ -64,6 +70,21 @@ Meteor.methods({
   },
 
   /**
+   * Meteor method: resetLogs
+   * Clear all log entried.
+   *
+   * @method resetLogs
+   * @param {Object} [options] Optional, specify specific framework to clear
+   */
+  resetLogs: function (options) {
+    var query = {};
+    if (options.framework) {
+      query.framework = options.framework;
+    }
+    VelocityLogs.remove(query);
+  },
+
+  /**
    * Meteor method: postLog
    * Log a method to the central Velocity log store.
    *
@@ -72,14 +93,14 @@ Meteor.methods({
    *                   type - String
    *                   message - String
    *                   framework - String  ex. 'jasmine-unit'
-   *                 
+   *
    *                 Optional parameters:
    *                   timestamp - Date
    */
   postLog: function (options) {
-    var requiredFields = ['type', 'message', 'framework']
+    var requiredFields = ['type', 'message', 'framework'];
 
-    _checkRequired (requiredFields, options);
+    _checkRequired(requiredFields, options);
 
     VelocityLogs.insert({
       timestamp: options.timestamp ? options.timestamp : Date.now(),
@@ -92,14 +113,14 @@ Meteor.methods({
   /**
    * Meteor method: postResult
    * Record the results of a test run.
-   * 
+   *
    * @method postResult
    * @param {Object} data Required fields:
    *                   id - String
    *                   name - String
    *                   framework - String  ex. 'jasmine-unit'
    *                   result - String.  ex. 'failed', 'passed'
-   *                 
+   *
    *                 Suggested fields:
    *                   timestamp
    *                   time
@@ -116,11 +137,32 @@ Meteor.methods({
 
     data = data || {};
 
-    _checkRequired (requiredFields, data);
+    _checkRequired(requiredFields, data);
 
     VelocityTestReports.upsert(data.id, {$set: data});
     _updateAggregateReports();
-  }  // end postResult
+  },  // end postResult
+
+  /**
+   * Meteor method: completed
+   * Frameworks must call this method to inform Velocity they have completed
+   * their current test runs. Velocity uses this flag when running in CI mode.
+   *
+   * @method completed
+   * @param {Object} data Required fields:
+   *                   framework - String  ex. 'jasmine-unit'
+   *
+   */
+  completed: function (data) {
+    var requiredFields = ['framework'];
+
+    data = data || {};
+
+    _checkRequired(requiredFields, data);
+
+    VelocityAggregateReports.upsert({'name': data.framework}, {$set: {'result': 'completed'}});
+    _updateAggregateReports();
+  }  // end completed
 
 });  // end Meteor methods
 
@@ -144,7 +186,7 @@ function _checkRequired (requiredFields, target) {
   _.each(requiredFields, function (name) {
     if (!target[name]) {
       throw new Error("Required field '" + name + "' is missing." +
-                      "Result not posted.")
+        "Result not posted.")
     }
   })
 }
@@ -189,11 +231,11 @@ function _loadTestPackageConfigs () {
       if (config.name && config.testPackage) {
 
         // add smart.json contents to our dictionary
-        memo[config.name] = config
+        memo[config.name] = config;
 
         if ('undefined' === typeof memo[config.name].regex) {
           // if test package hasn't defined an explicit regex for the file
-          // watcher, default to the package name as a suffix. 
+          // watcher, default to the package name as a suffix.
           // Ex. name = "mocha-web"
           //     regex = "-mocha-web.js"
           memo[config.name].regex = '-' + config.name + '.js';
@@ -211,7 +253,7 @@ function _loadTestPackageConfigs () {
   return testConfigDictionary;
 }  // end _loadTestPackageConfigs 
 
- 
+
 /**
  * Initialize the directory/file watcher.
  *
@@ -226,7 +268,6 @@ function _initWatcher (config) {
   testDir = path.join(process.env.PWD, TEST_DIR);
 
   _watcher = chokidar.watch(testDir, {ignored: /[\/\\]\./});
-
 
   _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
     var relativePath,
@@ -283,8 +324,8 @@ function _initWatcher (config) {
   _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
     DEBUG && console.log('File removed:', filePath);
     // If we only remove the file, we also need to remove the test results for
-    // just that file. This required changing the postResult API and we could 
-    // do it, but the brute force method of reset() will do the trick until we 
+    // just that file. This required changing the postResult API and we could
+    // do it, but the brute force method of reset() will do the trick until we
     // want to optimize VelocityTestFiles.remove(filePath);
     _reset(config);
   }));
@@ -307,11 +348,21 @@ function _reset (config) {
 
   VelocityTestFiles.remove({});
   VelocityTestReports.remove({});
+  VelocityLogs.remove({});
   VelocityAggregateReports.remove({});
   VelocityAggregateReports.insert({
-    _id: 'result',
-    name: 'Aggregate Result',
+    name: 'aggregateResult',
     result: 'pending'
+  });
+  VelocityAggregateReports.insert({
+    name: 'aggregateComplete',
+    result: 'pending'
+  });
+  _.each(_testFrameworks, function (testFramework) {
+    VelocityAggregateReports.insert({
+      name: testFramework,
+      result: 'pending'
+    });
   });
 
   watcher = _initWatcher(config);
@@ -320,17 +371,26 @@ function _reset (config) {
 /**
  * If any one test has failed, mark the aggregate test result as failed.
  *
- * @method _updateAggregateReports 
+ * @method _updateAggregateReports
  * @private
  */
 function _updateAggregateReports () {
+
   var failedResult,
       result;
 
   if (!VelocityTestReports.findOne({result: ''})) {
-    failedResult = VelocityTestReports.findOne({result: 'failed'})
-    result = failedResult ?  'failed' : 'passed'
+    failedResult = VelocityTestReports.findOne({result: 'failed'});
+    result = failedResult ? 'failed' : 'passed';
 
-    VelocityAggregateReports.update('result', {$set: {result: result}});
+    VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: result}});
   }
+
+  // if all test frameworks have completed, upsert an aggregate completed record
+  var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
+
+  if (_testFrameworks.length === completedFrameworksCount) {
+    VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+  }
+
 }
