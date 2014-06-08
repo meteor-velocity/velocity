@@ -9,9 +9,6 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
-
-  api.use(['templating', 'amplify'], 'client');
-
   api.add_files('lib/collections.js', ['client', 'server']);
   api.export('VelocityTestFiles', ['client', 'server']);
   api.export('VelocityTestReports', ['client', 'server']);
@@ -19,9 +16,4 @@ Package.on_use(function (api) {
   api.export('VelocityLogs', ['client', 'server']);
 
   api.add_files('lib/main.js', 'server');
-
-
-  api.add_files('lib/client-report.html', 'client');
-  api.add_files('lib/client-report.js', 'client');
-
 });

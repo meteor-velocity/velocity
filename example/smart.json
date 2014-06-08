@@ -11,6 +11,10 @@
     "jasmine-unit": {
         "-path": "../../jasmine-unit"
     },
-    "moment": {}
+    "moment": {},
+    "velocity-html-reporter": {
+      "git": "https://github.com/rissem/velocity-html-reporter",
+      "branch": "master"
+    }
   }
 }
