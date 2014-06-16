@@ -5,6 +5,11 @@ if (!(process.env.NODE_ENV == "development")){
   return
 }
 
+if (Mirror.isMirror){
+  // console.log("JUST A MIRROR, exiting...", Mirror.isMirror);
+  return
+}
+
 var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),

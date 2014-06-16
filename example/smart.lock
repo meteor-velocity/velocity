@@ -23,7 +23,7 @@
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity",
-        "commit": "062cdfeb8338fdb95b20b832e4dd69680ba0c4da"
+        "commit": "9feb37c543c60f650c225db791434213ddbb7cba"
       },
       "jasmine-unit": {
         "git": "https://github.com/xolvio/jasmine-unit.git",
