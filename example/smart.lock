@@ -27,8 +27,8 @@
       },
       "jasmine-unit": {
         "git": "https://github.com/xolvio/jasmine-unit.git",
-        "tag": "v0.1.8",
-        "commit": "abd4abd67585524a82cf57c5f0fb430f474beca3"
+        "tag": "v0.1.10",
+        "commit": "b5797ba4cacd45297427bc8a4cae73cc82fcea09"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
@@ -47,8 +47,8 @@
       },
       "package-stubber": {
         "git": "https://github.com/alanning/meteor-package-stubber.git",
-        "tag": "v0.0.1",
-        "commit": "08f3a3f89f95c668a43082a909787098f1aa2ee1"
+        "tag": "v0.0.3",
+        "commit": "bf8a11d648e266212867068b8f11280281129dbc"
       }
     }
   }
