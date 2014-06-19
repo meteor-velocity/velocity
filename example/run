@@ -3,6 +3,8 @@
 ## This file is useful for testing the actual velocity framework itself and 
 ## will eventually be removed!
 
+export DEBUG=1
 export VELOCITY_DEBUG=1
+export JASMINE_DEBUG=1
 export MONGO_URL=mongodb://localhost:27017/velocity
 meteor
