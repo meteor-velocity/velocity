@@ -23,12 +23,12 @@
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity",
-        "commit": "9feb37c543c60f650c225db791434213ddbb7cba"
+        "commit": "ea6f1eb2bfea6e775e859ec6a7a3e239ee582e75"
       },
       "jasmine-unit": {
         "git": "https://github.com/xolvio/jasmine-unit.git",
-        "tag": "v0.1.7",
-        "commit": "f7bc4a504d87d124d8ce566c28b0240f4f4b0e0c"
+        "tag": "v0.1.10",
+        "commit": "b5797ba4cacd45297427bc8a4cae73cc82fcea09"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
@@ -44,6 +44,11 @@
         "git": "https://github.com/xdissent/meteor-mirror.git",
         "tag": "v0.0.2",
         "commit": "03d965dcab2f976a1fdc6ce513edcd4c17b75746"
+      },
+      "package-stubber": {
+        "git": "https://github.com/alanning/meteor-package-stubber.git",
+        "tag": "v0.0.3",
+        "commit": "bf8a11d648e266212867068b8f11280281129dbc"
       }
     }
   }
