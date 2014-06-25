@@ -13,3 +13,4 @@ jasmine-unit
 moment
 velocity-html-reporter
 things
+iron-router

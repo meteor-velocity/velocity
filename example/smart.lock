@@ -14,7 +14,8 @@
       "velocity-html-reporter": {
         "git": "https://github.com/rissem/velocity-html-reporter",
         "branch": "master"
-      }
+      },
+      "iron-router": {}
     },
     "packages": {
       "velocity": {
@@ -23,12 +24,12 @@
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity",
-        "commit": "9feb37c543c60f650c225db791434213ddbb7cba"
+        "commit": "d1edce821096ff28b66370622ca9b69a7b5a54e7"
       },
       "jasmine-unit": {
         "git": "https://github.com/xolvio/jasmine-unit.git",
-        "tag": "v0.1.10",
-        "commit": "b5797ba4cacd45297427bc8a4cae73cc82fcea09"
+        "tag": "v0.1.11",
+        "commit": "342e3203994db8c9acf6060a90509824bdf3dda9"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
@@ -38,7 +39,12 @@
       "velocity-html-reporter": {
         "git": "https://github.com/rissem/velocity-html-reporter",
         "branch": "master",
-        "commit": "fe20c2e0029862b5f6d8b346f47290677020afab"
+        "commit": "bf4282295a07e88ef3f312409d613e0c0470be61"
+      },
+      "iron-router": {
+        "git": "https://github.com/EventedMind/iron-router.git",
+        "tag": "v0.7.1",
+        "commit": "d1ffb3f06ea4c112132b030f2eb1a70b81675ecb"
       },
       "mirror": {
         "git": "https://github.com/xdissent/meteor-mirror.git",
@@ -47,8 +53,13 @@
       },
       "package-stubber": {
         "git": "https://github.com/alanning/meteor-package-stubber.git",
-        "tag": "v0.0.3",
-        "commit": "bf8a11d648e266212867068b8f11280281129dbc"
+        "tag": "v0.0.5",
+        "commit": "753a0f64a18b721223a7a1149dbab4af959382d5"
+      },
+      "blaze-layout": {
+        "git": "https://github.com/EventedMind/blaze-layout.git",
+        "tag": "v0.2.4",
+        "commit": "b40e9b0612329288d75cf52ad14a7da64bb8618f"
       }
     }
   }
