@@ -4,6 +4,7 @@ var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),
     Rsync = Npm.require('rsync'),
+    fork = Npm.require('child_process').fork,
     chokidar = Npm.require('chokidar'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
@@ -19,7 +20,7 @@ _config = _loadTestPackageConfigs();
 _testFrameworks = _.pluck(_config, function (config) { return config.name; });
 DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
-if ((process.env.NODE_ENV == "development")) {
+if (!process.env.IS_MIRROR && (process.env.NODE_ENV == "development")) {
   // kick-off everything
   _reset(_config);
 } else {
@@ -366,7 +367,7 @@ function _reset (config) {
   });
 
   // Meteor just reloaded us which means we should rsync the app files
-  _syncMirror();
+  _syncAndStartMirror();
 
   watcher = _initWatcher(config);
 }
@@ -401,41 +402,53 @@ function _updateAggregateReports () {
 /**
  * Creates a mirror of the application under .meteor/local/.mirror
  * Any files with the pattern tests/.*  are not copied, this stops .report
- * directory from also being copied.
+ * directory from also being copied. The mirror is then started using  a node
+ * fork
  *
- * @method _syncMirror
+ * @method _syncAndStartMirror
  * @private
  */
-function _syncMirror () {
+function _syncAndStartMirror () {
 
-  var cmd = new Rsync()
-    .shell('ssh')
-    .flags('avz')
-    .set('delete')
-    .set('q')
-    .set('delay-updates')
-    .set('force')
-    .exclude(['.meteor/local','tests/.*'])
-    .source(process.env.PWD)
-    .destination(process.env.PWD + ',.meteor,local,.mirror'.split(',').join(path.sep));
+  var mirrorBasePath = process.env.PWD + '/.meteor/local/.mirror'.split('/').join(path.sep),
+      cmd = new Rsync()
+        .shell('ssh')
+        .flags('av')
+        .set('delete')
+        .set('q')
+        .set('delay-updates')
+        .set('force')
+        .exclude(['.meteor/local/.mirror', 'tests/.*'])
+        .source(process.env.PWD + path.sep)
+        .destination(mirrorBasePath);
 
   var then = Date.now();
-
   cmd.execute(function (error, code, cmd) {
     console.log('All done executing', cmd);
-    console.log('took', Date.now() - then);
+    console.log('rsync took', Date.now() - then);
+
+    // TODO do magic here like callback frameworks to let them do what they need?
+    // For now, only mocha-web tests are going to be copied outside the tests
+    // directory so they can be watched by meteor
+
+    var mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1');
+
+    // start meteor on the mirror using a different port and different db schema
+    var args = {
+      silent: true,
+      cwd: process.env.PWD,
+      env: _.extend({}, process.env, {
+        PORT: 5000,
+        ROOT_URL: 'http://localhost:5000/',
+        MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/mirror',
+        METEOR_SETTINGS: JSON.stringify(Meteor.settings),
+        IS_MIRROR: true
+      })
+    };
+
+    var child = fork(mirrorBasePath + '/.meteor/local/build/main.js'.split('/').join(path.sep), args);
+    child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stderr);
+
   });
-
-//  var cmd = 'rsync -av --delete -q --delay-updates --force --exclude="tests" <%= basePath %>/app/ <%= basePath %>/build/mirror_app;' +
-//    'mkdir -p <%= basePath %>/build/mirror_app/packages;' +
-//    'cd <%= basePath %>/build/mirror_app/packages;' +
-//    'ln -s ' + 'RTD_BASE_PATH' + '/lib/istanbul-middleware-port .;' +
-//    'ln -s ' + 'RTD_BASE_PATH' + '/lib/meteor-fixture .;' +
-//    'cp <%= basePath %>/test/acceptance/fixtures/* <%= basePath %>/build/mirror_app/server;' +
-//    'echo >> <%= basePath %>/build/mirror_app/.meteor/packages;' +
-//    'echo http >> <%= basePath %>/build/mirror_app/.meteor/packages;' +
-//    'echo istanbul-middleware-port >> <%= basePath %>/build/mirror_app/.meteor/packages;' +
-//    'echo meteor-fixture >> <%= basePath %>/build/mirror_app/.meteor/packages;';
-
-
 }
