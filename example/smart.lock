@@ -13,7 +13,7 @@
       "moment": {},
       "velocity-html-reporter": {
         "git": "https://github.com/rissem/velocity-html-reporter",
-        "branch": "master"
+        "branch": "report-tree"
       }
     },
     "packages": {
@@ -23,12 +23,12 @@
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity",
-        "commit": "9feb37c543c60f650c225db791434213ddbb7cba"
+        "commit": "d1edce821096ff28b66370622ca9b69a7b5a54e7"
       },
       "jasmine-unit": {
         "git": "https://github.com/xolvio/jasmine-unit.git",
-        "tag": "v0.1.8",
-        "commit": "abd4abd67585524a82cf57c5f0fb430f474beca3"
+        "tag": "v0.1.11",
+        "commit": "342e3203994db8c9acf6060a90509824bdf3dda9"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
@@ -37,8 +37,8 @@
       },
       "velocity-html-reporter": {
         "git": "https://github.com/rissem/velocity-html-reporter",
-        "branch": "master",
-        "commit": "fe20c2e0029862b5f6d8b346f47290677020afab"
+        "branch": "report-tree",
+        "commit": "a757c4158ea398b4c5a2532d911f98a1f8a60e31"
       },
       "mirror": {
         "git": "https://github.com/xdissent/meteor-mirror.git",
@@ -47,8 +47,8 @@
       },
       "package-stubber": {
         "git": "https://github.com/alanning/meteor-package-stubber.git",
-        "tag": "v0.0.1",
-        "commit": "08f3a3f89f95c668a43082a909787098f1aa2ee1"
+        "tag": "v0.0.5",
+        "commit": "753a0f64a18b721223a7a1149dbab4af959382d5"
       }
     }
   }

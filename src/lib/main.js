@@ -1,13 +1,9 @@
 "use strict";
 
-if (!(process.env.NODE_ENV == "development")){
-  // console.log("Not adding velocity code");
-  return
-}
-
 var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),
+    Rsync = Npm.require('rsync'),
     chokidar = Npm.require('chokidar'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
@@ -23,8 +19,12 @@ _config = _loadTestPackageConfigs();
 _testFrameworks = _.pluck(_config, function (config) { return config.name; });
 DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
-// kick-off everything
-_reset(_config);
+if ((process.env.NODE_ENV == "development")) {
+  // kick-off everything
+  _reset(_config);
+} else {
+  console.log("Not adding velocity code");
+}
 
 
 
@@ -365,6 +365,9 @@ function _reset (config) {
     });
   });
 
+  // Meteor just reloaded us which means we should rsync the app files
+  _syncMirror();
+
   watcher = _initWatcher(config);
 }
 
@@ -392,5 +395,47 @@ function _updateAggregateReports () {
   if (_testFrameworks.length === completedFrameworksCount) {
     VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
   }
+
+}
+
+/**
+ * Creates a mirror of the application under .meteor/local/.mirror
+ * Any files with the pattern tests/.*  are not copied, this stops .report
+ * directory from also being copied.
+ *
+ * @method _syncMirror
+ * @private
+ */
+function _syncMirror () {
+
+  var cmd = new Rsync()
+    .shell('ssh')
+    .flags('avz')
+    .set('delete')
+    .set('q')
+    .set('delay-updates')
+    .set('force')
+    .exclude(['.meteor/local','tests/.*'])
+    .source(process.env.PWD)
+    .destination(process.env.PWD + ',.meteor,local,.mirror'.split(',').join(path.sep));
+
+  var then = Date.now();
+
+  cmd.execute(function (error, code, cmd) {
+    console.log('All done executing', cmd);
+    console.log('took', Date.now() - then);
+  });
+
+//  var cmd = 'rsync -av --delete -q --delay-updates --force --exclude="tests" <%= basePath %>/app/ <%= basePath %>/build/mirror_app;' +
+//    'mkdir -p <%= basePath %>/build/mirror_app/packages;' +
+//    'cd <%= basePath %>/build/mirror_app/packages;' +
+//    'ln -s ' + 'RTD_BASE_PATH' + '/lib/istanbul-middleware-port .;' +
+//    'ln -s ' + 'RTD_BASE_PATH' + '/lib/meteor-fixture .;' +
+//    'cp <%= basePath %>/test/acceptance/fixtures/* <%= basePath %>/build/mirror_app/server;' +
+//    'echo >> <%= basePath %>/build/mirror_app/.meteor/packages;' +
+//    'echo http >> <%= basePath %>/build/mirror_app/.meteor/packages;' +
+//    'echo istanbul-middleware-port >> <%= basePath %>/build/mirror_app/.meteor/packages;' +
+//    'echo meteor-fixture >> <%= basePath %>/build/mirror_app/.meteor/packages;';
+
 
 }

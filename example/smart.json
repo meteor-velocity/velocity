@@ -14,7 +14,7 @@
     "moment": {},
     "velocity-html-reporter": {
       "git": "https://github.com/rissem/velocity-html-reporter",
-      "branch": "master"
+      "branch": "report-tree"
     }
   }
 }
