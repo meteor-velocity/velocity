@@ -15,7 +15,7 @@ To run the embedded example, type
 
 ```
 git clone https://github.com/xolvio/velocity.git
-cd example
+cd velocity/example
 mrt
 ```
 
