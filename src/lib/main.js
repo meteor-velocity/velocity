@@ -4,7 +4,7 @@ var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),
     Rsync = Npm.require('rsync'),
-    fork = Npm.require('child_process').fork,
+    spawn = Npm.require('child_process').spawn,
     chokidar = Npm.require('chokidar'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
@@ -418,14 +418,17 @@ function _syncAndStartMirror () {
         .set('q')
         .set('delay-updates')
         .set('force')
-        .exclude(['.meteor/local/.mirror', 'tests/.*'])
+        .exclude('.meteor/local')
+        .exclude('tests/.*')
         .source(process.env.PWD + path.sep)
         .destination(mirrorBasePath);
 
   var then = Date.now();
-  cmd.execute(function (error, code, cmd) {
+  cmd.execute(Meteor.bindEnvironment(function (error, code, cmd) {
     console.log('All done executing', cmd);
     console.log('rsync took', Date.now() - then);
+
+    // TODO strip out velocity and html reporter from the mirror app
 
     // TODO do magic here like callback frameworks to let them do what they need?
     // For now, only mocha-web tests are going to be copied outside the tests
@@ -434,9 +437,10 @@ function _syncAndStartMirror () {
     var mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1');
 
     // start meteor on the mirror using a different port and different db schema
-    var args = {
-      silent: true,
-      cwd: process.env.PWD,
+    var opts = {
+      cwd: mirrorBasePath,
+//      stdio: 'inherit',
+      stdio: 'ignore',
       env: _.extend({}, process.env, {
         PORT: 5000,
         ROOT_URL: 'http://localhost:5000/',
@@ -446,9 +450,10 @@ function _syncAndStartMirror () {
       })
     };
 
-    var child = fork(mirrorBasePath + '/.meteor/local/build/main.js'.split('/').join(path.sep), args);
-    child.stdout.pipe(process.stdout);
-    child.stderr.pipe(process.stderr);
+    console.log('Starting mirror on port 5000');
+    // TODO check if this also works on linux
+    spawn('/usr/local/bin/meteor'.split('/').join(path.sep), ['--port', '5000'], opts);
 
-  });
+  }));
+
 }
