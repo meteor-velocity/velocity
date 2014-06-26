@@ -1,12 +1,20 @@
 Velocity
 ========
-A reactive test-runner for Meteor.
+Test runner for Meteor. (under heavy development)
 
-**PLEASE NOTE: This is very early sneak-preview and is under heavy development.**
+###Easily run multiple testing frameworks simultaneously
+- install with one line
+- velocity tests your whole app (not just packages)
+- tests run in containers completely isolated from your app
+- one report shows all framework results reactively
+- easy CI integration
 
-To run, type:
+##Running the example app
+
+To run the embedded example, type
 
 ```
+git clone https://github.com/xolvio/velocity.git
 cd example
 mrt
 ```
@@ -17,11 +25,13 @@ You'll also see a green dot in the top right. If any tests are failing, this wil
 
 Try to modify the tests and watch the tests update reactively in the browser.
 
-The currently available testing frameworks are:
+## Current Frameworks
 
 * [mocha-web](https://github.com/mad-eye/meteor-mocha-web/tree/mtr) - A Velocity version of [mocha-web](https://github.com/mad-eye/meteor-mocha-web) (in progress)
 * [jasmine-unit](https://github.com/xolvio/jasmine-unit) - Unit testing extracted from [RTD](http://rtd.xolv.io/) (in progress)
 * [meteor-cucumber](https://github.com/xdissent/meteor-cucumber) - Velocity-compatible [CucumberJS](https://github.com/cucumber/cucumber-js) runner for Meteor
+
+##Contributors
 
 We are collaborating with an all-star team on unifying the Meteor testing landscape:
 
