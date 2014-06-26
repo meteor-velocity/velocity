@@ -9,14 +9,13 @@
       "-path": "../../meteor-mocha-web"
     },
     "jasmine-unit": {
-      "git":"https://github.com/xolvio/velocity",
-      "branch":"master",
-      "-path": "../../jasmine-unit"
+      "git":"https://github.com/xolvio/jasmine-unit",
+      "branch":"master"
     },
     "moment": {},
     "velocity-html-reporter": {
       "git": "https://github.com/rissem/velocity-html-reporter",
-      "branch": "report-tree"
+      "branch": "master"
     },
     "iron-router": {}
   }
