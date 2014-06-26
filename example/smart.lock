@@ -39,6 +39,7 @@
         "git": "https://github.com/rissem/velocity-html-reporter",
         "branch": "report-tree",
         "commit": "a757c4158ea398b4c5a2532d911f98a1f8a60e31"
+
       },
       "mirror": {
         "git": "https://github.com/xdissent/meteor-mirror.git",

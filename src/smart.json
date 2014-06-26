@@ -4,5 +4,8 @@
     "homepage": "https://github.com/xolvio/velocity",
     "author": "Sam Hatoum",
     "version": "0.1.7",
-    "git": "https://github.com/xolvio/velocity.git"
+    "git": "https://github.com/xolvio/velocity.git",
+    "packages":{
+        "mirror": "0.0.2"
+    }
 }

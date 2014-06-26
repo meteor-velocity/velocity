@@ -1,4 +1,5 @@
-Players = new Meteor.Collection 'players'
+
+@Players = new Meteor.Collection 'players'
 
 if Meteor.isClient
   Template.leaderboard.players = ->
