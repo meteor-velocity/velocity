@@ -8,6 +8,10 @@ if (!(process.env.NODE_ENV == "development")){
 var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),
+    Rsync = Npm.require('rsync'),
+    spawn = Npm.require('child_process').spawn,
+    fork = Npm.require('child_process').fork,
+    exec = Npm.require('child_process').exec,
     chokidar = Npm.require('chokidar'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
@@ -23,8 +27,12 @@ _config = _loadTestPackageConfigs();
 _testFrameworks = _.pluck(_config, function (config) { return config.name; });
 DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
-// kick-off everything
-_reset(_config);
+if (!process.env.IS_MIRROR && (process.env.NODE_ENV == "development")) {
+  // kick-off everything
+  _reset(_config);
+} else {
+  console.log("Not adding velocity code");
+}
 
 
 
@@ -251,7 +259,7 @@ function _loadTestPackageConfigs () {
   }, {});
 
   return testConfigDictionary;
-}  // end _loadTestPackageConfigs 
+}  // end _loadTestPackageConfigs
 
 
 /**
@@ -331,7 +339,7 @@ function _initWatcher (config) {
   }));
 
   return _watcher;
-}  // end _initWatcher 
+}  // end _initWatcher
 
 
 /**
@@ -365,6 +373,9 @@ function _reset (config) {
     });
   });
 
+  // Meteor just reloaded us which means we should rsync the app files
+  _syncAndStartMirror();
+
   watcher = _initWatcher(config);
 }
 
@@ -394,3 +405,72 @@ function _updateAggregateReports () {
   }
 
 }
+
+function _startMirror () {
+  var mirrorBasePath = process.env.PWD + '/.meteor/local/.mirror'.split('/').join(path.sep);
+  var mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1');
+  // start meteor on the mirror using a different port and different db schema
+  var opts = {
+    cwd: mirrorBasePath,
+    //      stdio: 'inherit',
+    stdio: 'ignore',
+    env: _.extend({}, process.env, {
+      PORT: 5000,
+      ROOT_URL: 'http://localhost:5000/',
+      MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/mirror',
+      METEOR_SETTINGS: JSON.stringify(Meteor.settings),
+      PARENT_URL: process.env.ROOT_URL,
+      IS_MIRROR: true
+    })
+  };
+  console.log('Starting mirror on port 5000');
+  // TODO check if this also works on linux
+  spawn('/usr/local/bin/meteor'.split('/').join(path.sep), ['--port', '5000'], opts);  
+}
+
+/**
+ * Creates a mirror of the application under .meteor/local/.mirror
+ * Any files with the pattern tests/.*  are not copied, this stops .report
+ * directory from also being copied. The mirror is then started using  a node
+ * fork
+ *
+ * @method _syncAndStartMirror
+ * @private
+ */
+function _syncAndStartMirror () {
+  var mirrorBasePath = process.env.PWD + '/.meteor/local/.mirror'.split('/').join(path.sep),
+  cmd = new Rsync()
+    .shell('ssh')
+    .flags('av')
+    .set('delete')
+    .set('q')
+    .set('delay-updates')
+    .set('force')
+    .exclude('.meteor/local')
+    .exclude('tests/.*')
+    .source(process.env.PWD + path.sep)
+    .destination(mirrorBasePath);
+  var then = Date.now();
+  cmd.execute(Meteor.bindEnvironment(function (error, code, cmd) {
+    console.log('All done executing', cmd);
+    console.log('rsync took', Date.now() - then);
+
+    // TODO strip out velocity and html reporter from the mirror app
+
+    // TODO do magic here like callback frameworks to let them do what they need?
+    // For now, only mocha-web tests are going to be copied outside the tests
+    // directory so they can be watched by meteor
+
+    if (fs.existsSync(process.env.PWD + "/tests/mocha-web")){
+      var cmd = "cp -r " + process.env.PWD + "/tests/mocha-web " + process.env.PWD + '/.meteor/local/.mirror';
+      exec(cmd, function(error, stdout, stderr){
+        // console.log('stdout: ' + stdout);
+        // console.log('stderr: ' + stderr);
+        _startMirror();
+      });      
+    } else {
+      _startMirror();
+    }
+  }));
+}
+

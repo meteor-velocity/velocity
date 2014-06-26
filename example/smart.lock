@@ -9,7 +9,10 @@
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity"
       },
-      "jasmine-unit": {},
+      "jasmine-unit": {
+        "git": "https://github.com/xolvio/jasmine-unit",
+        "branch": "master"
+      },
       "moment": {},
       "velocity-html-reporter": {
         "git": "https://github.com/rissem/velocity-html-reporter",
@@ -24,12 +27,12 @@
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity",
-        "commit": "d1edce821096ff28b66370622ca9b69a7b5a54e7"
+        "commit": "4a39f5803debb22fc61f623cf8cf907765fc4b9c"
       },
       "jasmine-unit": {
-        "git": "https://github.com/xolvio/jasmine-unit.git",
-        "tag": "v0.1.11",
-        "commit": "342e3203994db8c9acf6060a90509824bdf3dda9"
+        "git": "https://github.com/xolvio/jasmine-unit",
+        "branch": "master",
+        "commit": "3f539f5c839b011c354babdfe9762020067e7c74"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
@@ -39,7 +42,7 @@
       "velocity-html-reporter": {
         "git": "https://github.com/rissem/velocity-html-reporter",
         "branch": "master",
-        "commit": "bf4282295a07e88ef3f312409d613e0c0470be61"
+        "commit": "ab84c5787a6ed94b66e7d2b92460c5f56bd78c7e"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
