@@ -1,3 +1,9 @@
+## v0.1.8
+
+* add copySampleTests Meteor method
+* use rsync mirroring
+
+
 ## v0.1.7
 
 Added show/hide visibility toggle for every each report section with browser 

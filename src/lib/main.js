@@ -9,9 +9,10 @@ var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
     path = Npm.require('path'),
     Rsync = Npm.require('rsync'),
-    spawn = Npm.require('child_process').spawn,
-    fork = Npm.require('child_process').fork,
-    exec = Npm.require('child_process').exec,
+    child_process = Npm.require('child_process'),
+    spawn = child_process.spawn,
+    fork = child_process.fork,
+    exec = child_process.exec,
     chokidar = Npm.require('chokidar'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
@@ -159,7 +160,6 @@ Meteor.methods({
    * @method completed
    * @param {Object} data Required fields:
    *                   framework - String  ex. 'jasmine-unit'
-   *
    */
   completed: function (data) {
     var requiredFields = ['framework'];
@@ -170,7 +170,50 @@ Meteor.methods({
 
     VelocityAggregateReports.upsert({'name': data.framework}, {$set: {'result': 'completed'}});
     _updateAggregateReports();
-  }  // end completed
+  },  // end completed
+
+
+  /**
+   * Meteor method: copySampleTests
+   * Copy sample tests from frameworks to app/tests.
+   *
+   * @method copySampleTests
+   * @param {Object} options
+   *     ex. {framework: 'jasmine-unit'}
+   */
+  copySampleTests: function (options) {
+    var pwd = process.env.PWD,
+        samplesPath,
+        testsPath,
+        command;
+
+    options = options || {};
+
+    if (!options.framework) {
+      return;
+    }
+
+    samplesPath = path.join(pwd, 'packages', options.framework, 'SampleTests');
+    testsPath = path.join(pwd, 'tests');
+
+    if (fs.existsSync(samplesPath)) {
+      //DEBUG && console.log('samplesPath', path.join(samplesPath, '*'));
+      //DEBUG && console.log('testsPath', testsPath);
+
+      command = 'rsync -a ' + path.join(samplesPath, '*') + ' ' + testsPath;
+
+      DEBUG && console.log('[velocity]', command);
+
+      child_process.exec(command, function (err, stdout, stderr) {
+        if (err) {
+          console.log('ERROR', err);
+        }
+        console.log(stdout);
+        console.log(stderr);
+      });
+    }
+  }  // end copySampleTests
+
 
 });  // end Meteor methods
 
