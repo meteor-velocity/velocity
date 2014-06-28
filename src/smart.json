@@ -3,9 +3,7 @@
     "description": "A reactive test-runner for Meteor",
     "homepage": "https://github.com/xolvio/velocity",
     "author": "Sam Hatoum",
-    "version": "0.1.8",
+    "version": "0.1.9",
     "git": "https://github.com/xolvio/velocity.git",
-    "packages":{
-        "mirror": "0.0.2"
-    }
+    "packages":{}
 }
