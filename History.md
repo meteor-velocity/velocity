@@ -1,7 +1,8 @@
 ## v0.1.8
 
-* add copySampleTests Meteor method
-* use rsync mirroring
+* Add copySampleTests Meteor method
+* Use rsync mirroring
+* Removed HTML reporter from 
 
 
 ## v0.1.7
