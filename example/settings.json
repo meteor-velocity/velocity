@@ -1,8 +1,0 @@
-{
-  "mirror": {
-    "debug": false,
-    "current":null,
-    "stdout": true,
-    "stderr": true
- }
-}
