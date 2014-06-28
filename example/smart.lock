@@ -2,9 +2,7 @@
   "meteor": {},
   "dependencies": {
     "basePackages": {
-      "velocity": {
-        "path": "../src"
-      },
+      "velocity": {},
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity"
@@ -15,7 +13,9 @@
     },
     "packages": {
       "velocity": {
-        "path": "../src"
+        "git": "https://github.com/xolvio/velocity.git",
+        "tag": "v0.1.9",
+        "commit": "c5f5f721740f77a4a4924c44375697bdd4b5f3c8"
       },
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
