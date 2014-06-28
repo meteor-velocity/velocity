@@ -10,8 +10,8 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
-
   api.add_files('collections.js', ['client', 'server']);
+
   api.export('VelocityTestFiles', ['client', 'server']);
   api.export('VelocityTestReports', ['client', 'server']);
   api.export('VelocityAggregateReports', ['client', 'server']);
