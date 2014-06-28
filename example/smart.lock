@@ -9,16 +9,9 @@
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity"
       },
-      "jasmine-unit": {
-        "git": "https://github.com/xolvio/jasmine-unit",
-        "branch": "master"
-      },
-      "moment": {},
-      "velocity-html-reporter": {
-        "git": "https://github.com/rissem/velocity-html-reporter",
-        "branch": "master"
-      },
-      "iron-router": {}
+      "jasmine-unit": {},
+      "velocity-html-reporter": {},
+      "moment": {}
     },
     "packages": {
       "velocity": {
@@ -27,27 +20,22 @@
       "mocha-web": {
         "git": "https://github.com/mad-eye/meteor-mocha-web",
         "branch": "velocity",
-        "commit": "4a39f5803debb22fc61f623cf8cf907765fc4b9c"
+        "commit": "1204867efdb23ba6115157b5f2e68da4edb7d8e9"
       },
       "jasmine-unit": {
-        "git": "https://github.com/xolvio/jasmine-unit",
-        "branch": "master",
-        "commit": "3f539f5c839b011c354babdfe9762020067e7c74"
+        "git": "https://github.com/xolvio/jasmine-unit.git",
+        "tag": "v0.1.14",
+        "commit": "82d0be7ed9de23b8120b8723855cd63a4ef24c42"
+      },
+      "velocity-html-reporter": {
+        "git": "https://github.com/rissem/velocity-html-reporter.git",
+        "tag": "v0.1.0",
+        "commit": "9e03afe1853fbe8118fd2ad5c7c803be28ec4deb"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
         "tag": "v2.6.0",
         "commit": "26156df681750fd6e6ed77043eef32b6653ebbdf"
-      },
-      "velocity-html-reporter": {
-        "git": "https://github.com/rissem/velocity-html-reporter",
-        "branch": "master",
-        "commit": "ab84c5787a6ed94b66e7d2b92460c5f56bd78c7e"
-      },
-      "iron-router": {
-        "git": "https://github.com/EventedMind/iron-router.git",
-        "tag": "v0.7.1",
-        "commit": "d1ffb3f06ea4c112132b030f2eb1a70b81675ecb"
       },
       "mirror": {
         "git": "https://github.com/xdissent/meteor-mirror.git",
@@ -58,11 +46,6 @@
         "git": "https://github.com/alanning/meteor-package-stubber.git",
         "tag": "v0.0.5",
         "commit": "753a0f64a18b721223a7a1149dbab4af959382d5"
-      },
-      "blaze-layout": {
-        "git": "https://github.com/EventedMind/blaze-layout.git",
-        "tag": "v0.2.4",
-        "commit": "b40e9b0612329288d75cf52ad14a7da64bb8618f"
       }
     }
   }

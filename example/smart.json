@@ -1,6 +1,8 @@
 {
   "packages": {
-    "velocity": {},
+    "velocity": {
+      "path": "../src"
+    },
     "mocha-web": {
       "git": "https://github.com/mad-eye/meteor-mocha-web",
       "branch": "velocity"
