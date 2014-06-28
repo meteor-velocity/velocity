@@ -1,8 +1,14 @@
 ## v0.1.9
 
+* Remove ref to unused mirror package
+
+
+## v0.1.9
+
 * Add copySampleTests Meteor method
 * Use rsync mirroring
 * Removed HTML reporter from 
+
 
 ## v0.1.8
 
