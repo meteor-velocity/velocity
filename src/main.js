@@ -258,7 +258,7 @@ function _checkRequired (requiredFields, target) {
  *       "version": "0.1.1",
  *       "git": "https://github.com/xolvio/jasmine-unit.git",
  *       "test-package": true,
- *       "regex": "-jasmine-unit.(js|coffee)$"
+ *       "regex": "-jasmine-unit\\.(js|coffee)$"
  *     }
  *
  * @method _loadTestPackageConfigs
@@ -289,7 +289,7 @@ function _loadTestPackageConfigs () {
           // watcher, default to the package name as a suffix.
           // Ex. name = "mocha-web"
           //     regex = "-mocha-web.js"
-          memo[config.name].regex = '-' + config.name + '.js$';
+          memo[config.name].regex = '-' + config.name + '\\.js$';
         }
 
         // create a regexp obj for use in file watching
