@@ -330,19 +330,18 @@ function _initWatcher (config) {
 
     DEBUG && console.log('File added:', filePath);
 
+    relativePath = filePath.substring(process.env.PWD.length);
+    if (relativePath[0] === path.sep) {
+      relativePath = relativePath.substring(1);
+    }
     filename = path.basename(filePath);
 
     targetFramework = _.find(config, function (framework) {
-      return framework._regexp.test(filename);
+      return framework._regexp.test(relativePath);
     });
 
     if (targetFramework) {
       DEBUG && console.log(targetFramework.name, ' <= ', filePath);
-
-      relativePath = filePath.substring(process.env.PWD.length);
-      if (relativePath[0] === path.sep) {
-        relativePath = relativePath.substring(1);
-      }
 
       data = {
         _id: filePath,
