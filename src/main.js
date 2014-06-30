@@ -7,12 +7,14 @@ if (!(process.env.NODE_ENV == "development")){
 
 var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
+    readFile = Meteor._wrapAsync(fs.readFile),
+    writeFile = Meteor._wrapAsync(fs.writeFile),
     path = Npm.require('path'),
     Rsync = Npm.require('rsync'),
     child_process = Npm.require('child_process'),
     spawn = child_process.spawn,
     fork = child_process.fork,
-    exec = child_process.exec,
+    exec = Meteor._wrapAsync(child_process.exec),
     chokidar = Npm.require('chokidar'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
@@ -277,7 +279,7 @@ function _loadTestPackageConfigs () {
         config;
 
     try {
-      contents = fs.readFileSync(path.join(pwd, smartJsonPath));
+      contents = readFile(path.join(pwd, smartJsonPath));
       config = JSON.parse(contents);
       if (config.name && config.testPackage) {
 
@@ -465,7 +467,6 @@ function _startMirror () {
       IS_MIRROR: true
     })
   };
-  var writeFile = Meteor._wrapAsync(fs.writeFile);
   writeFile(mirrorBasePath + '/settings.json', JSON.stringify(Meteor.settings));
 
   console.log('Starting mirror on port 5000');
@@ -508,11 +509,8 @@ function _syncAndStartMirror () {
 
     if (fs.existsSync(process.env.PWD + "/tests/mocha-web")){
       var cmd = "cp -r " + process.env.PWD + "/tests/mocha-web " + process.env.PWD + '/.meteor/local/.mirror';
-      exec(cmd, function(error, stdout, stderr){
-        // console.log('stdout: ' + stdout);
-        // console.log('stderr: ' + stderr);
-        _startMirror();
-      });      
+      exec(cmd);
+      _startMirror();
     } else {
       _startMirror();
     }
