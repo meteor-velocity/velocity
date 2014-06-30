@@ -461,14 +461,16 @@ function _startMirror () {
       PORT: 5000,
       ROOT_URL: 'http://localhost:5000/',
       MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/mirror',
-      METEOR_SETTINGS: JSON.stringify(Meteor.settings),
       PARENT_URL: process.env.ROOT_URL,
       IS_MIRROR: true
     })
   };
+  var writeFile = Meteor._wrapAsync(fs.writeFile);
+  writeFile(mirrorBasePath + '/settings.json', JSON.stringify(Meteor.settings));
+
   console.log('Starting mirror on port 5000');
   // TODO check if this also works on linux
-  spawn('/usr/local/bin/meteor'.split('/').join(path.sep), ['--port', '5000'], opts);  
+  spawn('/usr/local/bin/meteor'.split('/').join(path.sep), ['--port', '5000', '--settings', 'settings.json'], opts);
 }
 
 /**
