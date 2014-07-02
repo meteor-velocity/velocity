@@ -45,5 +45,6 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 * [Robert Dickert](https://github.com/rdickert) from [Meteor Boulder](http://www.meetup.com/Meteor-Boulder), contributor to [all things Meteor](https://github.com/rdickert?tab=repositories)
 * [Ry Walker](https://github.com/ryw) from [Differential](http://differential.io/), co-author of [Testing with Meteor](http://testingmeteor.com/)
 * [Josh Owens](https://github.com/queso) from [Differential](http://differential.io/), co-author of [Testing with Meteor](http://testingmeteor.com/)
+* [Jonas](https://github.com/sanjo), velocity contributor
 
 Please join our discussions at the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
