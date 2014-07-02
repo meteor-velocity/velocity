@@ -468,7 +468,7 @@ function _startMirror () {
   };
   console.log('Starting mirror on port 5000');
   // TODO check if this also works on linux
-  spawn('/usr/local/bin/meteor'.split('/').join(path.sep), ['--port', '5000'], opts);  
+  spawn('meteor', ['--port', '5000'], opts);
 }
 
 /**
