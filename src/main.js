@@ -7,12 +7,14 @@ if (!(process.env.NODE_ENV == "development")){
 
 var _ = Npm.require('lodash'),
     fs = Npm.require('fs'),
+    readFile = Meteor._wrapAsync(fs.readFile),
+    writeFile = Meteor._wrapAsync(fs.writeFile),
     path = Npm.require('path'),
     Rsync = Npm.require('rsync'),
     child_process = Npm.require('child_process'),
     spawn = child_process.spawn,
     fork = child_process.fork,
-    exec = child_process.exec,
+    exec = Meteor._wrapAsync(child_process.exec),
     chokidar = Npm.require('chokidar'),
     glob = Npm.require('glob'),
     DEBUG = !!process.env.VELOCITY_DEBUG,
@@ -277,7 +279,7 @@ function _loadTestPackageConfigs () {
         config;
 
     try {
-      contents = fs.readFileSync(path.join(pwd, smartJsonPath));
+      contents = readFile(path.join(pwd, smartJsonPath));
       config = JSON.parse(contents);
       if (config.name && config.testPackage) {
 
@@ -322,7 +324,6 @@ function _initWatcher (config) {
 
   _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
     var relativePath,
-        filename,
         targetFramework,
         data;
 
@@ -334,8 +335,9 @@ function _initWatcher (config) {
     if (relativePath[0] === path.sep) {
       relativePath = relativePath.substring(1);
     }
-    filename = path.basename(filePath);
 
+    // test against each test framework's regexp matcher, use first
+    // one that matches
     targetFramework = _.find(config, function (framework) {
       return framework._regexp.test(relativePath);
     });
@@ -345,17 +347,12 @@ function _initWatcher (config) {
 
       data = {
         _id: filePath,
-        name: filename,
+        name: path.basename(filePath),
         absolutePath: filePath,
         relativePath: relativePath,
         targetFramework: targetFramework.name,
         lastModified: Date.now()
       };
-
-      // ### TEMPORARY HACK
-      if (targetFramework.name == 'jasmine-unit') {
-        data.targetFramework = 'jasmine-unit';
-      }
 
       //DEBUG && console.log('data', data);
       VelocityTestFiles.insert(data);
@@ -460,14 +457,15 @@ function _startMirror () {
       PORT: 5000,
       ROOT_URL: 'http://localhost:5000/',
       MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/mirror',
-      METEOR_SETTINGS: JSON.stringify(Meteor.settings),
       PARENT_URL: process.env.ROOT_URL,
       IS_MIRROR: true
     })
   };
+  writeFile(mirrorBasePath + '/settings.json', JSON.stringify(Meteor.settings));
+
   console.log('Starting mirror on port 5000');
-  // TODO check if this also works on linux
-  spawn('meteor', ['--port', '5000'], opts);
+
+  spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
 }
 
 /**
@@ -505,11 +503,8 @@ function _syncAndStartMirror () {
 
     if (fs.existsSync(process.env.PWD + "/tests/mocha-web")){
       var cmd = "cp -r " + process.env.PWD + "/tests/mocha-web " + process.env.PWD + '/.meteor/local/.mirror';
-      exec(cmd, function(error, stdout, stderr){
-        // console.log('stdout: ' + stdout);
-        // console.log('stderr: ' + stderr);
-        _startMirror();
-      });      
+      exec(cmd);
+      _startMirror();
     } else {
       _startMirror();
     }
