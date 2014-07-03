@@ -10,12 +10,12 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
-  api.add_files('src/collections.js', ['client', 'server']);
+  api.add_files('collections.js', ['client', 'server']);
 
   api.export('VelocityTestFiles', ['client', 'server']);
   api.export('VelocityTestReports', ['client', 'server']);
   api.export('VelocityAggregateReports', ['client', 'server']);
   api.export('VelocityLogs', ['client', 'server']);
 
-  api.add_files('src/main.js', 'server');
+  api.add_files('main.js', 'server');
 });
