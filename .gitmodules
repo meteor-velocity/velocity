@@ -1,3 +1,0 @@
-[submodule "example"]
-	path = example
-	url = git@github.com:xolvio/velocity-example.git
