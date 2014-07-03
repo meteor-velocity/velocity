@@ -23,6 +23,18 @@ Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=
 - easy CI integration
 
 
+### Quick-start
+
+Add some test frameworks to your app and include some sample tests:
+
+```bash
+$ cd your-app-dir
+$ mrt add velocity-quick-start
+```
+
+Check out the sample tests in the `tests` directory and run your app to see the results in both the console and the html-reporter overlay.
+
+
 ##Example app
 
 
