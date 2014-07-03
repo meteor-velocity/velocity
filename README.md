@@ -51,6 +51,71 @@ The `velocity` package coordinates between test frameworks and provides a common
 * [selenium-nightwatch](https://github.com/awatson1978/selenium-nightwatch/) - run acceptance tests in real browsers using Selenium and Nightwatch
 
 
+## Test framework authors
+
+We would love to add your framework to the list!  Take a look at how some of these interface with velocity and let us know about your framework on the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
+
+A few notes on being velocity-compatible:
+
+#### Sample Tests
+
+Please put some sample tests in a directory named `sample-tests` at the root of your package.  These will be used by the velocity-quick-start package and also allows users to click a button in the html-reporter to have them added to their apps.
+
+#### Debug output
+
+Please include a way to get more detailed info about your test runs.  
+
+One way that we've done it is by having an environment flag that the user can set.  Feel free to use `VELOCITY_DEBUG` if you'd like.  
+
+For example, you could write your logging like this:
+
+    var DEBUG = process.env.VELOCITY_DEBUG;
+    DEBUG && console.log('[my-framework] helpful debugging info', someVar);
+    
+
+#### Changes to `smart.json`
+
+You'll need to include some velocity-specific fields in your package's smart.json file:  
+
+* `testPackage` [Boolean] - lets velocity know your framework is available to send test files to.  
+* `regex` [String] - tells velocity which files in the `tests` directory should go to your framework.  
+
+An example `smart.json` from the `jasmine-unit` test framework:
+
+    {
+        "name": "jasmine-unit",
+        "description": "Velocity-compatible unit test package with jasmine syntax",
+        "homepage": "https://github.com/xolvio/jasmine-unit",
+        "author": "Sam Hatoum",
+        "version": "0.1.19",
+        "git": "https://github.com/xolvio/jasmine-unit.git",
+        "testPackage": true,
+        "regex": "-jasmine-unit.(js|coffee)$",
+        "packages": {
+          "velocity": "",
+          "package-stubber": ""
+        }
+    }
+
+Source: https://github.com/xolvio/jasmine-unit/blob/master/smart.json
+
+
+## Debug output
+
+Sometimes things break and its useful to get more debugging info.  Most of the test frameworks support some kind of debugging environment variable flag.  You can usually see a lot more details about what's happening if you run your app with this command:
+
+```bash
+$ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 mrt
+```
+
+
+## Troubleshooting
+
+* `Error: There was a problem checking out branch: master`
+
+Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
+
+
 ##Contributors
 
 We are collaborating with an all-star team on unifying the Meteor testing landscape:
@@ -68,18 +133,3 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 * [Jonas](https://github.com/sanjo), velocity contributor, [Jasmine](https://github.com/Sanjo/meteor-jasmine) package
 
 Please join our discussions at the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
-
-
-## Debug output
-
-Sometimes things break and its useful to get more debugging info.  Most of the test frameworks support some kind of debugging environment variable flag.  You can usually see a lot more details about what's happening if you run your app with this command:
-
-```bash
-$ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 mrt
-```
-
-## Troubleshooting
-
-* `Error: There was a problem checking out branch: master`
-
-Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
