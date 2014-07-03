@@ -4,10 +4,20 @@ Velocity
 Test runner (and community) for Meteor apps.  Under heavy development.
 
 
-###Easily run multiple testing frameworks simultaneously
+##Why Velocity?
 
+The Meteor-provided testing framework, TinyTest, works great for testing packages but doesn't work for apps.  Many members of the community created their own solutions but recently we wondered what would happen if we got everybody together and tried to unify our efforts.
+
+Velocity is the result - the unified testing framework for Meteor.
+
+Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=40m51s) talk that Robert, Sam, and Mike did at the June 2014 Meteor Devshop!
+
+
+##Benefits
+
+- officially sanctioned by the Meteor Development Group
 - install with one line
-- velocity tests your whole app (not just packages)
+- test your whole app, not just packages
 - tests run in containers completely isolated from your app
 - one report shows all framework results reactively
 - easy CI integration
