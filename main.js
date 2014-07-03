@@ -199,13 +199,12 @@ Meteor.methods({
     samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
     testsPath = path.join(pwd, 'tests');
 
-    if (fs.existsSync(samplesPath)) {
-      //DEBUG && console.log('samplesPath', path.join(samplesPath, '*'));
-      //DEBUG && console.log('testsPath', testsPath);
+    DEBUG && console.log('[velocity] checking for sample tests in', path.join(samplesPath, '*'));
 
+    if (fs.existsSync(samplesPath)) {
       command = 'rsync -a ' + path.join(samplesPath, '*') + ' ' + testsPath;
 
-      DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, ' - ', command);
+      DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
       child_process.exec(command, function (err, stdout, stderr) {
         if (err) {
