@@ -177,7 +177,8 @@ Meteor.methods({
 
   /**
    * Meteor method: copySampleTests
-   * Copy sample tests from frameworks to app/tests.
+   * Copy sample tests from frameworks `sample-tests` directories 
+   * to user's `app/tests` directory.
    *
    * @method copySampleTests
    * @param {Object} options
@@ -195,7 +196,7 @@ Meteor.methods({
       return;
     }
 
-    samplesPath = path.join(pwd, 'packages', options.framework, 'SampleTests');
+    samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
     testsPath = path.join(pwd, 'tests');
 
     if (fs.existsSync(samplesPath)) {
@@ -204,7 +205,7 @@ Meteor.methods({
 
       command = 'rsync -a ' + path.join(samplesPath, '*') + ' ' + testsPath;
 
-      DEBUG && console.log('[velocity]', command);
+      DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, ' - ', command);
 
       child_process.exec(command, function (err, stdout, stderr) {
         if (err) {
