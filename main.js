@@ -202,7 +202,9 @@ Meteor.methods({
     DEBUG && console.log('[velocity] checking for sample tests in', path.join(samplesPath, '*'));
 
     if (fs.existsSync(samplesPath)) {
-      command = 'rsync -a ' + path.join(samplesPath, '*') + ' ' + testsPath;
+      command = 'mkdir -p ' + testsPath + ' && ' + 
+                'rsync -a ' + path.join(samplesPath, '*') + 
+                          ' ' + testsPath + path.sep;
 
       DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
