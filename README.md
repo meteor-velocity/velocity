@@ -58,3 +58,18 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 * [Jonas](https://github.com/sanjo), velocity contributor, maintains Jasmine package
 
 Please join our discussions at the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
+
+
+## Debug output
+
+Sometimes things break and its useful to get more debugging info.  Most of the test frameworks support some kind of debugging environment variable flag.  You can usually see a lot more details about what's happening if you run your app with this command:
+
+```bash
+$ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 mrt
+```
+
+## Troubleshooting
+
+* `Error: There was a problem checking out branch: master`
+
+Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
