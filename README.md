@@ -51,11 +51,11 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 * [Mike Risse](https://github.com/rissem) from [MadEye](https://madeye.io/), author of [mocha-web](https://github.com/mad-eye/meteor-mocha-web)
 * [Greg Thornton](https://github.com/xdissent) author of [meteor-cucumber](https://github.com/xdissent/meteor-cucumber)
 * [Ronen Babayoff](https://github.com/ronen-lavaina) from LaVaina Inc, co-author of [Munit](https://github.com/spacejamio/meteor-munit)
-* [Abigail Watson](https://github.com/awatson1978) from [Pentasyllabic](http://www.pentasyllabic.com), author of [Meteor Cookbook](https://github.com/awatson1978/meteor-cookbook), maintains Selenium-Nightwatch package
+* [Abigail Watson](https://github.com/awatson1978) from [Pentasyllabic](http://www.pentasyllabic.com), author of [Meteor Cookbook](https://github.com/awatson1978/meteor-cookbook), [Selenium-Nightwatch](https://github.com/awatson1978/selenium-nightwatch/)
 * [Robert Dickert](https://github.com/rdickert) from [Meteor Boulder](http://www.meetup.com/Meteor-Boulder), contributor to [all things Meteor](https://github.com/rdickert?tab=repositories)
 * [Ry Walker](https://github.com/ryw) from [Differential](http://differential.io/), co-author of [Testing with Meteor](http://testingmeteor.com/)
 * [Josh Owens](https://github.com/queso) from [Differential](http://differential.io/), co-author of [Testing with Meteor](http://testingmeteor.com/)
-* [Jonas](https://github.com/sanjo), velocity contributor, maintains Jasmine package
+* [Jonas](https://github.com/sanjo), velocity contributor, [Jasmine](https://github.com/Sanjo/meteor-jasmine) package
 
 Please join our discussions at the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
 
