@@ -1,9 +1,9 @@
-/*jshint -W020, -W079 */
-"use strict";
+/*jshint -W117, -W030 */
 
 (function () {
+  "use strict";
 
-  if (!(process.env.NODE_ENV == "development") || process.env.IS_MIRROR) {
+  if (process.env.NODE_ENV !== "development" || process.env.IS_MIRROR) {
     DEBUG && console.log("Not adding velocity code");
     return;
   }
@@ -23,7 +23,6 @@
       _config,
       _testFrameworks,
       watcher;
-
 
   DEBUG && console.log('PWD', process.env.PWD);
 
@@ -59,9 +58,9 @@
      *                 and/or define a list of tests to keep.
      *                 ex.
      *                 {
-   *                   framework: "jasmine-unit",
-   *                   notIn: ['tests/auth-jasmine-unit.js']
-   *                 }
+     *                   framework: "jasmine-unit",
+     *                   notIn: ['tests/auth-jasmine-unit.js']
+     *                 }
      */
     resetReports: function (options) {
       var query = {};
@@ -236,9 +235,9 @@
     _.each(requiredFields, function (name) {
       if (!target[name]) {
         throw new Error("Required field '" + name + "' is missing." +
-          "Result not posted.")
+          "Result not posted.");
       }
-    })
+    });
   }
 
 
