@@ -1,4 +1,4 @@
-## vNext
+## v0.1.11
 
 * remove example submodule; instruct how to use external repo instead
 * update repo so users can ref velocity repo directly in smart.json
