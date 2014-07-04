@@ -13,7 +13,6 @@ var _ = Npm.require('lodash'),
     Rsync = Npm.require('rsync'),
     child_process = Npm.require('child_process'),
     spawn = child_process.spawn,
-    fork = child_process.fork,
     exec = Meteor._wrapAsync(child_process.exec),
     chokidar = Npm.require('chokidar'),
     glob = Npm.require('glob'),
@@ -454,7 +453,7 @@ function _startMirror () {
   var opts = {
     cwd: mirrorBasePath,
     //      stdio: 'inherit',
-    stdio: 'ignore',
+    stdio: 'pipe',
     env: _.extend({}, process.env, {
       PORT: 5000,
       ROOT_URL: 'http://localhost:5000/',
@@ -467,7 +466,7 @@ function _startMirror () {
 
   console.log('Starting mirror on port 5000');
 
-  spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
+  var mirror = spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
 }
 
 /**
