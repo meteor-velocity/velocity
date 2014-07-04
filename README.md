@@ -21,21 +21,30 @@ Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=
 - tests run in containers completely isolated from your app
 - one report shows all framework results reactively
 - easy CI integration
+- tests are not published to production
+- only executes in dev mode (`process.env.NODE_ENV === "development"`)
 
 
-### Quick-start
+## Usage
 
-Add some test frameworks to your app and include some sample tests:
+The Velocity package itself is not something that you would normally include.  Rather you would include the test framework that you would like to use ([see below](https://github.com/xolvio/velocity/#current-frameworks)) and it will automatically be added for you.
+
+There are generally two ways people get started with using velocity to test their apps: the `velocity-quick-start` package and the `velocity-example` app.
+
+#### Quick-start
+
+The [`velocity-quick-start`](https://github.com/alanning/meteor-velocity-quick-start) package will add some test frameworks to your app and include sample tests for you.  Here's how you would add it to your app:
 
 ```bash
 $ cd your-app-dir
 $ mrt add velocity-quick-start
+$ mrt
 ```
 
 Check out the sample tests in the `tests` directory and run your app to see the results in both the console and the html-reporter overlay.
 
 
-##Example app
+#### Example app
 
 
 ```bash
@@ -49,7 +58,7 @@ You'll see the leaderboard example started on port 3000.
 
 You'll also see a green dot in the top right. If any tests are failing, this will go red. Clicking the dot will show you the reports.
 
-Try to modify the tests and watch the tests update reactively in the browser.
+Try modifying the tests and see them update reactively in the browser.
 
 
 ## Current Frameworks
