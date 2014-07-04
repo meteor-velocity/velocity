@@ -177,7 +177,7 @@ Meteor.methods({
 
   /**
    * Meteor method: copySampleTests
-   * Copy sample tests from frameworks `sample-tests` directories 
+   * Copy sample tests from frameworks `sample-tests` directories
    * to user's `app/tests` directory.
    *
    * @method copySampleTests
@@ -503,13 +503,7 @@ function _syncAndStartMirror () {
     // For now, only mocha-web tests are going to be copied outside the tests
     // directory so they can be watched by meteor
 
-    if (fs.existsSync(process.env.PWD + "/tests/mocha-web")){
-      var cmd = "cp -r " + process.env.PWD + "/tests/mocha-web " + process.env.PWD + '/.meteor/local/.mirror';
-      exec(cmd);
-      _startMirror();
-    } else {
-      _startMirror();
-    }
+    _startMirror();
+
   }));
 }
-
