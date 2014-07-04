@@ -1,10 +1,11 @@
+/*jshint -W020, -W079 */
 "use strict";
 
 (function () {
 
-  if (!(process.env.NODE_ENV == "development")) {
-    // console.log("Not adding velocity code");
-    return
+  if (!(process.env.NODE_ENV == "development") || process.env.IS_MIRROR) {
+    DEBUG && console.log("Not adding velocity code");
+    return;
   }
 
   var _ = Npm.require('lodash'),
@@ -15,7 +16,6 @@
       Rsync = Npm.require('rsync'),
       child_process = Npm.require('child_process'),
       spawn = child_process.spawn,
-      exec = Meteor._wrapAsync(child_process.exec),
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
       DEBUG = !!process.env.VELOCITY_DEBUG,
@@ -31,14 +31,8 @@
   _testFrameworks = _.pluck(_config, function (config) { return config.name; });
   DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
-  if (!process.env.IS_MIRROR && (process.env.NODE_ENV == "development")) {
-    // kick-off everything
-    _reset(_config);
-  } else {
-    console.log("Not adding velocity code");
-  }
-
-
+  // kick-off everything
+  _reset(_config);
 
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
