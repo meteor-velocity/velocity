@@ -466,7 +466,7 @@ function _startMirror () {
 
   console.log('Starting mirror on port 5000');
 
-  var mirror = spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
+  spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
 }
 
 /**
