@@ -56,7 +56,7 @@ $ mrt
 
 You'll see the leaderboard example started on port 3000.
 
-You'll also see a green dot in the top right. If any tests are failing, this will go red. Clicking the dot will show you the reports.
+Because the example has included the [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) package, you'll see a green dot in the top right that indicates the success or failure of your tests.  If any tests are failing, this will go red.  Clicking the dot will display the report overlay test details.
 
 Try modifying the tests and see them update reactively in the browser.
 
@@ -70,6 +70,12 @@ The `velocity` package coordinates between test frameworks and provides a common
 * [meteor-cucumber](https://github.com/xdissent/meteor-cucumber) - Velocity-compatible [CucumberJS](https://github.com/cucumber/cucumber-js) runner for Meteor
 * [jasmine](https://github.com/Sanjo/meteor-jasmine) - run client tests in the browser within the app context.
 * [selenium-nightwatch](https://github.com/awatson1978/selenium-nightwatch/) - run acceptance tests in real browsers using Selenium and Nightwatch
+
+
+## Current Reporters
+
+* [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) - Adds an overlay to your app, green/red dot in top right.  Click dot for test details.
+
 
 
 ## Test framework authors
