@@ -33,7 +33,7 @@ There are generally two ways people get started with using velocity to test thei
 
 #### Quick-start
 
-The [`velocity-quick-start`](https://github.com/alanning/meteor-velocity-quick-start) package will add some test frameworks to your app and include sample tests for you.  Here's how you would add it to your app:
+The [`velocity-quick-start`](https://github.com/alanning/meteor-velocity-quick-start) package will add the [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) and some test frameworks to your app.  It will also add some sample tests for you.  Here's how you would add it to your app:
 
 ```bash
 $ cd your-app-dir
@@ -41,7 +41,7 @@ $ mrt add velocity-quick-start
 $ mrt
 ```
 
-Check out the sample tests in the `tests` directory and run your app to see the results in both the console and the html-reporter overlay.
+Check out the sample tests in the `tests` directory and run your app again to see the results in both the console and the html-reporter overlay.
 
 
 #### Example app
@@ -56,7 +56,7 @@ $ mrt
 
 You'll see the leaderboard example started on port 3000.
 
-Because the example has included the [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) package, you'll see a green dot in the top right that indicates the success or failure of your tests.  If any tests are failing, this will go red.  Clicking the dot will display the report overlay test details.
+Because the example has included the [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) package, you'll see a green/red dot in the top right that indicates the success or failure of your tests.  Clicking the dot will display test details.
 
 Try modifying the tests and see them update reactively in the browser.
 
@@ -74,7 +74,9 @@ The `velocity` package coordinates between test frameworks and provides a common
 
 ## Current Reporters
 
-* [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) - Adds an overlay to your app, green/red dot in top right.  Click dot for test details.
+Reporters display test results.
+
+* [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) - Adds an overlay to your app indicating test success/failure (green/red dot in top right).  Click dot for test details.  `mrt add velocity-html-reporter`
 
 
 
