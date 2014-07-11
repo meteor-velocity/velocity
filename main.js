@@ -1,4 +1,11 @@
 /*jshint -W117, -W030 */
+/* global
+   Velocity:true,
+   DEBUG:true
+ */
+
+DEBUG = !!process.env.VELOCITY_DEBUG;
+Velocity = {};
 
 (function () {
   "use strict";
@@ -18,7 +25,6 @@
       spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
-      DEBUG = !!process.env.VELOCITY_DEBUG,
       TEST_DIR = 'tests',
       _config,
       _testFrameworks,
