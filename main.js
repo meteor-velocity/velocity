@@ -481,8 +481,7 @@ Velocity = {};
 
     console.log('Starting mirror on port 5000');
 
-    var mirror = spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
-    console.log('mirror PID', mirror.pid);
+    spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
   }
 
   /**
