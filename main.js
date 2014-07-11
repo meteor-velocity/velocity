@@ -25,19 +25,36 @@ Velocity = {};
       spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
-      TEST_DIR = 'tests',
       _config,
       _testFrameworks,
       watcher;
 
-  DEBUG && console.log('PWD', process.env.PWD);
+  Meteor.startup(function initializeVelocity() {
+    DEBUG && console.log('PWD', process.env.PWD);
 
-  _config = _loadTestPackageConfigs();
-  _testFrameworks = _.pluck(_config, function (config) { return config.name; });
-  DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
+    _config = _loadTestPackageConfigs();
+    _testFrameworks = _.pluck(_config, function (config) {
+      return config.name;
+    });
+    DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
-  // kick-off everything
-  _reset(_config);
+    // kick-off everything
+    _reset(_config);
+  });
+
+//////////////////////////////////////////////////////////////////////
+// Public Methods
+//
+  _.extend(Velocity, {
+
+    getMirrorPath: function () {
+      return path.join(process.env.PWD, '.meteor', 'local', '.mirror');
+    },
+
+    getTestsPath: function () {
+      return path.join(process.env.PWD, 'tests');
+    }
+  });
 
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
@@ -317,12 +334,9 @@ Velocity = {};
    * @private
    */
   function _initWatcher (config) {
-    var testDir,
-        _watcher;
+    var _watcher;
 
-    testDir = path.join(process.env.PWD, TEST_DIR);
-
-    _watcher = chokidar.watch(testDir, {ignored: /[\/\\]\./});
+    _watcher = chokidar.watch(Velocity.getTestsPath(), {ignored: /[\/\\]\./});
 
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
       var relativePath,
@@ -448,7 +462,7 @@ Velocity = {};
   }
 
   function _startMirror () {
-    var mirrorBasePath = process.env.PWD + '/.meteor/local/.mirror'.split('/').join(path.sep);
+    var mirrorBasePath = Velocity.getMirrorPath();
     var mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1');
     // start meteor on the mirror using a different port and different db schema
     var opts = {
@@ -467,7 +481,8 @@ Velocity = {};
 
     console.log('Starting mirror on port 5000');
 
-    spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
+    var mirror = spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
+    console.log('mirror PID', mirror.pid);
   }
 
   /**
@@ -480,8 +495,7 @@ Velocity = {};
    * @private
    */
   function _syncAndStartMirror () {
-    var mirrorBasePath = process.env.PWD + '/.meteor/local/.mirror'.split('/').join(path.sep),
-        cmd = new Rsync()
+    var cmd = new Rsync()
           .shell('ssh')
           .flags('av')
           .set('delete')
@@ -491,7 +505,7 @@ Velocity = {};
           .exclude('.meteor/local')
           .exclude('tests/.*')
           .source(process.env.PWD + path.sep)
-          .destination(mirrorBasePath);
+          .destination(Velocity.getMirrorPath());
     var then = Date.now();
     cmd.execute(Meteor.bindEnvironment(function (error, code, cmd) {
       console.log('All done executing', cmd);
