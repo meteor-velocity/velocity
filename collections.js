@@ -1,28 +1,39 @@
-VelocityTestFiles = new Meteor.Collection("velocityTestFiles");
-VelocityTestReports = new Meteor.Collection("velocityTestReports");
-VelocityAggregateReports = new Meteor.Collection("velocityAggregateReports");
-VelocityLogs = new Meteor.Collection("velocityLogs");
+/* global
+ VelocityTestFiles: true,
+ VelocityTestReports: true,
+ VelocityAggregateReports: true,
+ VelocityLogs: true
+ */
 
-if (!Package["autopublish"]) {
-  if (Meteor.isServer) {
-    Meteor.publish("VelocityTestFiles", function () {
-      return VelocityTestFiles.find({});
-    });
-    Meteor.publish("VelocityTestReports", function () {
-      return VelocityTestReports.find({});
-    });
-    Meteor.publish("VelocityAggregateReports", function () {
-      return VelocityAggregateReports.find({});
-    });
-    Meteor.publish("VelocityLogs", function () {
-      return VelocityLogs.find({});
-    });
-  }
+VelocityTestFiles = new Meteor.Collection('velocityTestFiles');
+VelocityTestReports = new Meteor.Collection('velocityTestReports');
+VelocityAggregateReports = new Meteor.Collection('velocityAggregateReports');
+VelocityLogs = new Meteor.Collection('velocityLogs');
 
-  if (Meteor.isClient) {
-    Meteor.subscribe("VelocityTestFiles");
-    Meteor.subscribe("VelocityTestReports");
-    Meteor.subscribe("VelocityAggregateReports");
-    Meteor.subscribe("VelocityLogs");
+(function () {
+  'use strict';
+
+  if (!Package.autopublish) {
+    if (Meteor.isServer) {
+      Meteor.publish('VelocityTestFiles', function () {
+        return VelocityTestFiles.find({});
+      });
+      Meteor.publish('VelocityTestReports', function () {
+        return VelocityTestReports.find({});
+      });
+      Meteor.publish('VelocityAggregateReports', function () {
+        return VelocityAggregateReports.find({});
+      });
+      Meteor.publish('VelocityLogs', function () {
+        return VelocityLogs.find({});
+      });
+    }
+
+    if (Meteor.isClient) {
+      Meteor.subscribe('VelocityTestFiles');
+      Meteor.subscribe('VelocityTestReports');
+      Meteor.subscribe('VelocityAggregateReports');
+      Meteor.subscribe('VelocityLogs');
+    }
   }
-}
+})();

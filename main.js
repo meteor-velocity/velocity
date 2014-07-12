@@ -8,10 +8,10 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 Velocity = {};
 
 (function () {
-  "use strict";
+  'use strict';
 
-  if (process.env.NODE_ENV !== "development" || process.env.IS_MIRROR) {
-    DEBUG && console.log("Not adding velocity code");
+  if (process.env.NODE_ENV !== 'development' || process.env.IS_MIRROR) {
+    DEBUG && console.log('Not adding velocity code');
     return;
   }
 
@@ -81,7 +81,7 @@ Velocity = {};
      *                 and/or define a list of tests to keep.
      *                 ex.
      *                 {
-     *                   framework: "jasmine-unit",
+     *                   framework: 'jasmine-unit',
      *                   notIn: ['tests/auth-jasmine-unit.js']
      *                 }
      */
@@ -260,8 +260,8 @@ Velocity = {};
 
     _.each(requiredFields, function (name) {
       if (!target[name]) {
-        throw new Error("Required field '" + name + "' is missing." +
-          "Result not posted.");
+        throw new Error('Required field "' + name + '" is missing. ' +
+          'Result not posted.');
       }
     });
   }

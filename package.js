@@ -1,13 +1,13 @@
 Package.describe({
-  summary: "Velocity, a Meteor specific test-runner"
+  summary: 'Velocity, a Meteor specific test-runner'
 });
 
 Npm.depends({
-  "chokidar": "0.8.2",
-  "lodash": "2.4.1",
-  "glob": "3.2.9",
-  "rsync": "0.3.0",
-  "fs.extra": "1.2.1",
+  'chokidar': '0.8.2',
+  'lodash': '2.4.1',
+  'glob': '3.2.9',
+  'rsync': '0.3.0',
+  'fs.extra': '1.2.1',
 });
 
 Package.on_use(function (api) {
