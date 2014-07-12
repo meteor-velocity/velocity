@@ -255,6 +255,9 @@ Velocity = {};
    * @private
    */
   function _checkRequired (requiredFields, target) {
+    // Check target to pass 'audit-argument-checks' requirement
+    check(target, Match.Any);
+
     _.each(requiredFields, function (name) {
       if (!target[name]) {
         throw new Error("Required field '" + name + "' is missing." +
