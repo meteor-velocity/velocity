@@ -150,7 +150,7 @@ Used to be encountered when you referenced the velocity repo directly in `smart.
 We are collaborating with an all-star team on unifying the Meteor testing landscape:
 
 * [Sam Hatoum](https://github.com/samhatoum) from [Xolv.io](http://xolv.io/), author of [RTD](https://github.com/xolvio/rtd)
-* [Arunoda Susiripala](https://github.com/arunoda) from [MeteorHacks](meteorhacks.com), author of [Laika](http://arunoda.github.io/laika/)
+* [Arunoda Susiripala](https://github.com/arunoda) from [MeteorHacks](http://meteorhacks.com), author of [Laika](http://arunoda.github.io/laika/)
 * [Adrian Lanning](https://github.com/alanning) from [Share911](http://about.share911.com/), contributor to [all things Meteor](https://github.com/alanning?tab=repositories)
 * [Mike Risse](https://github.com/rissem) from [MadEye](https://madeye.io/), author of [mocha-web](https://github.com/mad-eye/meteor-mocha-web)
 * [Greg Thornton](https://github.com/xdissent) author of [meteor-cucumber](https://github.com/xdissent/meteor-cucumber)
