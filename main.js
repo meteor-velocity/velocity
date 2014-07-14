@@ -190,7 +190,7 @@ Velocity = {};
         failureType: Match.Optional(String),
         failureMessage: Match.Optional(String),
         failureStackTrace: Match.Optional(Match.Any),
-        ancestors: Match.Optional(Array)
+        ancestors: Match.Optional([String])
       });
       check(data, resultSchema);
 
