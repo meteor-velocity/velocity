@@ -558,9 +558,13 @@ Velocity = {};
       .source(process.env.PWD + path.sep)
       .destination(Velocity.getMirrorPath());
     var then = Date.now();
-    cmd.execute(Meteor.bindEnvironment(function (error, code, cmd) {
-      DEBUG && console.log('[velocity] rsync took', Date.now() - then);
+    cmd.execute(Meteor.bindEnvironment(function (error) {
 
+      if (error) {
+        DEBUG && console.error('[velocity] Error syncing mirror', error);
+      } else {
+        DEBUG && console.log('[velocity] rsync took', Date.now() - then);
+      }
       // TODO remove this once jasmine and mocha-web are using the new method
       Meteor.call('velocityStartMirror', {
         name: 'mocha-web',
