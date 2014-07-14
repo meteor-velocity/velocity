@@ -8,6 +8,7 @@ Npm.depends({
   'glob': '3.2.9',
   'rsync': '0.3.0',
   'fs.extra': '1.2.1',
+  'freeport': '1.0.2'
 });
 
 Package.on_use(function (api) {
@@ -15,6 +16,7 @@ Package.on_use(function (api) {
 
   api.export('Velocity', ['client', 'server']);
   api.export('VelocityTestFiles', ['client', 'server']);
+  api.export('VelocityFixtureFiles', ['client', 'server']);
   api.export('VelocityTestReports', ['client', 'server']);
   api.export('VelocityAggregateReports', ['client', 'server']);
   api.export('VelocityLogs', ['client', 'server']);
