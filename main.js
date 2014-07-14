@@ -308,16 +308,22 @@ Velocity = {};
 //
 
   /**
-   * Ensures that each require field is found on the target object.
-   * Throws exception if a required field is undefined, null or an empty string.
+   *
+   * Performs a http get and retries the specified number of times with the specified timeouts.
+   * Uses a future to respond and the future return object can be provided.
    *
    * @method _retryHttpGet
-   * @param url requiredFields  The target location
-   * @param retries             Maximum number of retries
-   * @param maxTimeout          Maximum time to wait for the location to respond
+   * @param url             requiredFields  The target location
+   *
+   * @param futureResponse  optional        The future response that will be augmented with the
+   *                                        http status code (if successful)
+   * @param retries         optional        Maximum number of retries
+   * @param maxTimeout      optional        Maximum time to wait for the location to respond
+   *
+   * @return    A future that can be used in meteor methods (or for other async needs)
    * @private
    */
-  function _retryHttpGet (url, response, retries, maxTimeout) {
+  function _retryHttpGet (url, futureResponse, retries, maxTimeout) {
     var f = new Future();
     var retry = new Retry({
       baseTimeout: 100,
@@ -329,7 +335,7 @@ Velocity = {};
         var res = HTTP.get(url);
         f.return(_.extend({
           statusCode: res.statusCode
-        }, response));
+        }, futureResponse));
       } catch (ex) {
         if (tries < retries ? retries : 5) {
           DEBUG && console.log('[velocity] retrying mirror at ', path, ex.message);
