@@ -6,6 +6,7 @@
  */
 
 VelocityTestFiles = new Meteor.Collection('velocityTestFiles');
+VelocityFixtureFiles = new Meteor.Collection('velocityFixtureFiles');
 VelocityTestReports = new Meteor.Collection('velocityTestReports');
 VelocityAggregateReports = new Meteor.Collection('velocityAggregateReports');
 VelocityLogs = new Meteor.Collection('velocityLogs');
@@ -17,6 +18,9 @@ VelocityLogs = new Meteor.Collection('velocityLogs');
     if (Meteor.isServer) {
       Meteor.publish('VelocityTestFiles', function () {
         return VelocityTestFiles.find({});
+      });
+      Meteor.publish('VelocityFixtureFiles', function () {
+        return VelocityFixtureFiles.find({});
       });
       Meteor.publish('VelocityTestReports', function () {
         return VelocityTestReports.find({});
@@ -31,6 +35,7 @@ VelocityLogs = new Meteor.Collection('velocityLogs');
 
     if (Meteor.isClient) {
       Meteor.subscribe('VelocityTestFiles');
+      Meteor.subscribe('VelocityFixtureFiles');
       Meteor.subscribe('VelocityTestReports');
       Meteor.subscribe('VelocityAggregateReports');
       Meteor.subscribe('VelocityLogs');

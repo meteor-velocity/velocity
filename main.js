@@ -1,7 +1,7 @@
 /*jshint -W117, -W030 */
 /* global
-   Velocity:true,
-   DEBUG:true
+ Velocity:true,
+ DEBUG:true
  */
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
@@ -9,6 +9,10 @@ Velocity = {};
 
 (function () {
   'use strict';
+
+//////////////////////////////////////////////////////////////////////
+// Init
+//
 
   if (process.env.NODE_ENV !== 'development' || process.env.IS_MIRROR) {
     DEBUG && console.log('Not adding velocity code');
@@ -21,16 +25,20 @@ Velocity = {};
       writeFile = Meteor._wrapAsync(fs.writeFile),
       path = Npm.require('path'),
       Rsync = Npm.require('rsync'),
+      Future = Npm.require('fibers/future'),
+      freeport = Npm.require('freeport'),
       child_process = Npm.require('child_process'),
       spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
       _config,
       _testFrameworks,
-      watcher;
+      _watcher,
+      FIXTURE_REG_EXP = new RegExp("-fixture.(js|coffee)$"),
+      DEFAULT_FIXTURE_PATH = process.env.PWD + path.sep + 'packages' + path.sep + 'velocity' + path.sep + 'default-fixture.js';
 
-  Meteor.startup(function initializeVelocity() {
-    DEBUG && console.log('PWD', process.env.PWD);
+  Meteor.startup(function initializeVelocity () {
+    DEBUG && console.log('[velocity] PWD', process.env.PWD);
 
     _config = _loadTestPackageConfigs();
     _testFrameworks = _.pluck(_config, function (config) {
@@ -45,6 +53,7 @@ Velocity = {};
 //////////////////////////////////////////////////////////////////////
 // Public Methods
 //
+
   _.extend(Velocity, {
 
     getMirrorPath: function () {
@@ -191,7 +200,6 @@ Velocity = {};
       _updateAggregateReports();
     },  // end completed
 
-
     /**
      * Meteor method: copySampleTests
      * Copy sample tests from frameworks `sample-tests` directories
@@ -233,17 +241,114 @@ Velocity = {};
           console.log(stderr);
         });
       }
-    }  // end copySampleTests
+    },  // end copySampleTests
 
+    /**
+     * Meteor method: velocityStartMirror
+     *
+     * Starts a mirror and copies any specified fixture files into the mirror.
+     * TODO and will remove any registered frameworks and reporters from the mirror
+     *
+     * @method velocityStartMirror
+     * @param {Object} options Required fields:
+     *                   name - String ex. 'mocha-web-1'
+     *
+     *                 Optional parameters:
+     *                   fixtureFiles - Array of files with absolute paths
+     *                   port - String use a specific port instead of finding the next available one
+     *
+     * @return the url of started mirror
+     */
+    velocityStartMirror: function (options) {
+
+      check(options, {
+        name: String,
+        port: Match.Optional(Number),
+        fixtureFiles: Match.Optional(Array)
+      });
+
+      var mirror_base_path = Velocity.getMirrorPath(),
+          mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1'),
+          port = options.port ? options.port : Meteor._wrapAsync(freeport)(),
+          mirrorLocation = 'http://localhost:' + port;
+
+      if (options.fixtureFiles) {
+        _.each(options.fixtureFiles, function (fixtureFile) {
+          VelocityFixtureFiles.insert({
+            _id: fixtureFile,
+            absolutePath: fixtureFile
+          });
+        });
+      }
+
+      var opts = {
+        cwd: mirror_base_path,
+        stdio: 'pipe',
+        env: _.extend({}, process.env, {
+          ROOT_URL: mirrorLocation,
+          MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/' + options.name,
+          PARENT_URL: process.env.ROOT_URL,
+          IS_MIRROR: true
+        })
+      };
+
+      writeFile(mirror_base_path + '/settings.json', JSON.stringify(Meteor.settings));
+
+      DEBUG && console.log('[velocity] Starting mirror at', mirrorLocation);
+
+      spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
+      return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
+
+    }  // end velocityStartMirror
 
   });  // end Meteor methods
-
-
-
 
 //////////////////////////////////////////////////////////////////////
 // Private functions
 //
+
+  /**
+   *
+   * Performs a http get and retries the specified number of times with the specified timeouts.
+   * Uses a future to respond and the future return object can be provided.
+   *
+   * @method _retryHttpGet
+   * @param url             requiredFields  The target location
+   *
+   * @param futureResponse  optional        The future response that will be augmented with the
+   *                                        http status code (if successful)
+   * @param retries         optional        Maximum number of retries
+   * @param maxTimeout      optional        Maximum time to wait for the location to respond
+   *
+   * @return    A future that can be used in meteor methods (or for other async needs)
+   * @private
+   */
+  function _retryHttpGet (url, futureResponse, retries, maxTimeout) {
+    var f = new Future();
+    var retry = new Retry({
+      baseTimeout: 100,
+      maxTimeout: maxTimeout ? maxTimeout : 1000
+    });
+    var tries = 0;
+    var doGet = function () {
+      try {
+        var res = HTTP.get(url);
+        f.return(_.extend({
+          statusCode: res.statusCode
+        }, futureResponse));
+      } catch (ex) {
+        if (tries < retries ? retries : 5) {
+          DEBUG && console.log('[velocity] retrying mirror at ', path, ex.message);
+          retry.retryLater(++tries, doGet);
+        } else {
+          console.error('[velocity] mirror failed to respond', ex.message);
+          f.throw(ex);
+        }
+      }
+    };
+    doGet();
+    return f.wait();
+  } // end _retryHttpGet
 
   /**
    * Ensures that each require field is found on the target object.
@@ -264,9 +369,7 @@ Velocity = {};
           'Result not posted.');
       }
     });
-  }
-
-
+  } // end _checkRequired
 
   /**
    * Locate all velocity-compatible test packages and return their config
@@ -275,15 +378,15 @@ Velocity = {};
    * @example
    *     // in `jasmine-unit` package's `smart.json`:
    *     {
- *       "name": "jasmine-unit",
- *       "description": "Velocity-compatible jasmine unit test package",
- *       "homepage": "https://github.com/xolvio/jasmine-unit",
- *       "author": "Sam Hatoum",
- *       "version": "0.1.1",
- *       "git": "https://github.com/xolvio/jasmine-unit.git",
- *       "test-package": true,
- *       "regex": "-jasmine-unit\\.(js|coffee)$"
- *     }
+   *       "name": "jasmine-unit",
+   *       "description": "Velocity-compatible jasmine unit test package",
+   *       "homepage": "https://github.com/xolvio/jasmine-unit",
+   *       "author": "Sam Hatoum",
+   *       "version": "0.1.1",
+   *       "git": "https://github.com/xolvio/jasmine-unit.git",
+   *       "test-package": true,
+   *       "regex": "-jasmine-unit\\.(js|coffee)$"
+   *     }
    *
    * @method _loadTestPackageConfigs
    * @return {Object} Hash of test package names and their normalized config data.
@@ -328,7 +431,6 @@ Velocity = {};
     return testConfigDictionary;
   }  // end _loadTestPackageConfigs
 
-
   /**
    * Initialize the directory/file watcher.
    *
@@ -337,7 +439,6 @@ Velocity = {};
    * @private
    */
   function _initWatcher (config) {
-    var _watcher;
 
     _watcher = chokidar.watch(Velocity.getTestsPath(), {ignored: /[\/\\]\./});
 
@@ -353,6 +454,16 @@ Velocity = {};
       relativePath = filePath.substring(process.env.PWD.length);
       if (relativePath[0] === path.sep) {
         relativePath = relativePath.substring(1);
+      }
+
+      // if this is a fixture file, put it in the fixtures collection
+      if (FIXTURE_REG_EXP.test(relativePath)) {
+        VelocityFixtureFiles.insert({
+          _id: filePath,
+          absolutePath: filePath,
+          lastModified: Date.now()
+        });
+        return;
       }
 
       // test against each test framework's regexp matcher, use first
@@ -384,6 +495,7 @@ Velocity = {};
       // Since we key on filePath and we only add files we're interested in,
       // we don't have to worry about inadvertently updating records for files
       // we don't care about.
+      VelocityFixtureFiles.update(filePath, { $set: {lastModified: Date.now()}});
       VelocityTestFiles.update(filePath, { $set: {lastModified: Date.now()}});
     }));
 
@@ -396,9 +508,7 @@ Velocity = {};
       _reset(config);
     }));
 
-    return _watcher;
   }  // end _initWatcher
-
 
   /**
    * Re-init file watcher and clear all test results.
@@ -408,11 +518,16 @@ Velocity = {};
    * @private
    */
   function _reset (config) {
-    if (watcher) {
-      watcher.close();
+    if (_watcher) {
+      _watcher.close();
     }
 
     VelocityTestFiles.remove({});
+    VelocityFixtureFiles.remove({});
+    VelocityFixtureFiles.insert({
+      _id: DEFAULT_FIXTURE_PATH,
+      absolutePath: DEFAULT_FIXTURE_PATH
+    });
     VelocityTestReports.remove({});
     VelocityLogs.remove({});
     VelocityAggregateReports.remove({});
@@ -431,10 +546,10 @@ Velocity = {};
       });
     });
 
-    // Meteor just reloaded us which means we should rsync the app files
-    _syncAndStartMirror();
+    // Meteor just reloaded us which means we should rsync the app files to the mirror
+    _syncMirror();
 
-    watcher = _initWatcher(config);
+    _initWatcher(config);
   }
 
   /**
@@ -464,62 +579,48 @@ Velocity = {};
 
   }
 
-  function _startMirror () {
-    var mirrorBasePath = Velocity.getMirrorPath();
-    var mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1');
-    // start meteor on the mirror using a different port and different db schema
-    var opts = {
-      cwd: mirrorBasePath,
-      //      stdio: 'inherit',
-      stdio: 'pipe',
-      env: _.extend({}, process.env, {
-        PORT: 5000,
-        ROOT_URL: 'http://localhost:5000/',
-        MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/mirror',
-        PARENT_URL: process.env.ROOT_URL,
-        IS_MIRROR: true
-      })
-    };
-    writeFile(mirrorBasePath + '/settings.json', JSON.stringify(Meteor.settings));
-
-    console.log('Starting mirror on port 5000');
-
-    spawn('meteor', ['--port', '5000', '--settings', 'settings.json'], opts);
-  }
-
   /**
-   * Creates a mirror of the application under .meteor/local/.mirror
-   * Any files with the pattern tests/.*  are not copied, this stops .report
-   * directory from also being copied. The mirror is then started using  a node
-   * fork
+   * Creates a physical mirror of the application under .meteor/local/.mirror
    *
-   * @method _syncAndStartMirror
+   *     - Any files with the pattern tests/.*  are not copied, this stops .report
+   *     directory from also being copied.
+   *
+   *     TODO - Strips out velocity, any test packages and reporters from the mirror's .meteor/packages file
+   *
+   * @method _syncMirror
    * @private
    */
-  function _syncAndStartMirror () {
+  function _syncMirror () {
     var cmd = new Rsync()
-          .shell('ssh')
-          .flags('av')
-          .set('delete')
-          .set('q')
-          .set('delay-updates')
-          .set('force')
-          .exclude('.meteor/local')
-          .exclude('tests/.*')
-          .source(process.env.PWD + path.sep)
-          .destination(Velocity.getMirrorPath());
+      .shell('ssh')
+      .flags('av')
+      .set('delete')
+      .set('q')
+      .set('delay-updates')
+      .set('force')
+      .exclude('.meteor/local')
+      .exclude('tests/.*')
+      .source(process.env.PWD + path.sep)
+      .destination(Velocity.getMirrorPath());
     var then = Date.now();
-    cmd.execute(Meteor.bindEnvironment(function (error, code, cmd) {
-      console.log('All done executing', cmd);
-      console.log('rsync took', Date.now() - then);
+    cmd.execute(Meteor.bindEnvironment(function (error) {
 
-      // TODO strip out velocity and html reporter from the mirror app
-
-      // TODO do magic here like callback frameworks to let them do what they need?
-      // For now, only mocha-web tests are going to be copied outside the tests
-      // directory so they can be watched by meteor
-
-      _startMirror();
+      if (error) {
+        DEBUG && console.error('[velocity] Error syncing mirror', error);
+      } else {
+        DEBUG && console.log('[velocity] rsync took', Date.now() - then);
+      }
+      // TODO remove this once jasmine and mocha-web are using the new method
+      Meteor.call('velocityStartMirror', {
+        name: 'mocha-web',
+        port: 5000
+      }, function (e, r) {
+        if (e) {
+          console.error('[velocity] mirror failed to start', e);
+        } else {
+          console.log('Mirror started', r);
+        }
+      });
 
     }));
   }
