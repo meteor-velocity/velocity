@@ -12,6 +12,10 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
+
+  api.use('http');
+  api.use('retry');
+
   api.add_files('collections.js', ['client', 'server']);
 
   api.export('Velocity', ['client', 'server']);

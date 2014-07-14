@@ -25,6 +25,7 @@ Velocity = {};
       writeFile = Meteor._wrapAsync(fs.writeFile),
       path = Npm.require('path'),
       Rsync = Npm.require('rsync'),
+      Future = Npm.require('fibers/future'),
       freeport = Npm.require('freeport'),
       child_process = Npm.require('child_process'),
       spawn = child_process.spawn,
@@ -268,7 +269,8 @@ Velocity = {};
 
       var mirror_base_path = Velocity.getMirrorPath(),
           mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1'),
-          port = options.port ? options.port : Meteor._wrapAsync(freeport)();
+          port = options.port ? options.port : Meteor._wrapAsync(freeport)(),
+          mirrorLocation = 'http://localhost:' + port;
 
       if (options.fixtureFiles) {
         _.each(options.fixtureFiles, function (fixtureFile) {
@@ -283,7 +285,7 @@ Velocity = {};
         cwd: mirror_base_path,
         stdio: 'pipe',
         env: _.extend({}, process.env, {
-          ROOT_URL: 'http://localhost:' + port,
+          ROOT_URL: mirrorLocation,
           MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/' + options.name,
           PARENT_URL: process.env.ROOT_URL,
           IS_MIRROR: true
@@ -292,10 +294,10 @@ Velocity = {};
 
       writeFile(mirror_base_path + '/settings.json', JSON.stringify(Meteor.settings));
 
-      DEBUG && console.log('[velocity] Starting mirror at http://localhost:' + port);
+      DEBUG && console.log('[velocity] Starting mirror at', mirrorLocation);
 
       spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
-      return 'http://localhost:' + port;
+      return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
 
     }  // end velocityStartMirror
 
@@ -304,6 +306,43 @@ Velocity = {};
 //////////////////////////////////////////////////////////////////////
 // Private functions
 //
+
+  /**
+   * Ensures that each require field is found on the target object.
+   * Throws exception if a required field is undefined, null or an empty string.
+   *
+   * @method _retryHttpGet
+   * @param url requiredFields  The target location
+   * @param retries             Maximum number of retries
+   * @param maxTimeout          Maximum time to wait for the location to respond
+   * @private
+   */
+  function _retryHttpGet (url, response, retries, maxTimeout) {
+    var f = new Future();
+    var retry = new Retry({
+      baseTimeout: 100,
+      maxTimeout: maxTimeout ? maxTimeout : 1000
+    });
+    var tries = 0;
+    var doGet = function () {
+      try {
+        var res = HTTP.get(url);
+        f.return(_.extend({
+          statusCode: res.statusCode
+        }, response));
+      } catch (ex) {
+        if (tries < retries ? retries : 5) {
+          DEBUG && console.log('[velocity] retrying mirror at ', path, ex.message);
+          retry.retryLater(++tries, doGet);
+        } else {
+          console.error('[velocity] mirror failed to respond', ex.message);
+          f.throw(ex);
+        }
+      }
+    };
+    doGet();
+    return f.wait();
+  } // end _retryHttpGet
 
   /**
    * Ensures that each require field is found on the target object.
@@ -324,7 +363,7 @@ Velocity = {};
           'Result not posted.');
       }
     });
-  }
+  } // end _checkRequired
 
   /**
    * Locate all velocity-compatible test packages and return their config
@@ -569,6 +608,12 @@ Velocity = {};
       Meteor.call('velocityStartMirror', {
         name: 'mocha-web',
         port: 5000
+      }, function (e, r) {
+        if (e) {
+          console.error('[velocity] mirror failed to start', e);
+        } else {
+          console.log('Mirror started', r);
+        }
       });
 
     }));
