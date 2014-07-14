@@ -159,6 +159,9 @@ Velocity = {};
      *                   result - String.  ex. 'failed', 'passed'
      *
      *                 Suggested fields:
+     *                   isClient - {Boolean] Is it a client test?
+     *                   isServer - {Boolean} Is it a server test?
+     *                   browser  - {String} In which browser did the test run?
      *                   timestamp
      *                   time
      *                   async
@@ -171,6 +174,25 @@ Velocity = {};
      */
     postResult: function (data) {
       var requiredFields = ['id', 'name', 'framework', 'result'];
+      var resultSchema = Match.ObjectIncluding({
+        id: String,
+        name: String,
+        framework: _matchOneOf(_.keys(_config)),
+        result: _matchOneOf(['passed', 'failed']), // TODO: Is something missing?
+        isClient: Match.Optional(Boolean),
+        isServer: Match.Optional(Boolean),
+        browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
+        timestamp: Match.Optional(String), // TODO: Should be date and not optional?
+        time: Match.Optional(Match.Any), // TODO: What is this?
+        async: Match.Optional(Boolean),
+        timeOut: Match.Optional(Match.Any),
+        pending: Match.Optional(Boolean),
+        failureType: Match.Optional(String),
+        failureMessage: Match.Optional(String),
+        failureStackTrace: Match.Optional(Match.Any),
+        ancestors: Match.Optional(Array)
+      });
+      check(data, resultSchema);
 
       data = data || {};
 
@@ -370,6 +392,12 @@ Velocity = {};
       }
     });
   } // end _checkRequired
+
+  function _matchOneOf(values) {
+    return Match.Where(function (value) {
+      return (values.indexOf(value) !== -1);
+    })
+  }
 
   /**
    * Locate all velocity-compatible test packages and return their config
