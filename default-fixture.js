@@ -1,7 +1,4 @@
 /*jshint -W117, -W030 */
-/* global
- Future: true
- */
 
 (function () {
   'use strict';
@@ -31,7 +28,6 @@
         return false;
       }
 
-      // Set up a future
       var fut = new Future();
 
       var collectionsRemoved = 0;
@@ -45,7 +41,7 @@
         _.each(appCollections, function (appCollection) {
           appCollection.remove(function (e) {
             if (e) {
-              fut['return']('fail: ' + e);
+              fut.return('fail: ' + e);
             }
             collectionsRemoved++;
             if (appCollections.length === collectionsRemoved) {
