@@ -1,4 +1,7 @@
 /*jshint -W117, -W030 */
+/* global
+ Future: true
+ */
 
 (function () {
   'use strict';
@@ -6,6 +9,11 @@
   //////////////////////////////////////////////////////////////////////
 // Meteor Methods
 //
+
+  var Future;
+  Meteor.startup(function () {
+    Future = Npm.require('fibers/future');
+  });
 
   Meteor.methods({
 
@@ -23,15 +31,33 @@
         return false;
       }
 
+      // Set up a future
+      var fut = new Future();
+
+      var collectionsRemoved = 0;
       var db = VelocityLogs.find()._mongo.db;
-      db.collections(function (err, cols) {
-        var appCollections = _.reject(cols, function (col) {
+      db.collections(function (err, collections) {
+
+        var appCollections = _.reject(collections, function (col) {
           return col.collectionName.indexOf('velocity') === 0 || col.collectionName === 'system.indexes';
         });
+
         _.each(appCollections, function (appCollection) {
-          appCollection.remove(function () {});
+          appCollection.remove(function (e) {
+            if (e) {
+              fut['return']('fail: ' + e);
+            }
+            collectionsRemoved++;
+            if (appCollections.length === collectionsRemoved) {
+              fut['return']('success');
+            }
+          });
         });
+
       });
+
+      return fut.wait();
+
     } // end velocityResetDatabase
 
   });
