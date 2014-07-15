@@ -156,21 +156,20 @@ Velocity = {};
      *                   id - String
      *                   name - String
      *                   framework - String  ex. 'jasmine-unit'
-     *                   result - String.  ex. 'failed', 'passed'
+     *                   result - String.  ex. 'failed', 'passed' or 'pending'
      *
      *                 Suggested fields:
      *                   isClient - {Boolean] Is it a client test?
      *                   isServer - {Boolean} Is it a server test?
      *                   browser  - {String} In which browser did the test run?
-     *                   timestamp
-     *                   time
-     *                   async
-     *                   timeOut
-     *                   pending
-     *                   failureType
-     *                   failureMessage
-     *                   failureStackTrace
-     *                   ancestors
+     *                   timestamp - {Date} The time that the test started for this result
+     *                   async - // TODO @rissem to write
+     *                   timeOut - // TODO @rissem to write
+     *                   failureType - {String} ex 'expect' or 'assert'
+     *                   failureMessage - {String} The failure message from the test framework
+     *                   failureStackTrace - {String} The stack trace associated with the failure
+     *                   ancestors - The hierarchy of suites and blocks above this test
+     *                               ex. 'Template.leaderboard.selected_name'
      */
     postResult: function (data) {
       var requiredFields = ['id', 'name', 'framework', 'result'];
@@ -178,15 +177,13 @@ Velocity = {};
         id: String,
         name: String,
         framework: _matchOneOf(_.keys(_config)),
-        result: _matchOneOf(['passed', 'failed']), // TODO: Is something missing?
+        result: _matchOneOf(['passed', 'failed', 'pending']),
         isClient: Match.Optional(Boolean),
         isServer: Match.Optional(Boolean),
         browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
-        timestamp: Match.Optional(String), // TODO: Should be date and not optional?
-        time: Match.Optional(Match.Any), // TODO: What is this?
+        timestamp: Match.Optional(Date),
         async: Match.Optional(Boolean),
         timeOut: Match.Optional(Match.Any),
-        pending: Match.Optional(Boolean),
         failureType: Match.Optional(String),
         failureMessage: Match.Optional(String),
         failureStackTrace: Match.Optional(Match.Any),
