@@ -603,6 +603,7 @@ Velocity = {};
       .source(process.env.PWD + path.sep)
       .destination(Velocity.getMirrorPath());
     var then = Date.now();
+
     cmd.execute(Meteor.bindEnvironment(function (error) {
 
       if (error) {
@@ -610,6 +611,10 @@ Velocity = {};
       } else {
         DEBUG && console.log('[velocity] rsync took', Date.now() - then);
       }
+
+      // TODO convert the instrumenter to a preprocessor package
+      Velocity.instrumentFiles();
+
       // TODO remove this once jasmine and mocha-web are using the new method
       Meteor.call('velocityStartMirror', {
         name: 'mocha-web',

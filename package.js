@@ -8,7 +8,9 @@ Npm.depends({
   'glob': '3.2.9',
   'rsync': '0.3.0',
   'fs.extra': '1.2.1',
-  'freeport': '1.0.2'
+  'freeport': '1.0.2',
+  'istanbul': '0.3.0',
+  'ibrik': '1.1.1'
 });
 
 Package.on_use(function (api) {
@@ -27,4 +29,5 @@ Package.on_use(function (api) {
 
   api.add_files('main.js', 'server');
   api.add_files(['lib/FileCopier.js'], 'server');
+  api.add_files(['lib/Instrumenter.js'], 'server');
 });
