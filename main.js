@@ -154,7 +154,7 @@ Velocity = {};
       });
 
       VelocityLogs.insert({
-        timestamp: options.timestamp ? options.timestamp : Date.now(),
+        timestamp: options.timestamp || new Date(),
         type: options.type,
         message: options.message,
         framework: options.framework
