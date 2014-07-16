@@ -12,7 +12,7 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
-
+  api.use('check');
   api.use('http');
   api.use('retry');
 
