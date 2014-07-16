@@ -95,6 +95,12 @@ Velocity = {};
      *                 }
      */
     resetReports: function (options) {
+      options = options || {};
+      check(options, {
+        framework: Match.Optional(String),
+        notIn: Match.Optional([String])
+      });
+
       var query = {};
       if (options.framework) {
         query.framework = options.framework;
@@ -114,6 +120,11 @@ Velocity = {};
      * @param {Object} [options] Optional, specify specific framework to clear
      */
     resetLogs: function (options) {
+      options = options || {};
+      check(options, {
+        framework: Match.Optional(String)
+      });
+
       var query = {};
       if (options.framework) {
         query.framework = options.framework;
@@ -135,9 +146,12 @@ Velocity = {};
      *                   timestamp - Date
      */
     postLog: function (options) {
-      var requiredFields = ['type', 'message', 'framework'];
-
-      _checkRequired(requiredFields, options);
+      check(options, {
+        type: String,
+        message: String,
+        framework: String,
+        timestamp: Match.Optional(Date)
+      });
 
       VelocityLogs.insert({
         timestamp: options.timestamp ? options.timestamp : Date.now(),
@@ -172,8 +186,7 @@ Velocity = {};
      *                               ex. 'Template.leaderboard.selected_name'
      */
     postResult: function (data) {
-      var requiredFields = ['id', 'name', 'framework', 'result'];
-      var resultSchema = Match.ObjectIncluding({
+      check(data, Match.ObjectIncluding({
         id: String,
         name: String,
         framework: _matchOneOf(_.keys(_config)),
@@ -188,12 +201,7 @@ Velocity = {};
         failureMessage: Match.Optional(String),
         failureStackTrace: Match.Optional(Match.Any),
         ancestors: Match.Optional([String])
-      });
-      check(data, resultSchema);
-
-      data = data || {};
-
-      _checkRequired(requiredFields, data);
+      }));
 
       VelocityTestReports.upsert(data.id, {$set: data});
       _updateAggregateReports();
@@ -209,11 +217,9 @@ Velocity = {};
      *                   framework - String  ex. 'jasmine-unit'
      */
     completed: function (data) {
-      var requiredFields = ['framework'];
-
-      data = data || {};
-
-      _checkRequired(requiredFields, data);
+      check(data, {
+        framework: String
+      });
 
       VelocityAggregateReports.upsert({'name': data.framework}, {$set: {'result': 'completed'}});
       _updateAggregateReports();
@@ -235,10 +241,9 @@ Velocity = {};
           command;
 
       options = options || {};
-
-      if (!options.framework) {
-        return;
-      }
+      check(options, {
+        framework: String
+      });
 
       samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
       testsPath = path.join(pwd, 'tests');
@@ -279,11 +284,10 @@ Velocity = {};
      * @return the url of started mirror
      */
     velocityStartMirror: function (options) {
-
       check(options, {
         name: String,
-        port: Match.Optional(Number),
-        fixtureFiles: Match.Optional(Array)
+        fixtureFiles: Match.Optional([String]),
+        port: Match.Optional(Number)
       });
 
       var mirror_base_path = Velocity.getMirrorPath(),
@@ -370,30 +374,15 @@ Velocity = {};
   } // end _retryHttpGet
 
   /**
-   * Ensures that each require field is found on the target object.
-   * Throws exception if a required field is undefined, null or an empty string.
-   *
-   * @method _checkRequired
-   * @param {Array} requiredFields - list of required field names
-   * @param {Object} target - target object to check
+   * Matcher for checking if a value is one of the given values.
+   * @param {Array} values Valid values.
+   * @returns {*}
    * @private
    */
-  function _checkRequired (requiredFields, target) {
-    // Check target to pass 'audit-argument-checks' requirement
-    check(target, Match.Any);
-
-    _.each(requiredFields, function (name) {
-      if (!target[name]) {
-        throw new Error('Required field "' + name + '" is missing. ' +
-          'Result not posted.');
-      }
-    });
-  } // end _checkRequired
-
   function _matchOneOf(values) {
     return Match.Where(function (value) {
       return (values.indexOf(value) !== -1);
-    })
+    });
   }
 
   /**
