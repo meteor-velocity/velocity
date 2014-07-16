@@ -1,3 +1,4 @@
+/*jshint -W117 */
 /* global
  VelocityTestFiles: true,
  VelocityTestReports: true,
