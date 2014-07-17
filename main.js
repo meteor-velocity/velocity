@@ -257,13 +257,16 @@ Velocity = {};
 
         DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
-        child_process.exec(command, function (err, stdout, stderr) {
-          if (err) {
-            console.log('ERROR', err);
-          }
-          console.log(stdout);
-          console.log(stderr);
-        });
+        child_process.exec(command, Meteor.bindEnvironment(
+          function copySampleTestsExecHandler(err, stdout, stderr) {
+            if (err) {
+              console.log('ERROR', err);
+            }
+            console.log(stdout);
+            console.log(stderr);
+          }),
+          'copySampleTestsExecHandler'
+        );
       }
     },  // end copySampleTests
 
