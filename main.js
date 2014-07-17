@@ -264,9 +264,9 @@ Velocity = {};
             }
             console.log(stdout);
             console.log(stderr);
-          }),
+          },
           'copySampleTestsExecHandler'
-        );
+        ));
       }
     },  // end copySampleTests
 
