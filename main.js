@@ -411,7 +411,7 @@ Velocity = {};
    */
   function _loadTestPackageConfigs () {
     var pwd = process.env.PWD,
-        smartJsons = glob.sync('packages/**/smart.json', {cwd: pwd}),
+        smartJsons = glob.sync('packages/*/smart.json', {cwd: pwd}),
         testConfigDictionary;
 
     DEBUG && console.log('Check for test package configs...', smartJsons);

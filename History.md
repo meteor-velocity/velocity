@@ -1,6 +1,12 @@
+## vNext
+
+* optimize searching for test packages
+
+
 ## v0.1.12
 
 * Passes audit-argument-checks now
+
 
 ### For Velocity plugin developers
 
@@ -9,6 +15,7 @@
 * Added FileCopier utility that can be used for copying test files into the mirror
 * Added Velocity.getMirrorPath for getting the absolute mirror directoy path
 * Added Velocity.getTestsPath for getting the absolute tests directory path
+
 
 ## v0.1.11
 
