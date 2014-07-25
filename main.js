@@ -364,7 +364,7 @@ Velocity = {};
         }, futureResponse));
       } catch (ex) {
         if (tries < retries ? retries : 5) {
-          DEBUG && console.log('[velocity] retrying mirror at ', path, ex.message);
+          DEBUG && console.log('[velocity] retrying mirror at ', url, ex.message);
           retry.retryLater(++tries, doGet);
         } else {
           console.error('[velocity] mirror failed to respond', ex.message);
