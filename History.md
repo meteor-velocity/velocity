@@ -1,7 +1,8 @@
-## vNext
+## v0.1.15
 
 * optimize searching for test packages
 * FileCopier: Correctly handle when a file already exists in the mirror
+
 
 ## v0.1.12
 
