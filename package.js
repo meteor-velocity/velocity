@@ -7,7 +7,7 @@ Npm.depends({
   'lodash': '2.4.1',
   'glob': '3.2.9',
   'rsync': '0.3.0',
-  'fs.extra': '1.2.1',
+  'fs-extra': '0.10.0',
   'freeport': '1.0.2'
 });
 

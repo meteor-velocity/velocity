@@ -1,3 +1,8 @@
+## v0.1.16
+
+* FileCopier: Updated fs-extra dependency
+
+
 ## v0.1.15
 
 * optimize searching for test packages
