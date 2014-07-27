@@ -339,7 +339,11 @@ Velocity = {};
 
       DEBUG && console.log('[velocity] Starting mirror at', mirrorLocation);
 
-      spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
+      var meteor = spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
+      if (!!process.env.VELOCITY_DEBUG_MIRROR) {
+        meteor.stdout.pipe(process.stdout);
+        meteor.stderr.pipe(process.stderr);
+      }
       return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
 
     }  // end velocityStartMirror
