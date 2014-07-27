@@ -24,6 +24,7 @@ Velocity = {};
       readFile = Meteor._wrapAsync(fs.readFile),
       writeFile = Meteor._wrapAsync(fs.writeFile),
       path = Npm.require('path'),
+      url = Npm.require('url'),
       Rsync = Npm.require('rsync'),
       Future = Npm.require('fibers/future'),
       freeport = Npm.require('freeport'),
@@ -293,10 +294,26 @@ Velocity = {};
         port: Match.Optional(Number)
       });
 
-      var mirror_base_path = Velocity.getMirrorPath(),
-          mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1'),
-          port = options.port ? options.port : Meteor._wrapAsync(freeport)(),
-          mirrorLocation = 'http://localhost:' + port;
+      var mirror_base_path = Velocity.getMirrorPath();
+
+      var mongoLocationParts = url.parse(process.env.MONGO_URL);
+      var mongoLocation = url.format({
+        protocol: mongoLocationParts.protocol,
+        slashes: mongoLocationParts.slashes,
+        hostname: mongoLocationParts.hostname,
+        port: mongoLocationParts.port,
+        pathname: '/' + options.name
+      });
+
+      var rootUrlParts = url.parse(Meteor.absoluteUrl());
+      var port = options.port ? options.port : Meteor._wrapAsync(freeport)();
+      var mirrorLocation = url.format({
+        protocol: rootUrlParts.protocol,
+        slashes: rootUrlParts.slashes,
+        hostname: rootUrlParts.hostname,
+        port: port,
+        pathname: rootUrlParts.pathname
+      });
 
       if (options.fixtureFiles) {
         _.each(options.fixtureFiles, function (fixtureFile) {
@@ -312,7 +329,7 @@ Velocity = {};
         stdio: 'pipe',
         env: _.extend({}, process.env, {
           ROOT_URL: mirrorLocation,
-          MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/' + options.name,
+          MONGO_URL: mongoLocation,
           PARENT_URL: process.env.ROOT_URL,
           IS_MIRROR: true
         })

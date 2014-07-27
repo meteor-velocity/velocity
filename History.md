@@ -1,3 +1,8 @@
+## vNEXT
+
+* The mirror urls are now based on the parent ROOT_URL and MONGO_URL
+
+
 ## v0.1.16
 
 * FileCopier: Updated fs-extra dependency
