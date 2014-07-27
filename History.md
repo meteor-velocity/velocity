@@ -1,3 +1,33 @@
+## vNEXT
+
+* The mirror urls are now based on the parent ROOT_URL and MONGO_URL
+
+
+## v0.1.16
+
+* FileCopier: Updated fs-extra dependency
+
+
+## v0.1.15
+
+* optimize searching for test packages
+* FileCopier: Correctly handle when a file already exists in the mirror
+
+
+## v0.1.12
+
+* Passes audit-argument-checks now
+
+
+### For Velocity plugin developers
+
+* Added API for requesting mirrors
+* Added API for resetting the database of the mirror
+* Added FileCopier utility that can be used for copying test files into the mirror
+* Added Velocity.getMirrorPath for getting the absolute mirror directoy path
+* Added Velocity.getTestsPath for getting the absolute tests directory path
+
+
 ## v0.1.11
 
 * remove example submodule; instruct how to use external repo instead

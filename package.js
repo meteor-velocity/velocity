@@ -7,14 +7,19 @@ Npm.depends({
   'lodash': '2.4.1',
   'glob': '3.2.9',
   'rsync': '0.3.0',
+<<<<<<< HEAD
   'fs.extra': '1.2.1',
   'freeport': '1.0.2',
   'istanbul': '0.3.0',
   'ibrik': '1.1.1'
+=======
+  'fs-extra': '0.10.0',
+  'freeport': '1.0.2'
+>>>>>>> b128f920a519a4f741f5eb3fc1b4e6bd5bc3ffed
 });
 
 Package.on_use(function (api) {
-
+  api.use('check');
   api.use('http');
   api.use('retry');
 

@@ -24,6 +24,7 @@ Velocity = {};
       readFile = Meteor._wrapAsync(fs.readFile),
       writeFile = Meteor._wrapAsync(fs.writeFile),
       path = Npm.require('path'),
+      url = Npm.require('url'),
       Rsync = Npm.require('rsync'),
       Future = Npm.require('fibers/future'),
       freeport = Npm.require('freeport'),
@@ -95,6 +96,12 @@ Velocity = {};
      *                 }
      */
     resetReports: function (options) {
+      options = options || {};
+      check(options, {
+        framework: Match.Optional(String),
+        notIn: Match.Optional([String])
+      });
+
       var query = {};
       if (options.framework) {
         query.framework = options.framework;
@@ -114,6 +121,11 @@ Velocity = {};
      * @param {Object} [options] Optional, specify specific framework to clear
      */
     resetLogs: function (options) {
+      options = options || {};
+      check(options, {
+        framework: Match.Optional(String)
+      });
+
       var query = {};
       if (options.framework) {
         query.framework = options.framework;
@@ -135,12 +147,15 @@ Velocity = {};
      *                   timestamp - Date
      */
     postLog: function (options) {
-      var requiredFields = ['type', 'message', 'framework'];
-
-      _checkRequired(requiredFields, options);
+      check(options, {
+        type: String,
+        message: String,
+        framework: String,
+        timestamp: Match.Optional(Match.OneOf(Date, String))
+      });
 
       VelocityLogs.insert({
-        timestamp: options.timestamp ? options.timestamp : Date.now(),
+        timestamp: options.timestamp || new Date(),
         type: options.type,
         message: options.message,
         framework: options.framework
@@ -156,25 +171,38 @@ Velocity = {};
      *                   id - String
      *                   name - String
      *                   framework - String  ex. 'jasmine-unit'
-     *                   result - String.  ex. 'failed', 'passed'
+     *                   result - String.  ex. 'failed', 'passed' or 'pending'
      *
      *                 Suggested fields:
-     *                   timestamp
-     *                   time
-     *                   async
-     *                   timeOut
-     *                   pending
-     *                   failureType
-     *                   failureMessage
-     *                   failureStackTrace
-     *                   ancestors
+     *                   isClient - {Boolean] Is it a client test?
+     *                   isServer - {Boolean} Is it a server test?
+     *                   browser  - {String} In which browser did the test run?
+     *                   timestamp - {Date} The time that the test started for this result
+     *                   async - // TODO @rissem to write
+     *                   timeOut - // TODO @rissem to write
+     *                   failureType - {String} ex 'expect' or 'assert'
+     *                   failureMessage - {String} The failure message from the test framework
+     *                   failureStackTrace - {String} The stack trace associated with the failure
+     *                   ancestors - The hierarchy of suites and blocks above this test
+     *                               ex. 'Template.leaderboard.selected_name'
      */
     postResult: function (data) {
-      var requiredFields = ['id', 'name', 'framework', 'result'];
-
-      data = data || {};
-
-      _checkRequired(requiredFields, data);
+      check(data, Match.ObjectIncluding({
+        id: String,
+        name: String,
+        framework: _matchOneOf(_.keys(_config)),
+        result: _matchOneOf(['passed', 'failed', 'pending']),
+        isClient: Match.Optional(Boolean),
+        isServer: Match.Optional(Boolean),
+        browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
+        timestamp: Match.Optional(Match.OneOf(Date, String)),
+        async: Match.Optional(Boolean),
+        timeOut: Match.Optional(Match.Any),
+        failureType: Match.Optional(String),
+        failureMessage: Match.Optional(String),
+        failureStackTrace: Match.Optional(Match.Any),
+        ancestors: Match.Optional([String])
+      }));
 
       VelocityTestReports.upsert(data.id, {$set: data});
       _updateAggregateReports();
@@ -190,11 +218,9 @@ Velocity = {};
      *                   framework - String  ex. 'jasmine-unit'
      */
     completed: function (data) {
-      var requiredFields = ['framework'];
-
-      data = data || {};
-
-      _checkRequired(requiredFields, data);
+      check(data, {
+        framework: String
+      });
 
       VelocityAggregateReports.upsert({'name': data.framework}, {$set: {'result': 'completed'}});
       _updateAggregateReports();
@@ -216,10 +242,9 @@ Velocity = {};
           command;
 
       options = options || {};
-
-      if (!options.framework) {
-        return;
-      }
+      check(options, {
+        framework: String
+      });
 
       samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
       testsPath = path.join(pwd, 'tests');
@@ -233,13 +258,16 @@ Velocity = {};
 
         DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
-        child_process.exec(command, function (err, stdout, stderr) {
-          if (err) {
-            console.log('ERROR', err);
-          }
-          console.log(stdout);
-          console.log(stderr);
-        });
+        child_process.exec(command, Meteor.bindEnvironment(
+          function copySampleTestsExecHandler(err, stdout, stderr) {
+            if (err) {
+              console.log('ERROR', err);
+            }
+            console.log(stdout);
+            console.log(stderr);
+          },
+          'copySampleTestsExecHandler'
+        ));
       }
     },  // end copySampleTests
 
@@ -260,17 +288,32 @@ Velocity = {};
      * @return the url of started mirror
      */
     velocityStartMirror: function (options) {
-
       check(options, {
         name: String,
-        port: Match.Optional(Number),
-        fixtureFiles: Match.Optional(Array)
+        fixtureFiles: Match.Optional([String]),
+        port: Match.Optional(Number)
       });
 
-      var mirror_base_path = Velocity.getMirrorPath(),
-          mongo_port = process.env.MONGO_URL.replace(/.*:(\d+).*/, '$1'),
-          port = options.port ? options.port : Meteor._wrapAsync(freeport)(),
-          mirrorLocation = 'http://localhost:' + port;
+      var mirror_base_path = Velocity.getMirrorPath();
+
+      var mongoLocationParts = url.parse(process.env.MONGO_URL);
+      var mongoLocation = url.format({
+        protocol: mongoLocationParts.protocol,
+        slashes: mongoLocationParts.slashes,
+        hostname: mongoLocationParts.hostname,
+        port: mongoLocationParts.port,
+        pathname: '/' + options.name
+      });
+
+      var rootUrlParts = url.parse(Meteor.absoluteUrl());
+      var port = options.port ? options.port : Meteor._wrapAsync(freeport)();
+      var mirrorLocation = url.format({
+        protocol: rootUrlParts.protocol,
+        slashes: rootUrlParts.slashes,
+        hostname: rootUrlParts.hostname,
+        port: port,
+        pathname: rootUrlParts.pathname
+      });
 
       if (options.fixtureFiles) {
         _.each(options.fixtureFiles, function (fixtureFile) {
@@ -286,7 +329,7 @@ Velocity = {};
         stdio: 'pipe',
         env: _.extend({}, process.env, {
           ROOT_URL: mirrorLocation,
-          MONGO_URL: 'mongodb://127.0.0.1:' + mongo_port + '/' + options.name,
+          MONGO_URL: mongoLocation,
           PARENT_URL: process.env.ROOT_URL,
           IS_MIRROR: true
         })
@@ -338,7 +381,7 @@ Velocity = {};
         }, futureResponse));
       } catch (ex) {
         if (tries < retries ? retries : 5) {
-          DEBUG && console.log('[velocity] retrying mirror at ', path, ex.message);
+          DEBUG && console.log('[velocity] retrying mirror at ', url, ex.message);
           retry.retryLater(++tries, doGet);
         } else {
           console.error('[velocity] mirror failed to respond', ex.message);
@@ -351,25 +394,16 @@ Velocity = {};
   } // end _retryHttpGet
 
   /**
-   * Ensures that each require field is found on the target object.
-   * Throws exception if a required field is undefined, null or an empty string.
-   *
-   * @method _checkRequired
-   * @param {Array} requiredFields - list of required field names
-   * @param {Object} target - target object to check
+   * Matcher for checking if a value is one of the given values.
+   * @param {Array} values Valid values.
+   * @returns {*}
    * @private
    */
-  function _checkRequired (requiredFields, target) {
-    // Check target to pass 'audit-argument-checks' requirement
-    check(target, Match.Any);
-
-    _.each(requiredFields, function (name) {
-      if (!target[name]) {
-        throw new Error('Required field "' + name + '" is missing. ' +
-          'Result not posted.');
-      }
+  function _matchOneOf(values) {
+    return Match.Where(function (value) {
+      return (values.indexOf(value) !== -1);
     });
-  } // end _checkRequired
+  }
 
   /**
    * Locate all velocity-compatible test packages and return their config
@@ -394,7 +428,7 @@ Velocity = {};
    */
   function _loadTestPackageConfigs () {
     var pwd = process.env.PWD,
-        smartJsons = glob.sync('packages/**/smart.json', {cwd: pwd}),
+        smartJsons = glob.sync('packages/*/smart.json', {cwd: pwd}),
         testConfigDictionary;
 
     DEBUG && console.log('Check for test package configs...', smartJsons);
