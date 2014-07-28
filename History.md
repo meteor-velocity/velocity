@@ -1,6 +1,8 @@
-## vNEXT
+## v0.1.17
 
 * The mirror urls are now based on the parent ROOT_URL and MONGO_URL
+* Velocity will now output the mirror log when the environment variable
+  `VELOCITY_DEBUG_MIRROR` is set to a truey value
 
 
 ## v0.1.16
