@@ -339,7 +339,17 @@ Velocity = {};
 
       DEBUG && console.log('[velocity] Starting mirror at', mirrorLocation);
 
-      spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
+      var meteor = spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
+      if (!!process.env.VELOCITY_DEBUG_MIRROR) {
+        var outputHandler = function(data) {
+          var lines = data.toString().split(/\r?\n/).slice(0, -1);
+          _.map(lines, function(line) {
+              console.log('[velocity mirror] ' + line);
+          });
+        };
+        meteor.stdout.on('data', outputHandler);
+        meteor.stderr.on('data', outputHandler);
+      }
       return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
 
     }  // end velocityStartMirror
