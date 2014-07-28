@@ -341,8 +341,14 @@ Velocity = {};
 
       var meteor = spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
       if (!!process.env.VELOCITY_DEBUG_MIRROR) {
-        meteor.stdout.pipe(process.stdout);
-        meteor.stderr.pipe(process.stderr);
+        var outputHandler = function(data) {
+          var lines = data.toString().split(/\r?\n/).slice(0, -1);
+          _.map(lines, function(line) {
+              console.log('[velocity mirror] ' + line);
+          });
+        };
+        meteor.stdout.on('data', outputHandler);
+        meteor.stderr.on('data', outputHandler);
       }
       return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
 
