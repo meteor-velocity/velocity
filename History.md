@@ -1,3 +1,9 @@
+## v0.1.18
+
+* Improved error handling when the mirror cannot be started.
+  Velocity will retry to start the mirror for 10 seconds before an error is shown.
+
+
 ## v0.1.17
 
 * The mirror urls are now based on the parent ROOT_URL and MONGO_URL
