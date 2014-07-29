@@ -714,7 +714,7 @@ Velocity = {};
         if (e) {
           console.error('[velocity] mirror failed to start', e);
         } else {
-          console.log('Mirror started', r);
+          console.log('[velocity] Mirror started', r);
         }
       });
 
