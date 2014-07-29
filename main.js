@@ -294,38 +294,16 @@ Velocity = {};
         port: Match.Optional(Number)
       });
 
-      var mirror_base_path = Velocity.getMirrorPath();
-
-      var mongoLocationParts = url.parse(process.env.MONGO_URL);
-      var mongoLocation = url.format({
-        protocol: mongoLocationParts.protocol,
-        slashes: mongoLocationParts.slashes,
-        hostname: mongoLocationParts.hostname,
-        port: mongoLocationParts.port,
-        pathname: '/' + options.name
-      });
-
-      var rootUrlParts = url.parse(Meteor.absoluteUrl());
-      var port = options.port ? options.port : Meteor._wrapAsync(freeport)();
-      var mirrorLocation = url.format({
-        protocol: rootUrlParts.protocol,
-        slashes: rootUrlParts.slashes,
-        hostname: rootUrlParts.hostname,
-        port: port,
-        pathname: rootUrlParts.pathname
-      });
+      var port = options.port || Meteor._wrapAsync(freeport)();
+      var mongoLocation = _getMongoUrl(options.name);
+      var mirrorLocation = _getMirrorUrl(port);
 
       if (options.fixtureFiles) {
-        _.each(options.fixtureFiles, function (fixtureFile) {
-          VelocityFixtureFiles.insert({
-            _id: fixtureFile,
-            absolutePath: fixtureFile
-          });
-        });
+        _addFixtures(options.fixtureFiles);
       }
 
       var opts = {
-        cwd: mirror_base_path,
+        cwd: Velocity.getMirrorPath(),
         stdio: 'pipe',
         env: _.extend({}, process.env, {
           ROOT_URL: mirrorLocation,
@@ -335,15 +313,15 @@ Velocity = {};
         })
       };
 
-      writeFile(mirror_base_path + '/settings.json', JSON.stringify(Meteor.settings));
+      writeFile(Velocity.getMirrorPath() + '/settings.json', JSON.stringify(Meteor.settings));
 
       DEBUG && console.log('[velocity] Mirror: starting at', mirrorLocation);
 
       var spawnAttempts = 10;
-      var spawnMeteor = function() {
-        var closeHandler = function(code, signal) {
+      var spawnMeteor = function () {
+        var closeHandler = function (code, signal) {
           console.log('[velocity] Mirror: exited with code ' + code + ' signal ' + signal);
-          setTimeout(function() {
+          setTimeout(function () {
             console.log('[velocity] Mirror: trying to restart');
             spawnAttempts--;
             if (spawnAttempts) {
@@ -354,7 +332,11 @@ Velocity = {};
             }
           }, 1000);
         };
-        var meteor = spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
+        var meteor = spawn(
+          'meteor',
+          ['--port', port, '--settings', 'settings.json'],
+          opts
+        );
         meteor.on('close', closeHandler);
 
         if (!!process.env.VELOCITY_DEBUG_MIRROR) {
@@ -369,6 +351,7 @@ Velocity = {};
         }
       };
       spawnMeteor();
+
       return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
 
     }  // end velocityStartMirror
@@ -378,6 +361,56 @@ Velocity = {};
 //////////////////////////////////////////////////////////////////////
 // Private functions
 //
+
+  /**
+   * Returns the MongoDB URL for the given database.
+   * @param database
+   * @returns {string} MongoDB Url
+   * @private
+   */
+  function _getMongoUrl(database) {
+    var mongoLocationParts = url.parse(process.env.MONGO_URL);
+    var mongoLocation = url.format({
+      protocol: mongoLocationParts.protocol,
+      slashes: mongoLocationParts.slashes,
+      hostname: mongoLocationParts.hostname,
+      port: mongoLocationParts.port,
+      pathname: '/' + database
+    });
+    return mongoLocation;
+  }
+
+  /**
+   * Return URL for the mirror with the given port.
+   * @param port Mirror port
+   * @returns {string} Mirror URL
+   * @private
+   */
+  function _getMirrorUrl(port) {
+    var rootUrlParts = url.parse(Meteor.absoluteUrl());
+    var mirrorLocation = url.format({
+      protocol: rootUrlParts.protocol,
+      slashes: rootUrlParts.slashes,
+      hostname: rootUrlParts.hostname,
+      port: port,
+      pathname: rootUrlParts.pathname
+    });
+    return mirrorLocation;
+  }
+
+  /**
+   * Add fixtures to the database.
+   * @param fixtureFiles Array with fixture file paths.
+   * @private
+   */
+  function _addFixtures(fixtureFiles) {
+    _.each(fixtureFiles, function (fixtureFile) {
+      VelocityFixtureFiles.insert({
+        _id: fixtureFile,
+        absolutePath: fixtureFile
+      });
+    });
+  }
 
   /**
    *
