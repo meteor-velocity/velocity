@@ -337,19 +337,38 @@ Velocity = {};
 
       writeFile(mirror_base_path + '/settings.json', JSON.stringify(Meteor.settings));
 
-      DEBUG && console.log('[velocity] Starting mirror at', mirrorLocation);
+      DEBUG && console.log('[velocity] Mirror: starting at', mirrorLocation);
 
-      var meteor = spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
-      if (!!process.env.VELOCITY_DEBUG_MIRROR) {
-        var outputHandler = function(data) {
-          var lines = data.toString().split(/\r?\n/).slice(0, -1);
-          _.map(lines, function(line) {
-              console.log('[velocity mirror] ' + line);
-          });
+      var spawnAttempts = 10;
+      var spawnMeteor = function() {
+        var closeHandler = function(code, signal) {
+          console.log('[velocity] Mirror: exited with code ' + code + ' signal ' + signal);
+          setTimeout(function() {
+            console.log('[velocity] Mirror: trying to restart');
+            spawnAttempts--;
+            if (spawnAttempts) {
+              spawnMeteor();
+            } else {
+              console.error('[velocity] Mirror: could not be started on port ' + port + '.\n' +
+                'Please make sure that nothing else is using the port and then restart your app to try again.');
+            }
+          }, 1000);
         };
-        meteor.stdout.on('data', outputHandler);
-        meteor.stderr.on('data', outputHandler);
-      }
+        var meteor = spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
+        meteor.on('close', closeHandler);
+
+        if (!!process.env.VELOCITY_DEBUG_MIRROR) {
+          var outputHandler = function (data) {
+            var lines = data.toString().split(/\r?\n/).slice(0, -1);
+            _.map(lines, function (line) {
+              console.log('[velocity mirror] ' + line);
+            });
+          };
+          meteor.stdout.on('data', outputHandler);
+          meteor.stderr.on('data', outputHandler);
+        }
+      };
+      spawnMeteor();
       return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
 
     }  // end velocityStartMirror
