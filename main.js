@@ -34,6 +34,8 @@ Velocity = {};
       glob = Npm.require('glob'),
       _config,
       _testFrameworks,
+      _preProcessors = [],
+      _reporters = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp("-fixture.(js|coffee)$"),
       DEFAULT_FIXTURE_PATH = process.env.PWD + path.sep + 'packages' + path.sep + 'velocity' + path.sep + 'default-fixture.js';
@@ -63,6 +65,14 @@ Velocity = {};
 
     getTestsPath: function () {
       return path.join(process.env.PWD, 'tests');
+    },
+
+    addPreProcessor: function (preProcessor) {
+      _preProcessors.push(preProcessor);
+    },
+
+    addReporter: function (reporter) {
+      _reporters.push(reporter);
     }
   });
 
@@ -187,6 +197,7 @@ Velocity = {};
      *                               ex. 'Template.leaderboard.selected_name'
      */
     postResult: function (data) {
+      console.log('postResult', data);
       check(data, Match.ObjectIncluding({
         id: String,
         name: String,
@@ -224,6 +235,7 @@ Velocity = {};
 
       VelocityAggregateReports.upsert({'name': data.framework}, {$set: {'result': 'completed'}});
       _updateAggregateReports();
+
     },  // end completed
 
     /**
@@ -259,7 +271,7 @@ Velocity = {};
         DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
         child_process.exec(command, Meteor.bindEnvironment(
-          function copySampleTestsExecHandler(err, stdout, stderr) {
+          function copySampleTestsExecHandler (err, stdout, stderr) {
             if (err) {
               console.log('ERROR', err);
             }
@@ -340,7 +352,22 @@ Velocity = {};
       DEBUG && console.log('[velocity] Starting mirror at', mirrorLocation);
 
       spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
-      return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
+
+      var storeMirrorMetadata = function () {
+        VelocityMirrors.insert({
+          framework: options.framework,
+          name: options.name,
+          port: port,
+          rootUrl: mirrorLocation,
+          mongoUrl: mongoLocation
+        });
+      };
+
+      return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port}, function (statusCode) {
+        if (statusCode === 200) {
+          storeMirrorMetadata();
+        }
+      });
 
     }  // end velocityStartMirror
 
@@ -366,7 +393,7 @@ Velocity = {};
    * @return    A future that can be used in meteor methods (or for other async needs)
    * @private
    */
-  function _retryHttpGet (url, futureResponse, retries, maxTimeout) {
+  function _retryHttpGet (url, futureResponse, preResponseCallback, retries, maxTimeout) {
     var f = new Future();
     var retry = new Retry({
       baseTimeout: 100,
@@ -376,6 +403,7 @@ Velocity = {};
     var doGet = function () {
       try {
         var res = HTTP.get(url);
+        preResponseCallback && preResponseCallback(res.statusCode);
         f.return(_.extend({
           statusCode: res.statusCode
         }, futureResponse));
@@ -399,7 +427,7 @@ Velocity = {};
    * @returns {*}
    * @private
    */
-  function _matchOneOf(values) {
+  function _matchOneOf (values) {
     return Match.Where(function (value) {
       return (values.indexOf(value) !== -1);
     });
@@ -579,6 +607,7 @@ Velocity = {};
         result: 'pending'
       });
     });
+    VelocityMirrors.remove({});
 
     // Meteor just reloaded us which means we should rsync the app files to the mirror
     _syncMirror();
@@ -609,6 +638,11 @@ Velocity = {};
 
     if (_testFrameworks.length === completedFrameworksCount) {
       VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+
+      _.each(_reporters, function (reporter) {
+        reporter();
+      });
+
     }
 
   }
@@ -646,8 +680,9 @@ Velocity = {};
         DEBUG && console.log('[velocity] rsync took', Date.now() - then);
       }
 
-      // TODO convert the instrumenter to a preprocessor package
-      Velocity.instrumentFiles();
+      _.each(_preProcessors, function (preProcessor) {
+        preProcessor();
+      });
 
       // TODO remove this once jasmine and mocha-web are using the new method
       Meteor.call('velocityStartMirror', {
