@@ -269,7 +269,7 @@ Velocity = {};
         DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
         child_process.exec(command, Meteor.bindEnvironment(
-          function copySampleTestsExecHandler(err, stdout, stderr) {
+          function copySampleTestsExecHandler (err, stdout, stderr) {
             if (err) {
               console.log('ERROR', err);
             }
@@ -394,7 +394,7 @@ Velocity = {};
    * @returns {string} MongoDB Url
    * @private
    */
-  function _getMongoUrl(database) {
+  function _getMongoUrl (database) {
     var mongoLocationParts = url.parse(process.env.MONGO_URL);
     var mongoLocation = url.format({
       protocol: mongoLocationParts.protocol,
@@ -412,7 +412,7 @@ Velocity = {};
    * @returns {string} Mirror URL
    * @private
    */
-  function _getMirrorUrl(port) {
+  function _getMirrorUrl (port) {
     var rootUrlParts = url.parse(Meteor.absoluteUrl());
     var mirrorLocation = url.format({
       protocol: rootUrlParts.protocol,
@@ -429,7 +429,7 @@ Velocity = {};
    * @param fixtureFiles Array with fixture file paths.
    * @private
    */
-  function _addFixtures(fixtureFiles) {
+  function _addFixtures (fixtureFiles) {
     _.each(fixtureFiles, function (fixtureFile) {
       VelocityFixtureFiles.insert({
         _id: fixtureFile,
@@ -489,7 +489,7 @@ Velocity = {};
    * @returns {*}
    * @private
    */
-  function _matchOneOf(values) {
+  function _matchOneOf (values) {
     return Match.Where(function (value) {
       return (values.indexOf(value) !== -1);
     });
