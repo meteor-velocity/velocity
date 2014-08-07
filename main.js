@@ -65,6 +65,14 @@ Velocity = {};
 
     getTestsPath: function () {
       return path.join(process.env.PWD, 'tests');
+    },
+
+    addPreProcessor: function (preProcessor) {
+      _preProcessors.push(preProcessor);
+    },
+
+    addReporter: function (reporter) {
+      _reporters.push(reporter);
     }
   });
 
@@ -346,13 +354,12 @@ Velocity = {};
         var outputHandler = function(data) {
           var lines = data.toString().split(/\r?\n/).slice(0, -1);
           _.map(lines, function(line) {
-              console.log('[velocity mirror] ' + line);
+            console.log('[velocity mirror] ' + line);
           });
         };
         meteor.stdout.on('data', outputHandler);
         meteor.stderr.on('data', outputHandler);
       }
-      return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port});
 
       var storeMirrorMetadata = function () {
         VelocityMirrors.insert({
@@ -367,6 +374,8 @@ Velocity = {};
       return _retryHttpGet(mirrorLocation, {url: mirrorLocation, port: port}, function (statusCode) {
         if (statusCode === 200) {
           storeMirrorMetadata();
+        } else {
+          console.log('WTF! Mirror status code was ', statusCode);
         }
       });
 
@@ -394,7 +403,7 @@ Velocity = {};
    * @return    A future that can be used in meteor methods (or for other async needs)
    * @private
    */
-  function _retryHttpGet (url, futureResponse, retries, maxTimeout) {
+  function _retryHttpGet (url, futureResponse, preResponseCallback, retries, maxTimeout) {
     var f = new Future();
     var retry = new Retry({
       baseTimeout: 100,
@@ -404,6 +413,7 @@ Velocity = {};
     var doGet = function () {
       try {
         var res = HTTP.get(url);
+        preResponseCallback && preResponseCallback(res.statusCode);
         f.return(_.extend({
           statusCode: res.statusCode
         }, futureResponse));
@@ -607,6 +617,7 @@ Velocity = {};
         result: 'pending'
       });
     });
+    VelocityMirrors.remove({});
 
     // Meteor just reloaded us which means we should rsync the app files to the mirror
     _syncMirror();
@@ -637,6 +648,11 @@ Velocity = {};
 
     if (_testFrameworks.length === completedFrameworksCount) {
       VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+
+      _.each(_reporters, function (reporter) {
+        reporter();
+      });
+
     }
 
   }
@@ -672,6 +688,11 @@ Velocity = {};
       } else {
         DEBUG && console.log('[velocity] rsync took', Date.now() - then);
       }
+
+      _.each(_preProcessors, function (preProcessor) {
+        preProcessor();
+      });
+
       // TODO remove this once jasmine and mocha-web are using the new method
       Meteor.call('velocityStartMirror', {
         name: 'mocha-web',
