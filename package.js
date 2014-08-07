@@ -8,9 +8,7 @@ Npm.depends({
   'glob': '3.2.9',
   'rsync': '0.3.0',
   'fs-extra': '0.10.0',
-  'freeport': '1.0.2',
-  'istanbul': '0.3.0',
-  'ibrik': '1.1.1'
+  'freeport': '1.0.2'
 });
 
 Package.on_use(function (api) {
@@ -26,12 +24,8 @@ Package.on_use(function (api) {
   api.export('VelocityTestReports', ['client', 'server']);
   api.export('VelocityAggregateReports', ['client', 'server']);
   api.export('VelocityLogs', ['client', 'server']);
+  api.export('VelocityMirrors', ['client', 'server']);
 
   api.add_files('main.js', 'server');
   api.add_files(['lib/FileCopier.js'], 'server');
-
-  api.add_files(['lib/coverage/collections.js'], ['server', 'client']);
-  api.add_files(['lib/coverage/main.js'], 'server');
-  api.add_files(['lib/coverage/server-fixture.js'], 'server');
-  api.add_files(['lib/coverage/client-fixture.js'], 'client');
 });
