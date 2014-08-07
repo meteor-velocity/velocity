@@ -304,38 +304,16 @@ Velocity = {};
         port: Match.Optional(Number)
       });
 
-      var mirror_base_path = Velocity.getMirrorPath();
-
-      var mongoLocationParts = url.parse(process.env.MONGO_URL);
-      var mongoLocation = url.format({
-        protocol: mongoLocationParts.protocol,
-        slashes: mongoLocationParts.slashes,
-        hostname: mongoLocationParts.hostname,
-        port: mongoLocationParts.port,
-        pathname: '/' + options.name
-      });
-
-      var rootUrlParts = url.parse(Meteor.absoluteUrl());
-      var port = options.port ? options.port : Meteor._wrapAsync(freeport)();
-      var mirrorLocation = url.format({
-        protocol: rootUrlParts.protocol,
-        slashes: rootUrlParts.slashes,
-        hostname: rootUrlParts.hostname,
-        port: port,
-        pathname: rootUrlParts.pathname
-      });
+      var port = options.port || Meteor._wrapAsync(freeport)();
+      var mongoLocation = _getMongoUrl(options.name);
+      var mirrorLocation = _getMirrorUrl(port);
 
       if (options.fixtureFiles) {
-        _.each(options.fixtureFiles, function (fixtureFile) {
-          VelocityFixtureFiles.insert({
-            _id: fixtureFile,
-            absolutePath: fixtureFile
-          });
-        });
+        _addFixtures(options.fixtureFiles);
       }
 
       var opts = {
-        cwd: mirror_base_path,
+        cwd: Velocity.getMirrorPath(),
         stdio: 'pipe',
         env: _.extend({}, process.env, {
           ROOT_URL: mirrorLocation,
@@ -345,21 +323,44 @@ Velocity = {};
         })
       };
 
-      writeFile(mirror_base_path + '/settings.json', JSON.stringify(Meteor.settings));
+      writeFile(Velocity.getMirrorPath() + '/settings.json', JSON.stringify(Meteor.settings));
 
-      DEBUG && console.log('[velocity] Starting mirror at', mirrorLocation);
+      DEBUG && console.log('[velocity] Mirror: starting at', mirrorLocation);
 
-      var meteor = spawn('meteor', ['--port', port, '--settings', 'settings.json'], opts);
-      if (!!process.env.VELOCITY_DEBUG_MIRROR) {
-        var outputHandler = function(data) {
-          var lines = data.toString().split(/\r?\n/).slice(0, -1);
-          _.map(lines, function(line) {
-            console.log('[velocity mirror] ' + line);
-          });
+      var spawnAttempts = 10;
+      var spawnMeteor = function () {
+        var closeHandler = function (code, signal) {
+          console.log('[velocity] Mirror: exited with code ' + code + ' signal ' + signal);
+          setTimeout(function () {
+            console.log('[velocity] Mirror: trying to restart');
+            spawnAttempts--;
+            if (spawnAttempts) {
+              spawnMeteor();
+            } else {
+              console.error('[velocity] Mirror: could not be started on port ' + port + '.\n' +
+                'Please make sure that nothing else is using the port and then restart your app to try again.');
+            }
+          }, 1000);
         };
-        meteor.stdout.on('data', outputHandler);
-        meteor.stderr.on('data', outputHandler);
-      }
+        var meteor = spawn(
+          'meteor',
+          ['--port', port, '--settings', 'settings.json'],
+          opts
+        );
+        meteor.on('close', closeHandler);
+
+        if (!!process.env.VELOCITY_DEBUG_MIRROR) {
+          var outputHandler = function (data) {
+            var lines = data.toString().split(/\r?\n/).slice(0, -1);
+            _.map(lines, function (line) {
+              console.log('[velocity mirror] ' + line);
+            });
+          };
+          meteor.stdout.on('data', outputHandler);
+          meteor.stderr.on('data', outputHandler);
+        }
+      };
+      spawnMeteor();
 
       var storeMirrorMetadata = function () {
         VelocityMirrors.insert({
@@ -388,17 +389,68 @@ Velocity = {};
 //
 
   /**
+   * Returns the MongoDB URL for the given database.
+   * @param database
+   * @returns {string} MongoDB Url
+   * @private
+   */
+  function _getMongoUrl(database) {
+    var mongoLocationParts = url.parse(process.env.MONGO_URL);
+    var mongoLocation = url.format({
+      protocol: mongoLocationParts.protocol,
+      slashes: mongoLocationParts.slashes,
+      hostname: mongoLocationParts.hostname,
+      port: mongoLocationParts.port,
+      pathname: '/' + database
+    });
+    return mongoLocation;
+  }
+
+  /**
+   * Return URL for the mirror with the given port.
+   * @param port Mirror port
+   * @returns {string} Mirror URL
+   * @private
+   */
+  function _getMirrorUrl(port) {
+    var rootUrlParts = url.parse(Meteor.absoluteUrl());
+    var mirrorLocation = url.format({
+      protocol: rootUrlParts.protocol,
+      slashes: rootUrlParts.slashes,
+      hostname: rootUrlParts.hostname,
+      port: port,
+      pathname: rootUrlParts.pathname
+    });
+    return mirrorLocation;
+  }
+
+  /**
+   * Add fixtures to the database.
+   * @param fixtureFiles Array with fixture file paths.
+   * @private
+   */
+  function _addFixtures(fixtureFiles) {
+    _.each(fixtureFiles, function (fixtureFile) {
+      VelocityFixtureFiles.insert({
+        _id: fixtureFile,
+        absolutePath: fixtureFile
+      });
+    });
+  }
+
+  /**
    *
    * Performs a http get and retries the specified number of times with the specified timeouts.
    * Uses a future to respond and the future return object can be provided.
    *
    * @method _retryHttpGet
-   * @param url             requiredFields  The target location
+   * @param url                   requiredFields  The target location
    *
-   * @param futureResponse  optional        The future response that will be augmented with the
-   *                                        http status code (if successful)
-   * @param retries         optional        Maximum number of retries
-   * @param maxTimeout      optional        Maximum time to wait for the location to respond
+   * @param futureResponse        optional        The future response that will be augmented with the
+   *                                              http status code (if successful)
+   * @param preResponseCallback   optional        Maximum number of retries
+   * @param retries               optional        Maximum number of retries
+   * @param maxTimeout            optional        Maximum time to wait for the location to respond
    *
    * @return    A future that can be used in meteor methods (or for other async needs)
    * @private
@@ -701,7 +753,7 @@ Velocity = {};
         if (e) {
           console.error('[velocity] mirror failed to start', e);
         } else {
-          console.log('Mirror started', r);
+          console.log('[velocity] Mirror started', r);
         }
       });
 
