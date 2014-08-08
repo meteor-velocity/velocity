@@ -698,7 +698,7 @@ Velocity = {};
     // if all test frameworks have completed, upsert an aggregate completed record
     var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
 
-    if (_testFrameworks.length === completedFrameworksCount) {
+    if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _testFrameworks.length === completedFrameworksCount) {
       VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
 
       _.each(_reporters, function (reporter) {
