@@ -378,7 +378,7 @@ Velocity = {};
         if (statusCode === 200) {
           storeMirrorMetadata();
         } else {
-          console.log('WTF! Mirror status code was ', statusCode);
+          console.error('Mirror did not start correctly. Status code was ', statusCode);
         }
       });
 
