@@ -21,8 +21,10 @@ Velocity = {};
 
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
+      fse = Npm.require('fs-extra'),
       readFile = Meteor._wrapAsync(fs.readFile),
       writeFile = Meteor._wrapAsync(fs.writeFile),
+      copyFile = Meteor._wrapAsync(fse.copy),
       path = Npm.require('path'),
       url = Npm.require('url'),
       Rsync = Npm.require('rsync'),
@@ -745,7 +747,13 @@ Velocity = {};
         preProcessor();
       });
 
-      // TODO remove this once jasmine and mocha-web are using the new method
+      VelocityFixtureFiles.find({}).forEach(function (fixture) {
+        var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
+        DEBUG && console.log('[velocity] copying fixture', fixture.absolutePath, 'to', fixtureLocationInMirror);
+        copyFile(fixture.absolutePath, fixtureLocationInMirror);
+      });
+
+      // TODO remove this once jasmine and mocha-web are using the velocityStartMirror
       Meteor.call('velocityStartMirror', {
         name: 'mocha-web',
         port: 5000
