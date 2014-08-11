@@ -382,7 +382,18 @@ Velocity = {};
         }
       });
 
-    }  // end velocityStartMirror
+    },  // end velocityStartMirror
+
+
+    /**
+     * Meteor method: velocityIsMirror
+     * Exposes the IS_MIRROR flag to clients
+     *
+     * @method velocityIsMirror
+     */
+    velocityIsMirror: function () {
+      return !!process.env.IS_MIRROR;
+    }
 
   });  // end Meteor methods
 
