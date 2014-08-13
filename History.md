@@ -1,3 +1,14 @@
+## vNext
+
+### For Velocity plugin developers
+
+* velocityIsMirror now available as a Meteor method for clients to know where they are running
+* Fixtures added through _addFixtures are now copied to the mirror
+* Added a VelocityMirrors collection that contains mirror metadata
+* Added preprocessors that run after an rsync but before starting a mirror
+* Added reporters which run after all frameworks have finished
+
+
 ## v0.1.18
 
 * Improved error handling when the mirror cannot be started.
