@@ -86,6 +86,9 @@ We would love to add your framework to the list!  Take a look at how some of the
 
 Please see the [velocity-wiki](https://github.com/xolvio/velocity/wiki/Making-your-test-framework-work-with-meteor-test-runner) for basic instructions on making your test framework work with Velocity.
 
+Also, be sure to check out the documentation for the public API.  You can view them in the browser by cloning this repo and then running: `open docs/classes/Velocity.html`
+
+ 
 A few notes on being velocity-compatible:
 
 #### Sample Tests
