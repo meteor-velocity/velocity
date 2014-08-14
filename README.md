@@ -84,6 +84,8 @@ Reporters display test results.
 
 We would love to add your framework to the list!  Take a look at how some of these interface with velocity and let us know about your framework on the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
 
+Please see the [velocity-wiki](https://github.com/xolvio/velocity/wiki/Making-your-test-framework-work-with-meteor-test-runner) for basic instructions on making your test framework work with Velocity.
+
 A few notes on being velocity-compatible:
 
 #### Sample Tests
