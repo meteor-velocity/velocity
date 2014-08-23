@@ -75,6 +75,10 @@ Velocity = {};
 
     addReporter: function (reporter) {
       _reporters.push(reporter);
+    },
+
+    getReportGithubIssueMessage: function() {
+      return "Please report the issue here: https://github.com/xolvio/velocity/issues";
     }
   });
 

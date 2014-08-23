@@ -36,7 +36,7 @@
 
         // safety check
         if (!process.env.IS_MIRROR) {
-          console.err('[velocity] velocityReset is not allowed outside of a mirror. Something has gone wrong. Contact the Velocity team.');
+          console.err('[velocity] velocityReset is not allowed outside of a mirror. Something has gone wrong.', Velocity.getReportGithubIssueMessage());
           return false;
         }
 
