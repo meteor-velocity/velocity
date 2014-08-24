@@ -1,3 +1,8 @@
+## v0.1.19
+
+* add option to FileCopier to control when files are copied
+
+
 ## v0.1.18
 
 * Improved error handling when the mirror cannot be started.

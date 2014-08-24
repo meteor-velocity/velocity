@@ -1,7 +1,7 @@
 {
   "name": "Velocity",
   "description": "Test runner for Meteor apps",
-  "version": "v0.1.18",
+  "version": "v0.1.19",
   "options": {
     "outdir": "./docs",
     "exclude": ".meteor,.build,tests",

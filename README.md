@@ -150,6 +150,23 @@ $ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 VELOCITY_DEBUG_MIRROR=1 mrt
 Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
 
 
+## Publishing to Atmosphere (for package maintainers)
+
+Steps for publishing a new version of this package to Atmosphere:
+
+* Make code changes
+* Commit changes
+* Update History.md with summary of changes
+* Bump version numbers in History.md, smart.json, and yuidoc.json
+* Execute `yuidoc` command from velocity root path
+* Commit changes
+* Push to github
+* `mrt release .`   <-- create tag in github & push to atmosphere
+
+
+FYI, `mrt publish .`   <-- just pushes to atmosphere without creating the tag
+
+
 ##Contributors
 
 We are collaborating with an all-star team on unifying the Meteor testing landscape:

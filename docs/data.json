@@ -2,13 +2,15 @@
     "project": {
         "name": "Velocity",
         "description": "Test runner for Meteor apps",
-        "version": "v0.1.18"
+        "version": "v0.1.19"
     },
     "files": {
         "lib/FileCopier.js": {
             "name": "lib/FileCopier.js",
             "modules": {},
-            "classes": {},
+            "classes": {
+                "FileCopier": 1
+            },
             "fors": {},
             "namespaces": {}
         },
@@ -36,6 +38,7 @@
             "name": "Velocity",
             "submodules": {},
             "classes": {
+                "FileCopier": 1,
                 "Velocity": 1
             },
             "fors": {},
@@ -46,6 +49,61 @@
         }
     },
     "classes": {
+        "FileCopier": {
+            "name": "FileCopier",
+            "shortname": "FileCopier",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Velocity",
+            "file": "lib/FileCopier.js",
+            "line": 9,
+            "description": "Worker that copies test files to the mirror reactively.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "targetFramework",
+                            "description": "The name of the target framework\n                                        for which the tests should be copied\n                                        to the mirror.",
+                            "type": "String"
+                        },
+                        {
+                            "name": "onFileAdded",
+                            "description": "Callback that is called after a \n                                        file was added.",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "onFileChanged",
+                            "description": "Callback that is called after a \n                                          file has changed.",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "onFileRemoved",
+                            "description": "Callback that is called after a \n                                          file was removed.",
+                            "type": "Function",
+                            "optional": true
+                        },
+                        {
+                            "name": "shouldCopy",
+                            "description": "Control whether a file is copied.  \n                                       Passed the file object from the \n                                       VelocityTestFiles collection which \n                                       has a `absolutePath` field. \n                                       Default: true",
+                            "type": "Function",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "example": [
+                "\n    var fileCopier = new Velocity.FileCopier({\n      targetFramework: TEST_FRAMEWORK_NAME\n    });\n    fileCopier.start();"
+            ]
+        },
         "Velocity": {
             "name": "Velocity",
             "shortname": "Velocity",
@@ -63,56 +121,19 @@
     "classitems": [
         {
             "file": "lib/FileCopier.js",
-            "line": 9,
-            "description": "Worker that copies test files to the mirror reactively.",
-            "is_constructor": 1,
-            "params": [
-                {
-                    "name": "options",
-                    "description": "",
-                    "type": "Object",
-                    "props": [
-                        {
-                            "name": "targetFramework",
-                            "description": "The name of the target framework\n                                        for which the tests should be copied to the mirror.",
-                            "type": "String"
-                        },
-                        {
-                            "name": "onFileAdded",
-                            "description": "Callback that is called after a file was added.",
-                            "type": "Function="
-                        },
-                        {
-                            "name": "onFileChanged",
-                            "description": "Callback that is called after a file has changed.",
-                            "type": "Function="
-                        },
-                        {
-                            "name": "onFileRemoved",
-                            "description": "Callback that is called after a file was removed.",
-                            "type": "Function="
-                        }
-                    ]
-                }
-            ],
-            "example": [
-                "\nvar fileCopier = new Velocity.FileCopier({\n  targetFramework: TEST_FRAMEWORK_NAME\n});\nfileCopier.start();"
-            ],
-            "class": "Velocity"
-        },
-        {
-            "file": "lib/FileCopier.js",
-            "line": 40,
+            "line": 54,
             "description": "Starts copying files to the mirror.",
+            "itemtype": "method",
+            "name": "start",
             "memberof": "Velocity.FileCopier.prototype",
-            "class": "Velocity"
+            "class": "FileCopier"
         },
         {
             "file": "lib/FileCopier.js",
-            "line": 58,
+            "line": 74,
             "description": "Stops copying files to the mirror.",
             "memberof": "Velocity.FileCopier.prototype",
-            "class": "Velocity"
+            "class": "FileCopier"
         },
         {
             "file": "default-fixture.js",
@@ -437,11 +458,11 @@
     "warnings": [
         {
             "message": "unknown tag: memberof",
-            "line": " lib/FileCopier.js:40"
+            "line": " lib/FileCopier.js:54"
         },
         {
             "message": "unknown tag: memberof",
-            "line": " lib/FileCopier.js:58"
+            "line": " lib/FileCopier.js:74"
         },
         {
             "message": "replacing incorrect tag: returns with return",
@@ -456,16 +477,8 @@
             "line": " main.js:492"
         },
         {
-            "message": "Missing item type\nWorker that copies test files to the mirror reactively.",
-            "line": " lib/FileCopier.js:9"
-        },
-        {
-            "message": "Missing item type\nStarts copying files to the mirror.",
-            "line": " lib/FileCopier.js:40"
-        },
-        {
             "message": "Missing item type\nStops copying files to the mirror.",
-            "line": " lib/FileCopier.js:58"
+            "line": " lib/FileCopier.js:74"
         },
         {
             "message": "Missing item type\nReturns the MongoDB URL for the given database.",
