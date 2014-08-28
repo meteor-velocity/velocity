@@ -25,6 +25,11 @@ Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=
 - only executes in dev mode (`process.env.NODE_ENV === "development"`)
 
 
+## Roadmap
+
+https://trello.com/b/VCmaj73b/velocity-project
+
+
 ## Usage
 
 The Velocity package itself is not something that you would normally include.  Rather you would include the test framework that you would like to use ([see below](https://github.com/xolvio/velocity/#current-frameworks)) and it will automatically be added for you.
