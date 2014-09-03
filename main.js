@@ -40,7 +40,7 @@ Velocity = {};
       spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
-      _config,
+      _config = {},
       _testFrameworks,
       _preProcessors = [],
       _postProcessors = [],
@@ -51,7 +51,8 @@ Velocity = {};
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
 
-    _config = _loadTestPackageConfigs();
+    // Prefer Velocity.registerTestingFramework over smart.json
+    _.defaults(_config, _loadTestPackageConfigs());
     _testFrameworks = _.pluck(_config, function (config) {
       return config.name;
     });
@@ -87,6 +88,15 @@ Velocity = {};
       return "Please report the issue here: https://github.com/xolvio/velocity/issues";
     }
   });
+
+  if (Meteor.isServer) {
+    _.extend(Velocity, {
+
+      registerTestingFramework: function (name, options) {
+        _config[name] = _parseTestingFrameworkOptions(name, options);
+      }
+    });
+  }
 
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
@@ -554,20 +564,8 @@ Velocity = {};
         contents = readFile(path.join(pwd, smartJsonPath));
         config = JSON.parse(contents);
         if (config.name && config.testPackage) {
-
           // add smart.json contents to our dictionary
-          memo[config.name] = config;
-
-          if ('undefined' === typeof memo[config.name].regex) {
-            // if test package hasn't defined an explicit regex for the file
-            // watcher, default to the package name as a suffix.
-            // Ex. name = "mocha-web"
-            //     regex = "-mocha-web.js"
-            memo[config.name].regex = '-' + config.name + '\\.js$';
-          }
-
-          // create a regexp obj for use in file watching
-          memo[config.name]._regexp = new RegExp(memo[config.name].regex);
+          memo[config.name] = _parseTestingFrameworkOptions(config.name, config);
         }
       } catch (ex) {
         DEBUG && console.log('Error reading file:', smartJsonPath, ex);
@@ -577,6 +575,20 @@ Velocity = {};
 
     return testConfigDictionary;
   }  // end _loadTestPackageConfigs
+
+  function _parseTestingFrameworkOptions(name, options) {
+    _.defaults(options, {
+      // if test package hasn't defined an explicit regex for the file
+      // watcher, default to the package name as a suffix.
+      // Ex. name = "mocha-web"
+      //     regex = "-mocha-web.js"
+      regex: '-' + name + '\\.js$'
+    });
+
+    options._regexp = new RegExp(options.regex);
+
+    return options;
+  }
 
   /**
    * Initialize the directory/file watcher.
