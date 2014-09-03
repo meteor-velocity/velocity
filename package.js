@@ -2,7 +2,10 @@
 "use strict";
 
 Package.describe({
-  summary: 'Velocity, a Meteor specific test-runner'
+  name: 'velocity:core',
+  summary: 'Velocity, a Meteor specific test-runner',
+  version: '0.2.0-pre0',
+  git: 'https://github.com/xolvio/velocity.git'
 });
 
 Npm.depends({
@@ -15,6 +18,10 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
+  if (api.versionsFrom) {
+    api.versionsFrom('METEOR@0.9.0');
+  }
+
   api.use('check');
   api.use('http');
   api.use('retry');
