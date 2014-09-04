@@ -578,6 +578,7 @@ Velocity = {};
 
   function _parseTestingFrameworkOptions(name, options) {
     _.defaults(options, {
+      name: name,
       // if test package hasn't defined an explicit regex for the file
       // watcher, default to the package name as a suffix.
       // Ex. name = "mocha-web"
