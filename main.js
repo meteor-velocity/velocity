@@ -43,7 +43,7 @@ Velocity = {};
       _config,
       _testFrameworks,
       _preProcessors = [],
-      _reporters = [],
+      _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp("-fixture.(js|coffee)$"),
       DEFAULT_FIXTURE_PATH = process.env.PWD + path.sep + 'packages' + path.sep + 'velocity' + path.sep + 'default-fixture.js';
@@ -79,8 +79,8 @@ Velocity = {};
       _preProcessors.push(preProcessor);
     },
 
-    addReporter: function (reporter) {
-      _reporters.push(reporter);
+    addPostProcessor: function (reporter) {
+      _postProcessors.push(reporter);
     },
 
     getReportGithubIssueMessage: function() {
@@ -724,7 +724,7 @@ Velocity = {};
     if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _testFrameworks.length === completedFrameworksCount) {
       VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
 
-      _.each(_reporters, function (reporter) {
+      _.each(_postProcessors, function (reporter) {
         reporter();
       });
 
