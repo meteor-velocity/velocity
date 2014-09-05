@@ -20,7 +20,7 @@ Velocity = {};
 // Init
 //
 
-  if (process.env.NODE_ENV !== 'development' || process.env.IS_MIRROR) {
+  if (process.env.NODE_ENV !== 'development' || process.env.VELOCITY === '0' || process.env.IS_MIRROR) {
     DEBUG && console.log('Not adding velocity code');
     return;
   }
