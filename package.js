@@ -1,3 +1,6 @@
+/*jshint -W117, -W097 */
+"use strict";
+
 Package.describe({
   summary: 'Velocity, a Meteor specific test-runner'
 });

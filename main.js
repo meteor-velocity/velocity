@@ -27,8 +27,10 @@ Velocity = {};
 
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
+      fse = Npm.require('fs-extra'),
       readFile = Meteor._wrapAsync(fs.readFile),
       writeFile = Meteor._wrapAsync(fs.writeFile),
+      copyFile = Meteor._wrapAsync(fse.copy),
       path = Npm.require('path'),
       url = Npm.require('url'),
       Rsync = Npm.require('rsync'),
@@ -41,7 +43,7 @@ Velocity = {};
       _config,
       _testFrameworks,
       _preProcessors = [],
-      _reporters = [],
+      _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp("-fixture.(js|coffee)$"),
       DEFAULT_FIXTURE_PATH = process.env.PWD + path.sep + 'packages' + path.sep + 'velocity' + path.sep + 'default-fixture.js';
@@ -77,8 +79,12 @@ Velocity = {};
       _preProcessors.push(preProcessor);
     },
 
-    addReporter: function (reporter) {
-      _reporters.push(reporter);
+    addPostProcessor: function (reporter) {
+      _postProcessors.push(reporter);
+    },
+
+    getReportGithubIssueMessage: function() {
+      return "Please report the issue here: https://github.com/xolvio/velocity/issues";
     }
   });
 
@@ -382,11 +388,22 @@ Velocity = {};
         if (statusCode === 200) {
           storeMirrorMetadata();
         } else {
-          console.log('WTF! Mirror status code was ', statusCode);
+          console.error('Mirror did not start correctly. Status code was ', statusCode);
         }
       });
 
-    }  // end velocityStartMirror
+    },  // end velocityStartMirror
+
+
+    /**
+     * Meteor method: velocityIsMirror
+     * Exposes the IS_MIRROR flag to clients
+     *
+     * @method velocityIsMirror
+     */
+    velocityIsMirror: function () {
+      return !!process.env.IS_MIRROR;
+    }
 
   });  // end Meteor methods
 
@@ -707,7 +724,7 @@ Velocity = {};
     if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _testFrameworks.length === completedFrameworksCount) {
       VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
 
-      _.each(_reporters, function (reporter) {
+      _.each(_postProcessors, function (reporter) {
         reporter();
       });
 
@@ -751,7 +768,13 @@ Velocity = {};
         preProcessor();
       });
 
-      // TODO remove this once jasmine and mocha-web are using the new method
+      VelocityFixtureFiles.find({}).forEach(function (fixture) {
+        var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
+        DEBUG && console.log('[velocity] copying fixture', fixture.absolutePath, 'to', fixtureLocationInMirror);
+        copyFile(fixture.absolutePath, fixtureLocationInMirror);
+      });
+
+      // TODO remove this once jasmine and mocha-web are using the velocityStartMirror
       Meteor.call('velocityStartMirror', {
         name: 'mocha-web',
         port: 5000
