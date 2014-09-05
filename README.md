@@ -25,6 +25,11 @@ Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=
 - only executes in dev mode (`process.env.NODE_ENV === "development"`)
 
 
+## Roadmap
+
+https://trello.com/b/VCmaj73b/velocity-project
+
+
 ## Usage
 
 The Velocity package itself is not something that you would normally include.  Rather you would include the test framework that you would like to use ([see below](https://github.com/xolvio/velocity/#current-frameworks)) and it will automatically be added for you.
@@ -84,6 +89,11 @@ Reporters display test results.
 
 We would love to add your framework to the list!  Take a look at how some of these interface with velocity and let us know about your framework on the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
 
+Please see the [velocity-wiki](https://github.com/xolvio/velocity/wiki/Making-your-test-framework-work-with-meteor-test-runner) for basic instructions on making your test framework work with Velocity.
+
+Also, be sure to check out the documentation for the public API.  You can view them in the browser by cloning this repo and then running: `open docs/classes/Velocity.html`
+
+ 
 A few notes on being velocity-compatible:
 
 #### Sample Tests
@@ -143,6 +153,23 @@ $ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 VELOCITY_DEBUG_MIRROR=1 mrt
 * `Error: There was a problem checking out branch: master`
 
 Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
+
+
+## Publishing to Atmosphere (for package maintainers)
+
+Steps for publishing a new version of this package to Atmosphere:
+
+* Make code changes
+* Commit changes
+* Update History.md with summary of changes
+* Bump version numbers in History.md, smart.json, and yuidoc.json
+* Execute `yuidoc` command from velocity root path
+* Commit changes
+* Push to github
+* `mrt release .`   <-- create tag in github & push to atmosphere
+
+
+FYI, `mrt publish .`   <-- just pushes to atmosphere without creating the tag
 
 
 ##Contributors
