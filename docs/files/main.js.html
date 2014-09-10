@@ -112,15 +112,17 @@ Velocity = {};
 // Init
 //
 
-  if (process.env.NODE_ENV !== &#x27;development&#x27; || process.env.IS_MIRROR) {
+  if (process.env.NODE_ENV !== &#x27;development&#x27; || process.env.VELOCITY === &#x27;0&#x27; || process.env.IS_MIRROR) {
     DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);
     return;
   }
 
   var _ = Npm.require(&#x27;lodash&#x27;),
       fs = Npm.require(&#x27;fs&#x27;),
+      fse = Npm.require(&#x27;fs-extra&#x27;),
       readFile = Meteor._wrapAsync(fs.readFile),
       writeFile = Meteor._wrapAsync(fs.writeFile),
+      copyFile = Meteor._wrapAsync(fse.copy),
       path = Npm.require(&#x27;path&#x27;),
       url = Npm.require(&#x27;url&#x27;),
       Rsync = Npm.require(&#x27;rsync&#x27;),
@@ -130,18 +132,20 @@ Velocity = {};
       spawn = child_process.spawn,
       chokidar = Npm.require(&#x27;chokidar&#x27;),
       glob = Npm.require(&#x27;glob&#x27;),
-      _config,
+      _config = {},
       _testFrameworks,
       _preProcessors = [],
-      _reporters = [],
+      _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp(&quot;-fixture.(js|coffee)$&quot;),
-      DEFAULT_FIXTURE_PATH = process.env.PWD + path.sep + &#x27;packages&#x27; + path.sep + &#x27;velocity&#x27; + path.sep + &#x27;default-fixture.js&#x27;;
+      SERVER_ASSETS_PATH = path.join(process.env.PWD, &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;),
+      DEFAULT_FIXTURE_PATH = path.join(SERVER_ASSETS_PATH, &#x27;packages&#x27;, &#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);
 
   Meteor.startup(function initializeVelocity () {
     DEBUG &amp;&amp; console.log(&#x27;[velocity] PWD&#x27;, process.env.PWD);
 
-    _config = _loadTestPackageConfigs();
+    // Prefer Velocity.registerTestingFramework over smart.json
+    _.defaults(_config, _loadTestPackageConfigs());
     _testFrameworks = _.pluck(_config, function (config) {
       return config.name;
     });
@@ -169,10 +173,33 @@ Velocity = {};
       _preProcessors.push(preProcessor);
     },
 
-    addReporter: function (reporter) {
-      _reporters.push(reporter);
+    addPostProcessor: function (reporter) {
+      _postProcessors.push(reporter);
+    },
+
+    getReportGithubIssueMessage: function() {
+      return &quot;Please report the issue here: https://github.com/xolvio/velocity/issues&quot;;
     }
   });
+
+  if (Meteor.isServer) {
+    _.extend(Velocity, {
+
+      /**
+       * Registers a testing framework plugin.
+       *
+       * @method registerTestingFramework
+       * @param name {String} The name of the testing framework.
+       * @param options {Object} Options for the testing framework.
+       * @param options.regex {String} The regular expression for
+       *                      test files that should be assigned
+       *                      to the testing framework.
+       */
+      registerTestingFramework: function (name, options) {
+        _config[name] = _parseTestingFrameworkOptions(name, options);
+      }
+    });
+  }
 
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
@@ -474,11 +501,22 @@ Velocity = {};
         if (statusCode === 200) {
           storeMirrorMetadata();
         } else {
-          console.log(&#x27;WTF! Mirror status code was &#x27;, statusCode);
+          console.error(&#x27;Mirror did not start correctly. Status code was &#x27;, statusCode);
         }
       });
 
-    }  // end velocityStartMirror
+    },  // end velocityStartMirror
+
+
+    /**
+     * Meteor method: velocityIsMirror
+     * Exposes the IS_MIRROR flag to clients
+     *
+     * @method velocityIsMirror
+     */
+    velocityIsMirror: function () {
+      return !!process.env.IS_MIRROR;
+    }
 
   });  // end Meteor methods
 
@@ -629,20 +667,8 @@ Velocity = {};
         contents = readFile(path.join(pwd, smartJsonPath));
         config = JSON.parse(contents);
         if (config.name &amp;&amp; config.testPackage) {
-
           // add smart.json contents to our dictionary
-          memo[config.name] = config;
-
-          if (&#x27;undefined&#x27; === typeof memo[config.name].regex) {
-            // if test package hasn&#x27;t defined an explicit regex for the file
-            // watcher, default to the package name as a suffix.
-            // Ex. name = &quot;mocha-web&quot;
-            //     regex = &quot;-mocha-web.js&quot;
-            memo[config.name].regex = &#x27;-&#x27; + config.name + &#x27;\\.js$&#x27;;
-          }
-
-          // create a regexp obj for use in file watching
-          memo[config.name]._regexp = new RegExp(memo[config.name].regex);
+          memo[config.name] = _parseTestingFrameworkOptions(config.name, config);
         }
       } catch (ex) {
         DEBUG &amp;&amp; console.log(&#x27;Error reading file:&#x27;, smartJsonPath, ex);
@@ -652,6 +678,21 @@ Velocity = {};
 
     return testConfigDictionary;
   }  // end _loadTestPackageConfigs
+
+  function _parseTestingFrameworkOptions(name, options) {
+    _.defaults(options, {
+      name: name,
+      // if test package hasn&#x27;t defined an explicit regex for the file
+      // watcher, default to the package name as a suffix.
+      // Ex. name = &quot;mocha-web&quot;
+      //     regex = &quot;-mocha-web.js&quot;
+      regex: &#x27;-&#x27; + name + &#x27;\\.js$&#x27;
+    });
+
+    options._regexp = new RegExp(options.regex);
+
+    return options;
+  }
 
   /**
    * Initialize the directory/file watcher.
@@ -799,7 +840,7 @@ Velocity = {};
     if (VelocityAggregateReports.findOne({&#x27;name&#x27;: &#x27;aggregateComplete&#x27;}).result !== &#x27;completed&#x27; &amp;&amp; _testFrameworks.length === completedFrameworksCount) {
       VelocityAggregateReports.update({&#x27;name&#x27;: &#x27;aggregateComplete&#x27;}, {$set: {&#x27;result&#x27;: &#x27;completed&#x27;}});
 
-      _.each(_reporters, function (reporter) {
+      _.each(_postProcessors, function (reporter) {
         reporter();
       });
 
@@ -843,7 +884,13 @@ Velocity = {};
         preProcessor();
       });
 
-      // TODO remove this once jasmine and mocha-web are using the new method
+      VelocityFixtureFiles.find({}).forEach(function (fixture) {
+        var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
+        DEBUG &amp;&amp; console.log(&#x27;[velocity] copying fixture&#x27;, fixture.absolutePath, &#x27;to&#x27;, fixtureLocationInMirror);
+        copyFile(fixture.absolutePath, fixtureLocationInMirror);
+      });
+
+      // TODO remove this once jasmine and mocha-web are using the velocityStartMirror
       Meteor.call(&#x27;velocityStartMirror&#x27;, {
         name: &#x27;mocha-web&#x27;,
         port: 5000

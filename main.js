@@ -93,6 +93,16 @@ Velocity = {};
   if (Meteor.isServer) {
     _.extend(Velocity, {
 
+      /**
+       * Registers a testing framework plugin.
+       *
+       * @method registerTestingFramework
+       * @param name {String} The name of the testing framework.
+       * @param options {Object} Options for the testing framework.
+       * @param options.regex {String} The regular expression for
+       *                      test files that should be assigned
+       *                      to the testing framework.
+       */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
       }

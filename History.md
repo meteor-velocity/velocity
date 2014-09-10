@@ -1,3 +1,12 @@
+## v0.2.0-pre0
+
+* Support for Meteor 0.9
+
+### For Velocity plugin developers
+
+* Added Velocity.registerTestingFramework as the new preferred way to register
+  the testing framework to Velocity.
+
 ## v0.1.20
 
 ### For Velocity plugin developers
