@@ -40,4 +40,9 @@ Package.on_use(function (api) {
 
   api.add_files('main.js', 'server');
   api.add_files(['lib/FileCopier.js'], 'server');
+
+  // Assets
+  api.add_files([
+    'default-fixture.js'
+  ], 'server', {isAsset: true})
 });

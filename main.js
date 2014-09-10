@@ -46,7 +46,8 @@ Velocity = {};
       _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp("-fixture.(js|coffee)$"),
-      DEFAULT_FIXTURE_PATH = process.env.PWD + path.sep + 'packages' + path.sep + 'velocity' + path.sep + 'default-fixture.js';
+      SERVER_ASSETS_PATH = path.join(process.env.PWD, '.meteor', 'local', 'build', 'programs', 'server', 'assets'),
+      DEFAULT_FIXTURE_PATH = path.join(SERVER_ASSETS_PATH, 'packages', 'velocity:core', 'default-fixture.js');
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
