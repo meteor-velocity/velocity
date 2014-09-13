@@ -382,16 +382,16 @@ Velocity = {};
         );
         meteor.on('close', closeHandler);
 
+        var outputHandler = function (data) {
+          var lines = data.toString().split(/\r?\n/).slice(0, -1);
+          _.map(lines, function (line) {
+            console.log('[velocity mirror] ' + line);
+          });
+        };
         if (!!process.env.VELOCITY_DEBUG_MIRROR) {
-          var outputHandler = function (data) {
-            var lines = data.toString().split(/\r?\n/).slice(0, -1);
-            _.map(lines, function (line) {
-              console.log('[velocity mirror] ' + line);
-            });
-          };
           meteor.stdout.on('data', outputHandler);
-          meteor.stderr.on('data', outputHandler);
         }
+        meteor.stderr.on('data', outputHandler);
       };
       spawnMeteor();
 
