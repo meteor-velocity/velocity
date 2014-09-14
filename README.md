@@ -32,13 +32,13 @@ https://trello.com/b/VCmaj73b/velocity-project
 
 ## Usage
 
-The Velocity package itself is not something that you would normally include.  Rather you would include the test framework that you would like to use ([see below](https://github.com/xolvio/velocity/#current-frameworks)) and it will automatically be added for you.
+The Velocity package itself is not something that you would normally include.  Rather you would include the test framework that you would like to use ([see below](https://github.com/meteor-velocity/velocity/#current-frameworks)) and it will automatically be added for you.
 
 There are generally two ways people get started with using velocity to test their apps: the `velocity-quick-start` package and the `velocity-example` app.
 
 #### Quick-start
 
-The [`velocity-quick-start`](https://github.com/alanning/meteor-velocity-quick-start) package will add the [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) and some test frameworks to your app.  It will also add some sample tests for you.  Here's how you would add it to your app:
+The [`velocity-quick-start`](https://github.com/alanning/meteor-velocity-quick-start) package will add the [velocity-html-reporter](https://github.com/meteor-velocity/html-reporter/) and some test frameworks to your app.  It will also add some sample tests for you.  Here's how you would add it to your app:
 
 ```bash
 $ cd your-app-dir
@@ -61,7 +61,7 @@ $ mrt
 
 You'll see the leaderboard example started on port 3000.
 
-Because the example has included the [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) package, you'll see a green/red dot in the top right that indicates the success or failure of your tests.  Clicking the dot will display test details.
+Because the example has included the [velocity-html-reporter](https://github.com/meteor-velocity/html-reporter/) package, you'll see a green/red dot in the top right that indicates the success or failure of your tests.  Clicking the dot will display test details.
 
 Try modifying the tests and see them update reactively in the browser.
 
@@ -81,7 +81,7 @@ The `velocity` package coordinates between test frameworks and provides a common
 
 Reporters display test results.
 
-* [velocity-html-reporter](https://github.com/rissem/velocity-html-reporter/) - Adds an overlay to your app indicating test success/failure (green/red dot in top right).  Click dot for test details.  `mrt add velocity-html-reporter`
+* [velocity-html-reporter](https://github.com/meteor-velocity/html-reporter/) - Adds an overlay to your app indicating test success/failure (green/red dot in top right).  Click dot for test details.  `mrt add velocity-html-reporter`
 
 
 

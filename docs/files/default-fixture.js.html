@@ -95,60 +95,75 @@
 (function () {
   &#x27;use strict&#x27;;
 
-  //////////////////////////////////////////////////////////////////////
+  if (Meteor.isServer) {
+
+//////////////////////////////////////////////////////////////////////
 // Meteor Methods
 //
 
-  var Future;
-  Meteor.startup(function () {
-    Future = Npm.require(&#x27;fibers/future&#x27;);
-  });
+    var Future;
+    Meteor.startup(function () {
+      Future = Npm.require(&#x27;fibers/future&#x27;);
+    });
 
-  Meteor.methods({
+    Meteor.methods({
 
-    /**
-     * Meteor method: velocityResetDatabase
-     * This truncate all collections in the app by using the native mongo object and calling collection.remove()
-     *
-     * @method velocityResetDatabase
-     */
-    velocityResetDatabase: function () {
+      /**
+       * Meteor method: velocityIsMirror
+       * Exposes the IS_MIRROR flag to mirror clients
+       *
+       * @method velocityIsMirror
+       */
+      velocityIsMirror: function () {
+        return !!process.env.IS_MIRROR;
+      },
 
-      // safety check
-      if (!process.env.IS_MIRROR) {
-        console.err(&#x27;[velocity] velocityReset is not allowed outside of a mirror. Something has gone wrong. Contact the Velocity team.&#x27;);
-        return false;
-      }
+      /**
+       * Meteor method: velocityResetDatabase
+       * This truncate all collections in the app by using the native mongo object and calling collection.remove()
+       *
+       * @method velocityResetDatabase
+       */
+      velocityResetDatabase: function () {
 
-      var fut = new Future();
+        // safety check
+        if (!process.env.IS_MIRROR) {
+          console.err(&#x27;[velocity] velocityReset is not allowed outside of a mirror. Something has gone wrong.&#x27;, Velocity.getReportGithubIssueMessage());
+          return false;
+        }
 
-      var collectionsRemoved = 0;
-      var db = VelocityLogs.find()._mongo.db;
-      db.collections(function (err, collections) {
+        var fut = new Future();
 
-        var appCollections = _.reject(collections, function (col) {
-          return col.collectionName.indexOf(&#x27;velocity&#x27;) === 0 || col.collectionName === &#x27;system.indexes&#x27;;
-        });
+        var collectionsRemoved = 0;
+        var db = VelocityLogs.find()._mongo.db;
+        db.collections(function (err, collections) {
 
-        _.each(appCollections, function (appCollection) {
-          appCollection.remove(function (e) {
-            if (e) {
-              fut.return(&#x27;fail: &#x27; + e);
-            }
-            collectionsRemoved++;
-            if (appCollections.length === collectionsRemoved) {
-              fut[&#x27;return&#x27;](&#x27;success&#x27;);
-            }
+          var appCollections = _.reject(collections, function (col) {
+            return col.collectionName.indexOf(&#x27;velocity&#x27;) === 0 || col.collectionName === &#x27;system.indexes&#x27;;
           });
+
+          _.each(appCollections, function (appCollection) {
+            appCollection.remove(function (e) {
+              if (e) {
+                fut.return(&#x27;fail: &#x27; + e);
+              }
+              collectionsRemoved++;
+              if (appCollections.length === collectionsRemoved) {
+                fut[&#x27;return&#x27;](&#x27;success&#x27;);
+              }
+            });
+          });
+
         });
 
-      });
+        return fut.wait();
 
-      return fut.wait();
+      } // end velocityResetDatabase
 
-    } // end velocityResetDatabase
+    });
 
-  });
+  }
+
 
 })();
 

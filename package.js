@@ -2,7 +2,10 @@
 "use strict";
 
 Package.describe({
-  summary: 'Velocity, a Meteor specific test-runner'
+  name: 'velocity:core',
+  summary: 'Velocity, a Meteor specific test-runner',
+  version: '0.2.0-pre1',
+  git: 'https://github.com/xolvio/velocity.git'
 });
 
 Npm.depends({
@@ -15,6 +18,12 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
+  if (api.versionsFrom) {
+    api.versionsFrom('METEOR@0.9.0');
+    // This is required for Meteor.Collection since Meteor 0.9.1
+    api.use('mongo-livedata');
+  }
+
   api.use('check');
   api.use('http');
   api.use('retry');
@@ -31,4 +40,9 @@ Package.on_use(function (api) {
 
   api.add_files('main.js', 'server');
   api.add_files(['lib/FileCopier.js'], 'server');
+
+  // Assets
+  api.add_files([
+    'default-fixture.js'
+  ], 'server', {isAsset: true})
 });

@@ -40,18 +40,20 @@ Velocity = {};
       spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
-      _config,
+      _config = {},
       _testFrameworks,
       _preProcessors = [],
       _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp("-fixture.(js|coffee)$"),
-      DEFAULT_FIXTURE_PATH = process.env.PWD + path.sep + 'packages' + path.sep + 'velocity' + path.sep + 'default-fixture.js';
+      SERVER_ASSETS_PATH = path.join(process.env.PWD, '.meteor', 'local', 'build', 'programs', 'server', 'assets'),
+      DEFAULT_FIXTURE_PATH = path.join(SERVER_ASSETS_PATH, 'packages', 'velocity:core', 'default-fixture.js');
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
 
-    _config = _loadTestPackageConfigs();
+    // Prefer Velocity.registerTestingFramework over smart.json
+    _.defaults(_config, _loadTestPackageConfigs());
     _testFrameworks = _.pluck(_config, function (config) {
       return config.name;
     });
@@ -87,6 +89,25 @@ Velocity = {};
       return "Please report the issue here: https://github.com/xolvio/velocity/issues";
     }
   });
+
+  if (Meteor.isServer) {
+    _.extend(Velocity, {
+
+      /**
+       * Registers a testing framework plugin.
+       *
+       * @method registerTestingFramework
+       * @param name {String} The name of the testing framework.
+       * @param options {Object} Options for the testing framework.
+       * @param options.regex {String} The regular expression for
+       *                      test files that should be assigned
+       *                      to the testing framework.
+       */
+      registerTestingFramework: function (name, options) {
+        _config[name] = _parseTestingFrameworkOptions(name, options);
+      }
+    });
+  }
 
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
@@ -361,16 +382,16 @@ Velocity = {};
         );
         meteor.on('close', closeHandler);
 
+        var outputHandler = function (data) {
+          var lines = data.toString().split(/\r?\n/).slice(0, -1);
+          _.map(lines, function (line) {
+            console.log('[velocity mirror] ' + line);
+          });
+        };
         if (!!process.env.VELOCITY_DEBUG_MIRROR) {
-          var outputHandler = function (data) {
-            var lines = data.toString().split(/\r?\n/).slice(0, -1);
-            _.map(lines, function (line) {
-              console.log('[velocity mirror] ' + line);
-            });
-          };
           meteor.stdout.on('data', outputHandler);
-          meteor.stderr.on('data', outputHandler);
         }
+        meteor.stderr.on('data', outputHandler);
       };
       spawnMeteor();
 
@@ -554,20 +575,8 @@ Velocity = {};
         contents = readFile(path.join(pwd, smartJsonPath));
         config = JSON.parse(contents);
         if (config.name && config.testPackage) {
-
           // add smart.json contents to our dictionary
-          memo[config.name] = config;
-
-          if ('undefined' === typeof memo[config.name].regex) {
-            // if test package hasn't defined an explicit regex for the file
-            // watcher, default to the package name as a suffix.
-            // Ex. name = "mocha-web"
-            //     regex = "-mocha-web.js"
-            memo[config.name].regex = '-' + config.name + '\\.js$';
-          }
-
-          // create a regexp obj for use in file watching
-          memo[config.name]._regexp = new RegExp(memo[config.name].regex);
+          memo[config.name] = _parseTestingFrameworkOptions(config.name, config);
         }
       } catch (ex) {
         DEBUG && console.log('Error reading file:', smartJsonPath, ex);
@@ -577,6 +586,21 @@ Velocity = {};
 
     return testConfigDictionary;
   }  // end _loadTestPackageConfigs
+
+  function _parseTestingFrameworkOptions(name, options) {
+    _.defaults(options, {
+      name: name,
+      // if test package hasn't defined an explicit regex for the file
+      // watcher, default to the package name as a suffix.
+      // Ex. name = "mocha-web"
+      //     regex = "-mocha-web.js"
+      regex: '-' + name + '\\.js$'
+    });
+
+    options._regexp = new RegExp(options.regex);
+
+    return options;
+  }
 
   /**
    * Initialize the directory/file watcher.

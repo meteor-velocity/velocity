@@ -137,7 +137,15 @@
         },
         {
             "file": "default-fixture.js",
-            "line": 17,
+            "line": 19,
+            "description": "Meteor method: velocityIsMirror\nExposes the IS_MIRROR flag to mirror clients",
+            "itemtype": "method",
+            "name": "velocityIsMirror",
+            "class": "Velocity"
+        },
+        {
+            "file": "default-fixture.js",
+            "line": 29,
             "description": "Meteor method: velocityResetDatabase\nThis truncate all collections in the app by using the native mongo object and calling collection.remove()",
             "itemtype": "method",
             "name": "velocityResetDatabase",
@@ -145,7 +153,35 @@
         },
         {
             "file": "main.js",
-            "line": 91,
+            "line": 96,
+            "description": "Registers a testing framework plugin.",
+            "itemtype": "method",
+            "name": "registerTestingFramework",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the testing framework.",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "Options for the testing framework.",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "regex",
+                            "description": "The regular expression for\n                     test files that should be assigned\n                     to the testing framework.",
+                            "type": "String"
+                        }
+                    ]
+                }
+            ],
+            "class": "Velocity",
+            "module": "Velocity"
+        },
+        {
+            "file": "main.js",
+            "line": 118,
             "description": "Meteor method: reset\nRe-init file watcher and clear all test results.",
             "itemtype": "method",
             "name": "reset",
@@ -154,7 +190,7 @@
         },
         {
             "file": "main.js",
-            "line": 101,
+            "line": 128,
             "description": "Meteor method: resetReports\nClear all test results.",
             "itemtype": "method",
             "name": "resetReports",
@@ -171,7 +207,7 @@
         },
         {
             "file": "main.js",
-            "line": 132,
+            "line": 159,
             "description": "Meteor method: resetLogs\nClear all log entried.",
             "itemtype": "method",
             "name": "resetLogs",
@@ -188,7 +224,7 @@
         },
         {
             "file": "main.js",
-            "line": 152,
+            "line": 179,
             "description": "Meteor method: postLog\nLog a method to the central Velocity log store.",
             "itemtype": "method",
             "name": "postLog",
@@ -204,7 +240,7 @@
         },
         {
             "file": "main.js",
-            "line": 181,
+            "line": 208,
             "description": "Meteor method: postResult\nRecord the results of a test run.",
             "itemtype": "method",
             "name": "postResult",
@@ -220,7 +256,7 @@
         },
         {
             "file": "main.js",
-            "line": 227,
+            "line": 254,
             "description": "Meteor method: completed\nFrameworks must call this method to inform Velocity they have completed\ntheir current test runs. Velocity uses this flag when running in CI mode.",
             "itemtype": "method",
             "name": "completed",
@@ -236,13 +272,13 @@
         },
         {
             "file": "main.js",
-            "line": 245,
+            "line": 272,
             "description": "Meteor method: copySampleTests\nCopy sample tests from frameworks `sample-tests` directories\nto user's `app/tests` directory.",
             "itemtype": "method",
             "name": "copySampleTests",
             "params": [
                 {
-                    "name": "options!~YUIDOC_LINE~!",
+                    "name": "options",
                     "description": "ex. {framework: 'jasmine-unit'}",
                     "type": "Object"
                 }
@@ -252,7 +288,7 @@
         },
         {
             "file": "main.js",
-            "line": 290,
+            "line": 317,
             "description": "Meteor method: velocityStartMirror\n\nStarts a mirror and copies any specified fixture files into the mirror.\nTODO and will remove any registered frameworks and reporters from the mirror",
             "itemtype": "method",
             "name": "velocityStartMirror",
@@ -271,7 +307,16 @@
         },
         {
             "file": "main.js",
-            "line": 397,
+            "line": 419,
+            "description": "Meteor method: velocityIsMirror\nExposes the IS_MIRROR flag to clients",
+            "itemtype": "method",
+            "name": "velocityIsMirror",
+            "class": "Velocity",
+            "module": "Velocity"
+        },
+        {
+            "file": "main.js",
+            "line": 435,
             "description": "Returns the MongoDB URL for the given database.",
             "params": [
                 {
@@ -290,7 +335,7 @@
         },
         {
             "file": "main.js",
-            "line": 415,
+            "line": 453,
             "description": "Return URL for the mirror with the given port.",
             "params": [
                 {
@@ -309,7 +354,7 @@
         },
         {
             "file": "main.js",
-            "line": 433,
+            "line": 471,
             "description": "Add fixtures to the database.",
             "params": [
                 {
@@ -324,7 +369,7 @@
         },
         {
             "file": "main.js",
-            "line": 447,
+            "line": 485,
             "description": "Performs a http get and retries the specified number of times with the specified timeouts.\n Uses a future to respond and the future return object can be provided.",
             "itemtype": "method",
             "name": "_retryHttpGet",
@@ -360,7 +405,7 @@
         },
         {
             "file": "main.js",
-            "line": 492,
+            "line": 530,
             "description": "Matcher for checking if a value is one of the given values.",
             "params": [
                 {
@@ -380,7 +425,7 @@
         },
         {
             "file": "main.js",
-            "line": 504,
+            "line": 542,
             "description": "Locate all velocity-compatible test packages and return their config\ndata.",
             "example": [
                 "\n    // in `jasmine-unit` package's `smart.json`:\n    {\n      \"name\": \"jasmine-unit\",\n      \"description\": \"Velocity-compatible jasmine unit test package\",\n      \"homepage\": \"https://github.com/xolvio/jasmine-unit\",\n      \"author\": \"Sam Hatoum\",\n      \"version\": \"0.1.1\",\n      \"git\": \"https://github.com/xolvio/jasmine-unit.git\",\n      \"test-package\": true,\n      \"regex\": \"-jasmine-unit\\\\.(js|coffee)$\"\n    }"
@@ -398,7 +443,7 @@
         },
         {
             "file": "main.js",
-            "line": 564,
+            "line": 605,
             "description": "Initialize the directory/file watcher.",
             "itemtype": "method",
             "name": "_initWatcher",
@@ -416,7 +461,7 @@
         },
         {
             "file": "main.js",
-            "line": 643,
+            "line": 684,
             "description": "Re-init file watcher and clear all test results.",
             "itemtype": "method",
             "name": "_reset",
@@ -434,7 +479,7 @@
         },
         {
             "file": "main.js",
-            "line": 686,
+            "line": 727,
             "description": "If any one test has failed, mark the aggregate test result as failed.",
             "itemtype": "method",
             "name": "_updateAggregateReports",
@@ -445,7 +490,7 @@
         },
         {
             "file": "main.js",
-            "line": 718,
+            "line": 759,
             "description": "Creates a physical mirror of the application under .meteor/local/.mirror\n\n    - Any files with the pattern tests/.*  are not copied, this stops .report\n    directory from also being copied.\n\n    TODO - Strips out velocity, any test packages and reporters from the mirror's .meteor/packages file",
             "itemtype": "method",
             "name": "_syncMirror",
@@ -466,15 +511,15 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " main.js:397"
+            "line": " main.js:435"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " main.js:415"
+            "line": " main.js:453"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " main.js:492"
+            "line": " main.js:530"
         },
         {
             "message": "Missing item type\nStops copying files to the mirror.",
@@ -482,19 +527,19 @@
         },
         {
             "message": "Missing item type\nReturns the MongoDB URL for the given database.",
-            "line": " main.js:397"
+            "line": " main.js:435"
         },
         {
             "message": "Missing item type\nReturn URL for the mirror with the given port.",
-            "line": " main.js:415"
+            "line": " main.js:453"
         },
         {
             "message": "Missing item type\nAdd fixtures to the database.",
-            "line": " main.js:433"
+            "line": " main.js:471"
         },
         {
             "message": "Missing item type\nMatcher for checking if a value is one of the given values.",
-            "line": " main.js:492"
+            "line": " main.js:530"
         }
     ]
 }
