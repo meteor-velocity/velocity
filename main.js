@@ -27,14 +27,18 @@ Velocity = {};
 
   var isMeteor92OrNewer = function () {
     if (Meteor.release) {
-      var majorVersion = Number(Meteor.release[0]);
-      var minorVersion = Number(Meteor.release[3]);
-      var patchVersion = Number(Meteor.release[5]);
-      if (majorVersion > 0 ||
-         (majorVersion == 0 && minorVersion > 9) ||
-         (majorVersion == 0 && minorVersion == 9 && patchVersion >= 2)
-      ) {
-        return true;
+      var versionRegExp = /(?:METEOR@)?(\d+)\.(\d+)\.(\d+)(?:\.(\d+))/;
+      var version = versionRegExp.exec(Meteor.release);
+      if (version) {
+        var majorVersion = Number(version[1]);
+        var minorVersion = Number(version[2]);
+        var patchVersion = Number(version[3]);
+        if (majorVersion > 0 ||
+          (majorVersion == 0 && minorVersion > 9) ||
+          (majorVersion == 0 && minorVersion == 9 && patchVersion >= 2)
+          ) {
+          return true;
+        }
       }
     }
 
@@ -46,7 +50,7 @@ Velocity = {};
       process.env.PWD, '.meteor', 'local', 'build', 'programs', 'server', 'assets'
     );
     if (isMeteor92OrNewer()) {
-      packageName.replace(':', '_')
+      packageName = packageName.replace(':', '_')
     }
 
     return path.join(serverAssetsPath, 'packages', packageName, fileName);
