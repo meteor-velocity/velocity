@@ -19,7 +19,7 @@ Npm.depends({
 
 Package.on_use(function (api) {
   if (api.versionsFrom) {
-    api.versionsFrom('METEOR@0.9.0');
+    api.versionsFrom('METEOR@0.9.1');
     // This is required for Meteor.Collection since Meteor 0.9.1
     api.use('mongo');
   }
