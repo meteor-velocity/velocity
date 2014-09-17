@@ -25,6 +25,33 @@ Velocity = {};
     return;
   }
 
+  var isMeteor92OrNewer = function () {
+    if (Meteor.release) {
+      var majorVersion = Number(Meteor.release[0]);
+      var minorVersion = Number(Meteor.release[3]);
+      var patchVersion = Number(Meteor.release[5]);
+      if (majorVersion > 0 ||
+         (majorVersion == 0 && minorVersion > 9) ||
+         (majorVersion == 0 && minorVersion == 9 && patchVersion >= 2)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  var getAssetPath = function (packageName, fileName) {
+    var serverAssetsPath = path.join(
+      process.env.PWD, '.meteor', 'local', 'build', 'programs', 'server', 'assets'
+    );
+    if (isMeteor92OrNewer()) {
+      packageName.replace(':', '_')
+    }
+
+    return path.join(serverAssetsPath, 'packages', packageName, fileName);
+  };
+
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
       fse = Npm.require('fs-extra'),
@@ -46,8 +73,7 @@ Velocity = {};
       _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp("-fixture.(js|coffee)$"),
-      SERVER_ASSETS_PATH = path.join(process.env.PWD, '.meteor', 'local', 'build', 'programs', 'server', 'assets'),
-      DEFAULT_FIXTURE_PATH = path.join(SERVER_ASSETS_PATH, 'packages', 'velocity:core', 'default-fixture.js');
+      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js');
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
