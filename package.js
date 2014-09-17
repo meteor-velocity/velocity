@@ -21,7 +21,7 @@ Package.on_use(function (api) {
   if (api.versionsFrom) {
     api.versionsFrom('METEOR@0.9.0');
     // This is required for Meteor.Collection since Meteor 0.9.1
-    api.use('mongo-livedata');
+    api.use('mongo');
   }
 
   api.use('check');
