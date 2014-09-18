@@ -172,6 +172,13 @@ Steps for publishing a new version of this package to Atmosphere:
 FYI, `mrt publish .`   <-- just pushes to atmosphere without creating the tag
 
 
+## Publishing to Meteor Package System
+
+We have to publish velocity:core for the different architectures (Mac OS, 64-bit Linux and 32-bit Linux).
+
+First publish velocity:core on your development machine with `meteor publish`. Then you will need machines with the other two architectures. Then use `meteor publish-for-arch velocity:core@VERSION --release 0.9.2.1` (also see [Meteor docs](http://docs.meteor.com/#meteorpublishforarch)).
+
+
 ##Contributors
 
 We are collaborating with an all-star team on unifying the Meteor testing landscape:
