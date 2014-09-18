@@ -34,55 +34,21 @@ https://trello.com/b/VCmaj73b/velocity-project
 
 The Velocity package itself is not something that you would normally include.  Rather you would include the test framework that you would like to use ([see below](https://github.com/meteor-velocity/velocity/#current-frameworks)) and it will automatically be added for you.
 
-There are generally two ways people get started with using velocity to test their apps: the `velocity-quick-start` package and the `velocity-example` app.
-
-#### Quick-start
-
-The [`velocity-quick-start`](https://github.com/alanning/meteor-velocity-quick-start) package will add the [velocity-html-reporter](https://github.com/meteor-velocity/html-reporter/) and some test frameworks to your app.  It will also add some sample tests for you.  Here's how you would add it to your app:
-
-```bash
-$ cd your-app-dir
-$ mrt add velocity-quick-start
-$ mrt
-```
-
-Check out the sample tests in the `tests` directory and run your app again to see the results in both the console and the html-reporter overlay.
-
-
-#### Example app
-
-
-```bash
-$ cd ~/tmp
-$ git clone https://github.com/xolvio/velocity-example.git
-$ cd velocity-example
-$ mrt
-```
-
-You'll see the leaderboard example started on port 3000.
-
-Because the example has included the [velocity-html-reporter](https://github.com/meteor-velocity/html-reporter/) package, you'll see a green/red dot in the top right that indicates the success or failure of your tests.  Clicking the dot will display test details.
-
-Try modifying the tests and see them update reactively in the browser.
-
 
 ## Current Frameworks
 
 The `velocity` package coordinates between test frameworks and provides a common structure for getting test results.  Velocity by itself does not perform any tests.  To actually test your app, use one or more of the velocity-compatible test frameworks listed below:
 
-* [mocha-web-velocity](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web.  Runs mocha tests in the Meteor context which is great for integration testing.
-* [jasmine-unit](https://github.com/xolvio/jasmine-unit) - Runs jasmine unit tests out of the Meteor context.  Fast and good for smaller unit tests.
-* [meteor-cucumber](https://github.com/xdissent/meteor-cucumber) - Velocity-compatible [CucumberJS](https://github.com/cucumber/cucumber-js) runner for Meteor
-* [jasmine](https://github.com/Sanjo/meteor-jasmine) - run client tests in the browser within the app context.
-* [selenium-nightwatch](https://github.com/awatson1978/selenium-nightwatch/) - run acceptance tests in real browsers using Selenium and Nightwatch
+* [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) - Write client and server unit and integration tests with Jasmine.
+* [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
+* [awatson1978:selenium-nightwatch](https://github.com/awatson1978/selenium-nightwatch/) - run acceptance tests in real browsers using Selenium and Nightwatch
 
 
 ## Current Reporters
 
 Reporters display test results.
 
-* [velocity-html-reporter](https://github.com/meteor-velocity/html-reporter/) - Adds an overlay to your app indicating test success/failure (green/red dot in top right).  Click dot for test details.  `mrt add velocity-html-reporter`
-
+* [velocity:html-reporter](https://github.com/meteor-velocity/html-reporter/) - Adds an overlay to your app indicating test success/failure (green/red dot in top right).  Click dot for test details.  `meteor add velocity:html-reporter`
 
 
 ## Test framework authors
@@ -112,31 +78,9 @@ For example, you could write your logging like this:
     DEBUG && console.log('[my-framework] helpful debugging info', someVar);
     
 
-#### Changes to `smart.json`
+#### Register testing framework to Velocity
 
-You'll need to include some velocity-specific fields in your package's smart.json file:  
-
-* `testPackage` [Boolean] - lets velocity know your framework is available to send test files to.  
-* `regex` [String] - tells velocity which files in the `tests` directory should go to your framework.  
-
-An example `smart.json` from the `jasmine-unit` test framework:
-
-    {
-        "name": "jasmine-unit",
-        "description": "Velocity-compatible unit test package with jasmine syntax",
-        "homepage": "https://github.com/xolvio/jasmine-unit",
-        "author": "Sam Hatoum",
-        "version": "0.1.19",
-        "git": "https://github.com/xolvio/jasmine-unit.git",
-        "testPackage": true,
-        "regex": "-jasmine-unit.(js|coffee)$",
-        "packages": {
-          "velocity": "",
-          "package-stubber": ""
-        }
-    }
-
-Source: https://github.com/xolvio/jasmine-unit/blob/master/smart.json
+Use `Velocity.registerTestingFramework(frameworkName, options)` to register your package as testing framework. You can find a description of the expected arguments in the docs.
 
 
 ## Debug output
