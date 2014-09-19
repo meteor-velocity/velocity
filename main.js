@@ -123,7 +123,6 @@ Velocity = {};
 
   if (Meteor.isServer) {
     _.extend(Velocity, {
-
       /**
        * Registers a testing framework plugin.
        *
@@ -133,9 +132,11 @@ Velocity = {};
        * @param options.regex {String} The regular expression for
        *                      test files that should be assigned
        *                      to the testing framework.
-       * @param options.sampleTestGenerator {Function} Returns an
-       *                      array of files to be included when
-       *                      a user requests sample tests.
+       * @param options.sampleTestGenerator {Function} sampleTestGenerator
+       *    returns an array of fileObjects with the following fields:
+       * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
+       * @param options.sampleTestGenerator.contents {String} contents of the test file
+the path thats returned
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
