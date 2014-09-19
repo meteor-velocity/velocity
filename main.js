@@ -71,6 +71,7 @@ Velocity = {};
       spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
+      mkdirp = Npm.require('mkdirp'),
       _config = {},
       _testFrameworks,
       _preProcessors = [],
@@ -132,6 +133,9 @@ Velocity = {};
        * @param options.regex {String} The regular expression for
        *                      test files that should be assigned
        *                      to the testing framework.
+       * @param options.sampleTestGenerator {Function} Returns an
+       *                      array of files to be included when
+       *                      a user requests sample tests.
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
@@ -319,28 +323,39 @@ Velocity = {};
         framework: String
       });
 
-      samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
-      testsPath = path.join(pwd, 'tests');
+      if (_config[options.framework].sampleTestGenerator){
+        var sampleTests = _config[options.framework].sampleTestGenerator(options);
+        DEBUG && console.log('[velocity] found ', sampleTests.length, 'sample test files for', options.framework);
+        sampleTests.forEach(function(testFile){
+          var fullTestPath = path.join(pwd, 'tests', testFile.path);
+          var testDir = path.dirname(fullTestPath);
+          mkdirp.sync(testDir);
+          fs.writeFileSync(fullTestPath, testFile.contents);
+        });
+      } else {
+        samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
+        testsPath = path.join(pwd, 'tests');
 
-      DEBUG && console.log('[velocity] checking for sample tests in', path.join(samplesPath, '*'));
+        DEBUG && console.log('[velocity] checking for sample tests in', path.join(samplesPath, '*'));
 
-      if (fs.existsSync(samplesPath)) {
-        command = 'mkdir -p ' + testsPath + ' && ' +
-          'rsync -au ' + path.join(samplesPath, '*') +
-          ' ' + testsPath + path.sep;
+        if (fs.existsSync(samplesPath)) {
+          command = 'mkdir -p ' + testsPath + ' && ' +
+            'rsync -au ' + path.join(samplesPath, '*') +
+            ' ' + testsPath + path.sep;
 
-        DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
+          DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
-        child_process.exec(command, Meteor.bindEnvironment(
-          function copySampleTestsExecHandler (err, stdout, stderr) {
-            if (err) {
-              console.log('ERROR', err);
-            }
-            console.log(stdout);
-            console.log(stderr);
-          },
-          'copySampleTestsExecHandler'
-        ));
+          child_process.exec(command, Meteor.bindEnvironment(
+            function copySampleTestsExecHandler (err, stdout, stderr) {
+              if (err) {
+                console.log('ERROR', err);
+              }
+              console.log(stdout);
+              console.log(stderr);
+            },
+            'copySampleTestsExecHandler'
+          ));
+        }
       }
     },  // end copySampleTests
 
