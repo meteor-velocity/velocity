@@ -72,7 +72,6 @@ Velocity = {};
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
       _config = {},
-      _testFrameworks,
       _preProcessors = [],
       _postProcessors = [],
       _watcher,
@@ -81,10 +80,6 @@ Velocity = {};
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
-
-    _testFrameworks = _.pluck(_config, function (config) {
-      return config.name;
-    });
     DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
     // kick-off everything
@@ -519,6 +514,10 @@ Velocity = {};
 // Private functions
 //
 
+  function _getTestFrameworkNames() {
+    return _.pluck(_config, 'name');
+  }
+
   /**
    * Returns the MongoDB URL for the given database.
    * @param database
@@ -746,7 +745,7 @@ Velocity = {};
       name: 'aggregateComplete',
       result: 'pending'
     });
-    _.each(_testFrameworks, function (testFramework) {
+    _.forEach(_getTestFrameworkNames(), function (testFramework) {
       VelocityAggregateReports.insert({
         name: testFramework,
         result: 'pending'
@@ -783,9 +782,12 @@ Velocity = {};
     // TODO: remove this try/catch block and replace it with better logic
     try{
       // if all test frameworks have completed, upsert an aggregate completed record
-      var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
+      var completedFrameworksCount = VelocityAggregateReports.find({
+        'name': {$in: _getTestFrameworkNames()},
+        'result': 'completed'
+      }).count();
 
-      if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _testFrameworks.length === completedFrameworksCount) {
+      if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _getTestFrameworkNames().length === completedFrameworksCount) {
         VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
 
         _.each(_postProcessors, function (reporter) {
