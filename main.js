@@ -72,7 +72,6 @@ Velocity = {};
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
       _config = {},
-      _testFrameworks,
       _preProcessors = [],
       _postProcessors = [],
       _watcher,
@@ -81,12 +80,6 @@ Velocity = {};
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
-
-    // Prefer Velocity.registerTestingFramework over smart.json
-    _.defaults(_config, _loadTestPackageConfigs());
-    _testFrameworks = _.pluck(_config, function (config) {
-      return config.name;
-    });
     DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
     // kick-off everything
@@ -127,11 +120,15 @@ Velocity = {};
        * Registers a testing framework plugin.
        *
        * @method registerTestingFramework
-       * @param name {String} The name of the testing framework.
-       * @param options {Object} Options for the testing framework.
-       * @param options.regex {String} The regular expression for
-       *                      test files that should be assigned
-       *                      to the testing framework.
+       * @param {String} name The name of the testing framework.
+       * @param {Object} [options] Options for the testing framework.
+       * @param {String} [options.regex] The regular expression for
+       *                                 test files that should be assigned
+       *                                 to the testing framework.
+       *                                 The path relative to the tests
+       *                                 folder is matched against it.
+       *                                 The default is "name/.+\.js$"
+       *                                 (name is the testing framework name).
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
@@ -517,6 +514,10 @@ Velocity = {};
 // Private functions
 //
 
+  function _getTestFrameworkNames() {
+    return _.pluck(_config, 'name');
+  }
+
   /**
    * Returns the MongoDB URL for the given database.
    * @param database
@@ -624,62 +625,11 @@ Velocity = {};
     });
   }
 
-  /**
-   * Locate all velocity-compatible test packages and return their config
-   * data.
-   *
-   * @example
-   *     // in `jasmine-unit` package's `smart.json`:
-   *     {
-   *       "name": "jasmine-unit",
-   *       "description": "Velocity-compatible jasmine unit test package",
-   *       "homepage": "https://github.com/xolvio/jasmine-unit",
-   *       "author": "Sam Hatoum",
-   *       "version": "0.1.1",
-   *       "git": "https://github.com/xolvio/jasmine-unit.git",
-   *       "test-package": true,
-   *       "regex": "-jasmine-unit\\.(js|coffee)$"
-   *     }
-   *
-   * @method _loadTestPackageConfigs
-   * @return {Object} Hash of test package names and their normalized config data.
-   * @private
-   */
-  function _loadTestPackageConfigs () {
-    var pwd = process.env.PWD,
-        smartJsons = glob.sync('packages/*/smart.json', {cwd: pwd}),
-        testConfigDictionary;
-
-    DEBUG && console.log('Check for test package configs...', smartJsons);
-
-    testConfigDictionary = _.reduce(smartJsons, function (memo, smartJsonPath) {
-      var contents,
-          config;
-
-      try {
-        contents = readFile(path.join(pwd, smartJsonPath));
-        config = JSON.parse(contents);
-        if (config.name && config.testPackage) {
-          // add smart.json contents to our dictionary
-          memo[config.name] = _parseTestingFrameworkOptions(config.name, config);
-        }
-      } catch (ex) {
-        DEBUG && console.log('Error reading file:', smartJsonPath, ex);
-      }
-      return memo;
-    }, {});
-
-    return testConfigDictionary;
-  }  // end _loadTestPackageConfigs
-
   function _parseTestingFrameworkOptions(name, options) {
+    options = options || {};
     _.defaults(options, {
       name: name,
-      // if test package hasn't defined an explicit regex for the file
-      // watcher, default to the package name as a suffix.
-      // Ex. name = "mocha-web"
-      //     regex = "-mocha-web.js"
-      regex: '-' + name + '\\.js$'
+      regex: name + '\\' + path.sep + '.+\\.js$'
     });
 
     options._regexp = new RegExp(options.regex);
@@ -691,7 +641,7 @@ Velocity = {};
    * Initialize the directory/file watcher.
    *
    * @method _initWatcher
-   * @param {Object} config  See `_loadTestPackageConfigs`.
+   * @param {Object} config  See `registerTestingFramework`.
    * @private
    */
   function _initWatcher (config) {
@@ -770,7 +720,7 @@ Velocity = {};
    * Re-init file watcher and clear all test results.
    *
    * @method _reset
-   * @param {Object} config  See `_loadTestPackageConfigs`.
+   * @param {Object} config  See `registerTestingFramework`.
    * @private
    */
   function _reset (config) {
@@ -795,7 +745,7 @@ Velocity = {};
       name: 'aggregateComplete',
       result: 'pending'
     });
-    _.each(_testFrameworks, function (testFramework) {
+    _.forEach(_getTestFrameworkNames(), function (testFramework) {
       VelocityAggregateReports.insert({
         name: testFramework,
         result: 'pending'
@@ -841,19 +791,19 @@ Velocity = {};
       }
 
       // if all test frameworks have completed, upsert an aggregate completed record
-      var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
-      console.log('completedFrameworksCount', completedFrameworksCount);
+      var completedFrameworksCount = VelocityAggregateReports.find({
+        'name': {$in: _getTestFrameworkNames()},
+        'result': 'completed'
+      }).count();
 
-      // if our global status is not complete and our number of completed frameworks has just hit the number of total frameworks
-      if ((VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed') && (_testFrameworks.length === completedFrameworksCount)) {
+      if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _getTestFrameworkNames().length === completedFrameworksCount) {
 
-        // we want to mark the global status as complete
         VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
 
-        // console.log('_postProcessors', _postProcessors);
-        // _.each(_postProcessors, function (reporter) {
-        //   reporter();
-        // });
+        console.log('_postProcessors', _postProcessors);
+        _.each(_postProcessors, function (reporter) {
+          reporter();
+        });
       }
     //}catch(error){
     //  console.log(error)
