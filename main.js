@@ -767,7 +767,6 @@ Velocity = {};
    */
   function _updateAggregateReports () {
     console.log('_updateAggregateReports');
-    console.log('_testFrameworks', _testFrameworks);
     console.log('VelocityAggregateReports.find().fetch()', VelocityAggregateReports.find().fetch());
 
     // lets assuming that the framework wants to aggregate reports
