@@ -127,11 +127,15 @@ Velocity = {};
        * Registers a testing framework plugin.
        *
        * @method registerTestingFramework
-       * @param name {String} The name of the testing framework.
-       * @param options {Object} Options for the testing framework.
-       * @param options.regex {String} The regular expression for
-       *                      test files that should be assigned
-       *                      to the testing framework.
+       * @param {String} name The name of the testing framework.
+       * @param {Object} [options] Options for the testing framework.
+       * @param {String} [options.regex] The regular expression for
+       *                                 test files that should be assigned
+       *                                 to the testing framework.
+       *                                 The path relative to the tests
+       *                                 folder is matched against it.
+       *                                 The default is "name/.+\.js$"
+       *                                 (name is the testing framework name).
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
@@ -676,11 +680,7 @@ Velocity = {};
     options = options || {};
     _.defaults(options, {
       name: name,
-      // if test package hasn't defined an explicit regex for the file
-      // watcher, default to the package name as a suffix.
-      // Ex. name = "mocha-web"
-      //     regex = "-mocha-web.js"
-      regex: '-' + name + '\\.js$'
+      regex: name + '\\' + path.sep + '.+\\.js$'
     });
 
     options._regexp = new RegExp(options.regex);
