@@ -825,17 +825,24 @@ Velocity = {};
       VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: result}});
     }
 
-    // if all test frameworks have completed, upsert an aggregate completed record
-    var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
+    // lets assuming that the framework wants to aggregate reports
+    // but not hang if it doesn't
+    // TODO: remove this try/catch block and replace it with better logic
+    try{
+      // if all test frameworks have completed, upsert an aggregate completed record
+      var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
 
-    if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _testFrameworks.length === completedFrameworksCount) {
-      VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+      if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _testFrameworks.length === completedFrameworksCount) {
+        VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
 
-      _.each(_postProcessors, function (reporter) {
-        reporter();
-      });
-
+        _.each(_postProcessors, function (reporter) {
+          reporter();
+        });
+      }
+    }catch(error){
+      console.log(error)
     }
+
 
   }
 
