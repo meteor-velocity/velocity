@@ -816,34 +816,48 @@ Velocity = {};
    * @private
    */
   function _updateAggregateReports () {
+    console.log('_updateAggregateReports');
+    console.log('_testFrameworks', _testFrameworks);
+    console.log('VelocityAggregateReports.find().fetch()', VelocityAggregateReports.find().fetch());
+
     // lets assuming that the framework wants to aggregate reports
     // but not hang if it doesn't
     // TODO: remove this try/catch block and replace it with better logic
-    try{
+    //try{
 
       var failedResult,
-          result;
+          frameworkResult;
 
+      // if all of our test reports have valid results
       if (!VelocityTestReports.findOne({result: ''})) {
+        // look through them and see if we find any tests that failed
         failedResult = VelocityTestReports.findOne({result: 'failed'});
-        result = failedResult ? 'failed' : 'passed';
 
-        VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: result}});
+        // if any tests failed, set the framework as failed; otherwise set our framework to passed
+        frameworkResult = failedResult ? 'failed' : 'passed';
+
+        // update the global status
+        VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
       }
 
       // if all test frameworks have completed, upsert an aggregate completed record
       var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
+      console.log('completedFrameworksCount', completedFrameworksCount);
 
-      if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _testFrameworks.length === completedFrameworksCount) {
+      // if our global status is not complete and our number of completed frameworks has just hit the number of total frameworks
+      if ((VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed') && (_testFrameworks.length === completedFrameworksCount)) {
+
+        // we want to mark the global status as complete
         VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
 
-        _.each(_postProcessors, function (reporter) {
-          reporter();
-        });
+        // console.log('_postProcessors', _postProcessors);
+        // _.each(_postProcessors, function (reporter) {
+        //   reporter();
+        // });
       }
-    }catch(error){
-      console.log(error)
-    }
+    //}catch(error){
+    //  console.log(error)
+    //}
 
 
   }
