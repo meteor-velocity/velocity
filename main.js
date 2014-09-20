@@ -82,8 +82,6 @@ Velocity = {};
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
 
-    // Prefer Velocity.registerTestingFramework over smart.json
-    _.defaults(_config, _loadTestPackageConfigs());
     _testFrameworks = _.pluck(_config, function (config) {
       return config.name;
     });
@@ -628,54 +626,6 @@ Velocity = {};
     });
   }
 
-  /**
-   * Locate all velocity-compatible test packages and return their config
-   * data.
-   *
-   * @example
-   *     // in `jasmine-unit` package's `smart.json`:
-   *     {
-   *       "name": "jasmine-unit",
-   *       "description": "Velocity-compatible jasmine unit test package",
-   *       "homepage": "https://github.com/xolvio/jasmine-unit",
-   *       "author": "Sam Hatoum",
-   *       "version": "0.1.1",
-   *       "git": "https://github.com/xolvio/jasmine-unit.git",
-   *       "test-package": true,
-   *       "regex": "-jasmine-unit\\.(js|coffee)$"
-   *     }
-   *
-   * @method _loadTestPackageConfigs
-   * @return {Object} Hash of test package names and their normalized config data.
-   * @private
-   */
-  function _loadTestPackageConfigs () {
-    var pwd = process.env.PWD,
-        smartJsons = glob.sync('packages/*/smart.json', {cwd: pwd}),
-        testConfigDictionary;
-
-    DEBUG && console.log('Check for test package configs...', smartJsons);
-
-    testConfigDictionary = _.reduce(smartJsons, function (memo, smartJsonPath) {
-      var contents,
-          config;
-
-      try {
-        contents = readFile(path.join(pwd, smartJsonPath));
-        config = JSON.parse(contents);
-        if (config.name && config.testPackage) {
-          // add smart.json contents to our dictionary
-          memo[config.name] = _parseTestingFrameworkOptions(config.name, config);
-        }
-      } catch (ex) {
-        DEBUG && console.log('Error reading file:', smartJsonPath, ex);
-      }
-      return memo;
-    }, {});
-
-    return testConfigDictionary;
-  }  // end _loadTestPackageConfigs
-
   function _parseTestingFrameworkOptions(name, options) {
     options = options || {};
     _.defaults(options, {
@@ -692,7 +642,7 @@ Velocity = {};
    * Initialize the directory/file watcher.
    *
    * @method _initWatcher
-   * @param {Object} config  See `_loadTestPackageConfigs`.
+   * @param {Object} config  See `registerTestingFramework`.
    * @private
    */
   function _initWatcher (config) {
@@ -771,7 +721,7 @@ Velocity = {};
    * Re-init file watcher and clear all test results.
    *
    * @method _reset
-   * @param {Object} config  See `_loadTestPackageConfigs`.
+   * @param {Object} config  See `registerTestingFramework`.
    * @private
    */
   function _reset (config) {
