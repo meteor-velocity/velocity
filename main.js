@@ -135,6 +135,59 @@ Velocity = {};
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
+      },
+      parseXmlFiles: function  (selectedFramework){
+         closeFunc = Meteor.bindEnvironment(function () {
+           console.log('binding environment and parsing output xml files...')
+
+            function hashCode (s) {
+              return s.split("").reduce(function (a, b) {
+                a = ((a << 5) - a) + b.charCodeAt(0);
+                return a & a;
+              }, 0);
+            }
+
+           var newResults = [];
+           //var globSearchString = parsePath('**/FIREFOX*.xml');
+           var globSearchString = path.join('**', 'FIREFOX_*.xml');
+           var xmlFiles = glob.sync(globSearchString, { cwd: testReportsPath });
+
+           console.log('globSearchString', globSearchString);
+
+           _.each(xmlFiles, function (xmlFile, index) {
+             parseString(fs.readFileSync(testReportsPath + path.sep + xmlFile), function (err, result) {
+               _.each(result.testsuites.testsuite, function (testsuite) {
+                 _.each(testsuite.testcase, function (testcase) {
+                   var result = ({
+                     name: testcase.$.name,
+                     framework: selectedFramework,
+                     result: testcase.failure ? 'failed' : 'passed',
+                     timestamp: testsuite.$.timestamp,
+                     time: testcase.$.time,
+                     ancestors: [testcase.$.classname]
+                   });
+
+                   if (testcase.failure) {
+                     _.each(testcase.failure, function (failure) {
+                       result.failureType = failure.$.type;
+                       result.failureMessage = failure.$.message;
+                       result.failureStackTrace = failure._;
+                     });
+                   }
+                   result.id = selectedFramework + ':' + hashCode(xmlFile + testcase.$.classname + testcase.$.name);
+                   newResults.push(result.id);
+                   console.log('result', result);
+                   Meteor.call('postResult', result);
+                 });
+               });
+             });
+
+             if (index === xmlFiles.length - 1) {
+               Meteor.call('resetReports', {framework: selectedFramework, notIn: newResults});
+               Meteor.call('completed', {framework: selectedFramework});
+             }
+           });
+         });
       }
     });
   }
