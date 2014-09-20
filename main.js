@@ -137,7 +137,7 @@ Velocity = {};
         _config[name] = _parseTestingFrameworkOptions(name, options);
       },
       parseXmlFiles: function  (selectedFramework){
-         closeFunc = Meteor.bindEnvironment(function () {
+         var closeFunc = Meteor.bindEnvironment(function () {
            console.log('binding environment and parsing output xml files...')
 
             function hashCode (s) {
