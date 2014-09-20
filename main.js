@@ -767,7 +767,7 @@ Velocity = {};
    */
   function _updateAggregateReports () {
     console.log('_updateAggregateReports');
-    console.log('VelocityAggregateReports.find().fetch()', VelocityAggregateReports.find().fetch());
+    //console.log('VelocityAggregateReports.find().fetch()', VelocityAggregateReports.find().fetch());
 
     // lets assuming that the framework wants to aggregate reports
     // but not hang if it doesn't
@@ -799,7 +799,7 @@ Velocity = {};
 
         VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
 
-        console.log('_postProcessors', _postProcessors);
+        //console.log('_postProcessors', _postProcessors);
         _.each(_postProcessors, function (reporter) {
           reporter();
         });
