@@ -673,6 +673,7 @@ Velocity = {};
   }  // end _loadTestPackageConfigs
 
   function _parseTestingFrameworkOptions(name, options) {
+    options = options || {};
     _.defaults(options, {
       name: name,
       // if test package hasn't defined an explicit regex for the file
