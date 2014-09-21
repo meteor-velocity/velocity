@@ -796,14 +796,20 @@ Velocity = {};
         'result': 'completed'
       }).count();
 
-      if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _getTestFrameworkNames().length === completedFrameworksCount) {
 
-        VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+      // the following syntax is dangerous in case the database is flapping and the cursor hasn't been instantiated
+      // VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result
 
-        //console.log('_postProcessors', _postProcessors);
-        _.each(_postProcessors, function (reporter) {
-          reporter();
-        });
+      var aggregateComplete = VelocityAggregateReports.findOne({'name': 'aggregateComplete'});
+      if(aggregateComplete){
+        if((aggregateComplete.result !== 'completed') && (_getTestFrameworkNames().length === completedFrameworksCount)){
+          VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+
+          _.each(_postProcessors, function (reporter) {
+            reporter();
+          });
+
+        }
       }
     //}catch(error){
     //  console.log(error)
