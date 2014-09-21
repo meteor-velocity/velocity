@@ -1,6 +1,6 @@
-## v0.2.0-pre0
+## v0.2.0
 
-* Support for Meteor 0.9
+* Support for Meteor >= 0.9.1
 
 ### For Velocity plugin developers
 
