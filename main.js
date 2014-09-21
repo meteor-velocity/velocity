@@ -270,6 +270,7 @@ Velocity = {};
      *                   timestamp - Date
      */
     postLog: function (options) {
+      console.log
       check(options, {
         type: String,
         message: String,
