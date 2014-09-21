@@ -767,7 +767,7 @@ Velocity = {};
    * @private
    */
   function _updateAggregateReports () {
-    console.log('_updateAggregateReports');
+    //console.log('_updateAggregateReports');
     //console.log('VelocityAggregateReports.find().fetch()', VelocityAggregateReports.find().fetch());
 
     // lets assuming that the framework wants to aggregate reports
