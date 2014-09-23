@@ -73,7 +73,6 @@ Velocity = {};
       glob = Npm.require('glob'),
       mkdirp = Npm.require('mkdirp'),
       _config = {},
-      _testFrameworks,
       _preProcessors = [],
       _postProcessors = [],
       _watcher,
@@ -82,12 +81,6 @@ Velocity = {};
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
-
-    // Prefer Velocity.registerTestingFramework over smart.json
-    _.defaults(_config, _loadTestPackageConfigs());
-    _testFrameworks = _.pluck(_config, function (config) {
-      return config.name;
-    });
     DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
     // kick-off everything
@@ -127,19 +120,75 @@ Velocity = {};
        * Registers a testing framework plugin.
        *
        * @method registerTestingFramework
-       * @param name {String} The name of the testing framework.
-       * @param options {Object} Options for the testing framework.
-       * @param options.regex {String} The regular expression for
+       * @param {String name The name of the testing framework.
+       * @param {Object} [options] Options for the testing framework.
+       * @param {String} options.regex The regular expression for
        *                      test files that should be assigned
        *                      to the testing framework.
+       *                                 The path relative to the tests
+       *                                 folder is matched against it.
+       *                                 The default is "name/.+\.js$"
+       *                                 (name is the testing framework name).
        * @param options.sampleTestGenerator {Function} sampleTestGenerator
        *    returns an array of fileObjects with the following fields:
        * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
-       * @param options.sampleTestGenerator.contents {String} contents of the test file
-the path thats returned
+       * @param options.sampleTestGenerator.contents {String} contents of the test file the path thats returned
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
+      },
+      parseXmlFiles: function  (selectedFramework){
+         var closeFunc = Meteor.bindEnvironment(function () {
+           console.log('binding environment and parsing output xml files...')
+
+            function hashCode (s) {
+              return s.split("").reduce(function (a, b) {
+                a = ((a << 5) - a) + b.charCodeAt(0);
+                return a & a;
+              }, 0);
+            }
+
+           var newResults = [];
+           //var globSearchString = parsePath('**/FIREFOX*.xml');
+           var globSearchString = path.join('**', 'FIREFOX_*.xml');
+           var xmlFiles = glob.sync(globSearchString, { cwd: testReportsPath });
+
+           console.log('globSearchString', globSearchString);
+
+           _.each(xmlFiles, function (xmlFile, index) {
+             parseString(fs.readFileSync(testReportsPath + path.sep + xmlFile), function (err, result) {
+               _.each(result.testsuites.testsuite, function (testsuite) {
+                 _.each(testsuite.testcase, function (testcase) {
+                   var result = ({
+                     name: testcase.$.name,
+                     framework: selectedFramework,
+                     result: testcase.failure ? 'failed' : 'passed',
+                     timestamp: testsuite.$.timestamp,
+                     time: testcase.$.time,
+                     ancestors: [testcase.$.classname]
+                   });
+
+                   if (testcase.failure) {
+                     _.each(testcase.failure, function (failure) {
+                       result.failureType = failure.$.type;
+                       result.failureMessage = failure.$.message;
+                       result.failureStackTrace = failure._;
+                     });
+                   }
+                   result.id = selectedFramework + ':' + hashCode(xmlFile + testcase.$.classname + testcase.$.name);
+                   newResults.push(result.id);
+                   console.log('result', result);
+                   Meteor.call('postResult', result);
+                 });
+               });
+             });
+
+             if (index === xmlFiles.length - 1) {
+               Meteor.call('resetReports', {framework: selectedFramework, notIn: newResults});
+               Meteor.call('completed', {framework: selectedFramework});
+             }
+           });
+         });
       }
     });
   }
@@ -225,6 +274,7 @@ the path thats returned
      *                   timestamp - Date
      */
     postLog: function (options) {
+      console.log
       check(options, {
         type: String,
         message: String,
@@ -265,6 +315,8 @@ the path thats returned
      *                               ex. 'Template.leaderboard.selected_name'
      */
     postResult: function (data) {
+      // Nightwatch doesn't return failureType, failureMessage, feailureStackTrace, or ancestors
+      // we can't assume that a test framework will have that informationPhoenix42
       check(data, Match.ObjectIncluding({
         id: String,
         name: String,
@@ -275,11 +327,11 @@ the path thats returned
         browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
         timestamp: Match.Optional(Match.OneOf(Date, String)),
         async: Match.Optional(Boolean),
-        timeOut: Match.Optional(Match.Any),
-        failureType: Match.Optional(String),
-        failureMessage: Match.Optional(String),
-        failureStackTrace: Match.Optional(Match.Any),
-        ancestors: Match.Optional([String])
+        timeOut: Match.Optional(Match.Any)
+        //failureType: Match.Optional(String),
+        //failureMessage: Match.Optional(String),
+        //failureStackTrace: Match.Optional(Match.Any),
+        //ancestors: Match.Optional([String])
       }));
 
       VelocityTestReports.upsert(data.id, {$set: data});
@@ -478,6 +530,10 @@ the path thats returned
 // Private functions
 //
 
+  function _getTestFrameworkNames() {
+    return _.pluck(_config, 'name');
+  }
+
   /**
    * Returns the MongoDB URL for the given database.
    * @param database
@@ -585,62 +641,11 @@ the path thats returned
     });
   }
 
-  /**
-   * Locate all velocity-compatible test packages and return their config
-   * data.
-   *
-   * @example
-   *     // in `jasmine-unit` package's `smart.json`:
-   *     {
-   *       "name": "jasmine-unit",
-   *       "description": "Velocity-compatible jasmine unit test package",
-   *       "homepage": "https://github.com/xolvio/jasmine-unit",
-   *       "author": "Sam Hatoum",
-   *       "version": "0.1.1",
-   *       "git": "https://github.com/xolvio/jasmine-unit.git",
-   *       "test-package": true,
-   *       "regex": "-jasmine-unit\\.(js|coffee)$"
-   *     }
-   *
-   * @method _loadTestPackageConfigs
-   * @return {Object} Hash of test package names and their normalized config data.
-   * @private
-   */
-  function _loadTestPackageConfigs () {
-    var pwd = process.env.PWD,
-        smartJsons = glob.sync('packages/*/smart.json', {cwd: pwd}),
-        testConfigDictionary;
-
-    DEBUG && console.log('Check for test package configs...', smartJsons);
-
-    testConfigDictionary = _.reduce(smartJsons, function (memo, smartJsonPath) {
-      var contents,
-          config;
-
-      try {
-        contents = readFile(path.join(pwd, smartJsonPath));
-        config = JSON.parse(contents);
-        if (config.name && config.testPackage) {
-          // add smart.json contents to our dictionary
-          memo[config.name] = _parseTestingFrameworkOptions(config.name, config);
-        }
-      } catch (ex) {
-        DEBUG && console.log('Error reading file:', smartJsonPath, ex);
-      }
-      return memo;
-    }, {});
-
-    return testConfigDictionary;
-  }  // end _loadTestPackageConfigs
-
   function _parseTestingFrameworkOptions(name, options) {
+    options = options || {};
     _.defaults(options, {
       name: name,
-      // if test package hasn't defined an explicit regex for the file
-      // watcher, default to the package name as a suffix.
-      // Ex. name = "mocha-web"
-      //     regex = "-mocha-web.js"
-      regex: '-' + name + '\\.js$'
+      regex: name + '\\' + path.sep + '.+\\.js$'
     });
 
     options._regexp = new RegExp(options.regex);
@@ -652,7 +657,7 @@ the path thats returned
    * Initialize the directory/file watcher.
    *
    * @method _initWatcher
-   * @param {Object} config  See `_loadTestPackageConfigs`.
+   * @param {Object} config  See `registerTestingFramework`.
    * @private
    */
   function _initWatcher (config) {
@@ -731,7 +736,7 @@ the path thats returned
    * Re-init file watcher and clear all test results.
    *
    * @method _reset
-   * @param {Object} config  See `_loadTestPackageConfigs`.
+   * @param {Object} config  See `registerTestingFramework`.
    * @private
    */
   function _reset (config) {
@@ -756,7 +761,7 @@ the path thats returned
       name: 'aggregateComplete',
       result: 'pending'
     });
-    _.each(_testFrameworks, function (testFramework) {
+    _.forEach(_getTestFrameworkNames(), function (testFramework) {
       VelocityAggregateReports.insert({
         name: testFramework,
         result: 'pending'
@@ -777,28 +782,54 @@ the path thats returned
    * @private
    */
   function _updateAggregateReports () {
+    //console.log('_updateAggregateReports');
+    //console.log('VelocityAggregateReports.find().fetch()', VelocityAggregateReports.find().fetch());
 
-    var failedResult,
-        result;
+    // lets assuming that the framework wants to aggregate reports
+    // but not hang if it doesn't
+    // TODO: remove this try/catch block and replace it with better logic
+    //try{
 
-    if (!VelocityTestReports.findOne({result: ''})) {
-      failedResult = VelocityTestReports.findOne({result: 'failed'});
-      result = failedResult ? 'failed' : 'passed';
+      var failedResult,
+          frameworkResult;
 
-      VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: result}});
-    }
+      // if all of our test reports have valid results
+      if (!VelocityTestReports.findOne({result: ''})) {
+        // look through them and see if we find any tests that failed
+        failedResult = VelocityTestReports.findOne({result: 'failed'});
 
-    // if all test frameworks have completed, upsert an aggregate completed record
-    var completedFrameworksCount = VelocityAggregateReports.find({ 'name': {$in: _testFrameworks}, 'result': 'completed'}).count();
+        // if any tests failed, set the framework as failed; otherwise set our framework to passed
+        frameworkResult = failedResult ? 'failed' : 'passed';
 
-    if (VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result !== 'completed' && _testFrameworks.length === completedFrameworksCount) {
-      VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+        // update the global status
+        VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
+      }
 
-      _.each(_postProcessors, function (reporter) {
-        reporter();
-      });
+      // if all test frameworks have completed, upsert an aggregate completed record
+      var completedFrameworksCount = VelocityAggregateReports.find({
+        'name': {$in: _getTestFrameworkNames()},
+        'result': 'completed'
+      }).count();
 
-    }
+
+      // the following syntax is dangerous in case the database is flapping and the cursor hasn't been instantiated
+      // VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result
+
+      var aggregateComplete = VelocityAggregateReports.findOne({'name': 'aggregateComplete'});
+      if(aggregateComplete){
+        if((aggregateComplete.result !== 'completed') && (_getTestFrameworkNames().length === completedFrameworksCount)){
+          VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+
+          _.each(_postProcessors, function (reporter) {
+            reporter();
+          });
+
+        }
+      }
+    //}catch(error){
+    //  console.log(error)
+    //}
+
 
   }
 

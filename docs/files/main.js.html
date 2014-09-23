@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: v0.1.19</em>
+            <em>API Docs for: 0.2.13</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -41,15 +41,243 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/_syncMirror                                                                                             // 812.html">_syncMirror                                                                                             // 812</a></li>
+            
                 <li><a href="../classes/FileCopier.html">FileCopier</a></li>
             
                 <li><a href="../classes/Velocity.html">Velocity</a></li>
+            
+                <li><a href="../classes/Velocity                                                                                                   // 12
+/                                                                                                                  // 13
+Velocity = {};                                                                                                       // 14
+                                                                                                                    // 15
+(function () {                                                                                                       // 16
+ &#x27;use strict&#x27;;                                                                                                      // 17
+                                                                                                                    // 18
+//////////////////////////////////////////////////////////////////////                                               // 19
+// Init                                                                                                              // 20
+//                                                                                                                   // 21
+                                                                                                                    // 22
+ if (process.env.NODE_ENV !== &#x27;development&#x27; || process.env.VELOCITY === &#x27;0&#x27; || process.env.IS_MIRROR) {             // 23
+   DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);                                                                // 24
+   return;                                                                                                          // 25
+ }                                                                                                                  // 26
+                                                                                                                    // 27
+ var isMeteor92OrNewer = function () {                                                                              // 28
+   if (Meteor.release) {                                                                                            // 29
+     var versionRegExp = /(?:METEOR@)?(\d+)\.(\d+)\.(\d+)(?:\.(\d+))/;                                              // 30
+     var version = versionRegExp.exec(Meteor.release);                                                              // 31
+     if (version) {                                                                                                 // 32
+       var majorVersion = Number(version[1]);                                                                       // 33
+       var minorVersion = Number(version[2]);                                                                       // 34
+       var patchVersion = Number(version[3]);                                                                       // 35
+       if (majorVersion &gt; 0 ||                                                                                      // 36
+         (majorVersion == 0 &amp;&amp; minorVersion &gt; 9) ||                                                                 // 37
+         (majorVersion == 0 &amp;&amp; minorVersion == 9 &amp;&amp; patchVersion &gt;= 2)                                              // 38
+         ) {                                                                                                        // 39
+         return true;                                                                                               // 40
+       }                                                                                                            // 41
+     }                                                                                                              // 42
+   }                                                                                                                // 43
+                                                                                                                    // 44
+   return false;                                                                                                    // 45
+ };                                                                                                                 // 46
+                                                                                                                    // 47
+ var getAssetPath = function (packageName, fileName) {                                                              // 48
+   var serverAssetsPath = path.join(                                                                                // 49
+     process.env.PWD, &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;                                   // 50
+   );                                                                                                               // 51
+   if (isMeteor92OrNewer()) {                                                                                       // 52
+     packageName = packageName.replace(&#x27;:&#x27;, &#x27;_&#x27;)                                                                    // 53
+   }                                                                                                                // 54
+                                                                                                                    // 55
+   return path.join(serverAssetsPath, &#x27;packages&#x27;, packageName, fileName);                                           // 56
+ };                                                                                                                 // 57
+                                                                                                                    // 58
+ var _ = Npm.require(&#x27;lodash&#x27;),                                                                                     // 59
+     fs = Npm.require(&#x27;fs&#x27;),                                                                                        // 60
+     fse = Npm.require(&#x27;fs-extra&#x27;),                                                                                 // 61
+     readFile = Meteor._wrapAsync(fs.readFile),                                                                     // 62
+     writeFile = Meteor._wrapAsync(fs.writeFile),                                                                   // 63
+     copyFile = Meteor._wrapAsync(fse.copy),                                                                        // 64
+     path = Npm.require(&#x27;path&#x27;),                                                                                    // 65
+     url = Npm.require(&#x27;url&#x27;),                                                                                      // 66
+     Rsync = Npm.require(&#x27;rsync&#x27;),                                                                                  // 67
+     Future = Npm.require(&#x27;fibers/future&#x27;),                                                                         // 68
+     freeport = Npm.require(&#x27;freeport&#x27;),                                                                            // 69
+     child_process = Npm.require(&#x27;child_process&#x27;),                                                                  // 70
+     spawn = child_process.spawn,                                                                                   // 71
+     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                            // 72
+     glob = Npm.require(&#x27;glob&#x27;),                                                                                    // 73
+     _config = {},                                                                                                  // 74
+     _preProcessors = [],                                                                                           // 75
+     _postProcessors = [],                                                                                          // 76
+     _watcher,                                                                                                      // 77
+     FIXTURE_REG_EXP = new RegExp(&quot;-fixture.(js|coffee)$&quot;),                                                         // 78
+     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);                                    // 79
+                                                                                                                    // 80
+ Meteor.startup(function initializeVelocity () {                                                                    // 81
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] PWD&#x27;, process.env.PWD);                                                         // 82
+   DEBUG &amp;&amp; console.log(&#x27;velocity config =&#x27;, JSON.stringify(_config, null, 2));                                     // 83
+                                                                                                                    // 84
+   // kick-off everything                                                                                           // 85
+   _reset(_config);                                                                                                 // 86
+ });                                                                                                                // 87
+                                                                                                                    // 88
+//////////////////////////////////////////////////////////////////////                                               // 89
+// Public Methods                                                                                                    // 90
+//                                                                                                                   // 91
+                                                                                                                    // 92
+ _.extend(Velocity, {                                                                                               // 93
+                                                                                                                    // 94
+   getMirrorPath: function () {                                                                                     // 95
+     return path.join(process.env.PWD, &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;.mirror&#x27;);                                              // 96
+   },                                                                                                               // 97
+                                                                                                                    // 98
+   getTestsPath: function () {                                                                                      // 99
+     return path.join(process.env.PWD, &#x27;tests&#x27;);                                                                    // 100
+   },                                                                                                               // 101
+                                                                                                                    // 102
+   addPreProcessor: function (preProcessor) {                                                                       // 103
+     _preProcessors.push(preProcessor);                                                                             // 104
+   },                                                                                                               // 105
+                                                                                                                    // 106
+   addPostProcessor: function (reporter) {                                                                          // 107
+     _postProcessors.push(reporter);                                                                                // 108
+   },                                                                                                               // 109
+                                                                                                                    // 110
+   getReportGithubIssueMessage: function() {                                                                        // 111
+     return &quot;Please report the issue here: https://github.com/xolvio/velocity/issues&quot;;                              // 112
+   }                                                                                                                // 113
+ });                                                                                                                // 114
+                                                                                                                    // 115
+ if (Meteor.isServer) {                                                                                             // 116
+   _.extend(Velocity, {                                                                                             // 117
+                                                                                                                    // 118
+     /**                                                                                                            // 119
+Registers a testing framework plugin.                                                                       // 120
+                                                                                                            // 121.html">Velocity                                                                                                   // 12
+/                                                                                                                  // 13
+Velocity = {};                                                                                                       // 14
+                                                                                                                    // 15
+(function () {                                                                                                       // 16
+ &#x27;use strict&#x27;;                                                                                                      // 17
+                                                                                                                    // 18
+//////////////////////////////////////////////////////////////////////                                               // 19
+// Init                                                                                                              // 20
+//                                                                                                                   // 21
+                                                                                                                    // 22
+ if (process.env.NODE_ENV !== &#x27;development&#x27; || process.env.VELOCITY === &#x27;0&#x27; || process.env.IS_MIRROR) {             // 23
+   DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);                                                                // 24
+   return;                                                                                                          // 25
+ }                                                                                                                  // 26
+                                                                                                                    // 27
+ var isMeteor92OrNewer = function () {                                                                              // 28
+   if (Meteor.release) {                                                                                            // 29
+     var versionRegExp = /(?:METEOR@)?(\d+)\.(\d+)\.(\d+)(?:\.(\d+))/;                                              // 30
+     var version = versionRegExp.exec(Meteor.release);                                                              // 31
+     if (version) {                                                                                                 // 32
+       var majorVersion = Number(version[1]);                                                                       // 33
+       var minorVersion = Number(version[2]);                                                                       // 34
+       var patchVersion = Number(version[3]);                                                                       // 35
+       if (majorVersion &gt; 0 ||                                                                                      // 36
+         (majorVersion == 0 &amp;&amp; minorVersion &gt; 9) ||                                                                 // 37
+         (majorVersion == 0 &amp;&amp; minorVersion == 9 &amp;&amp; patchVersion &gt;= 2)                                              // 38
+         ) {                                                                                                        // 39
+         return true;                                                                                               // 40
+       }                                                                                                            // 41
+     }                                                                                                              // 42
+   }                                                                                                                // 43
+                                                                                                                    // 44
+   return false;                                                                                                    // 45
+ };                                                                                                                 // 46
+                                                                                                                    // 47
+ var getAssetPath = function (packageName, fileName) {                                                              // 48
+   var serverAssetsPath = path.join(                                                                                // 49
+     process.env.PWD, &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;                                   // 50
+   );                                                                                                               // 51
+   if (isMeteor92OrNewer()) {                                                                                       // 52
+     packageName = packageName.replace(&#x27;:&#x27;, &#x27;_&#x27;)                                                                    // 53
+   }                                                                                                                // 54
+                                                                                                                    // 55
+   return path.join(serverAssetsPath, &#x27;packages&#x27;, packageName, fileName);                                           // 56
+ };                                                                                                                 // 57
+                                                                                                                    // 58
+ var _ = Npm.require(&#x27;lodash&#x27;),                                                                                     // 59
+     fs = Npm.require(&#x27;fs&#x27;),                                                                                        // 60
+     fse = Npm.require(&#x27;fs-extra&#x27;),                                                                                 // 61
+     readFile = Meteor._wrapAsync(fs.readFile),                                                                     // 62
+     writeFile = Meteor._wrapAsync(fs.writeFile),                                                                   // 63
+     copyFile = Meteor._wrapAsync(fse.copy),                                                                        // 64
+     path = Npm.require(&#x27;path&#x27;),                                                                                    // 65
+     url = Npm.require(&#x27;url&#x27;),                                                                                      // 66
+     Rsync = Npm.require(&#x27;rsync&#x27;),                                                                                  // 67
+     Future = Npm.require(&#x27;fibers/future&#x27;),                                                                         // 68
+     freeport = Npm.require(&#x27;freeport&#x27;),                                                                            // 69
+     child_process = Npm.require(&#x27;child_process&#x27;),                                                                  // 70
+     spawn = child_process.spawn,                                                                                   // 71
+     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                            // 72
+     glob = Npm.require(&#x27;glob&#x27;),                                                                                    // 73
+     _config = {},                                                                                                  // 74
+     _preProcessors = [],                                                                                           // 75
+     _postProcessors = [],                                                                                          // 76
+     _watcher,                                                                                                      // 77
+     FIXTURE_REG_EXP = new RegExp(&quot;-fixture.(js|coffee)$&quot;),                                                         // 78
+     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);                                    // 79
+                                                                                                                    // 80
+ Meteor.startup(function initializeVelocity () {                                                                    // 81
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] PWD&#x27;, process.env.PWD);                                                         // 82
+   DEBUG &amp;&amp; console.log(&#x27;velocity config =&#x27;, JSON.stringify(_config, null, 2));                                     // 83
+                                                                                                                    // 84
+   // kick-off everything                                                                                           // 85
+   _reset(_config);                                                                                                 // 86
+ });                                                                                                                // 87
+                                                                                                                    // 88
+//////////////////////////////////////////////////////////////////////                                               // 89
+// Public Methods                                                                                                    // 90
+//                                                                                                                   // 91
+                                                                                                                    // 92
+ _.extend(Velocity, {                                                                                               // 93
+                                                                                                                    // 94
+   getMirrorPath: function () {                                                                                     // 95
+     return path.join(process.env.PWD, &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;.mirror&#x27;);                                              // 96
+   },                                                                                                               // 97
+                                                                                                                    // 98
+   getTestsPath: function () {                                                                                      // 99
+     return path.join(process.env.PWD, &#x27;tests&#x27;);                                                                    // 100
+   },                                                                                                               // 101
+                                                                                                                    // 102
+   addPreProcessor: function (preProcessor) {                                                                       // 103
+     _preProcessors.push(preProcessor);                                                                             // 104
+   },                                                                                                               // 105
+                                                                                                                    // 106
+   addPostProcessor: function (reporter) {                                                                          // 107
+     _postProcessors.push(reporter);                                                                                // 108
+   },                                                                                                               // 109
+                                                                                                                    // 110
+   getReportGithubIssueMessage: function() {                                                                        // 111
+     return &quot;Please report the issue here: https://github.com/xolvio/velocity/issues&quot;;                              // 112
+   }                                                                                                                // 113
+ });                                                                                                                // 114
+                                                                                                                    // 115
+ if (Meteor.isServer) {                                                                                             // 116
+   _.extend(Velocity, {                                                                                             // 117
+                                                                                                                    // 118
+     /**                                                                                                            // 119
+Registers a testing framework plugin.                                                                       // 120
+                                                                                                            // 121</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
             
                 <li><a href="../modules/Velocity.html">Velocity</a></li>
+            
+                <li><a href="../modules/Velocity                                                                                                  __ 9
+_                                                                                                                  __ 10
+_**                                                                                                                  __ 11.html">Velocity                                                                                                  // 9
+/                                                                                                                  // 10
+/**                                                                                                                  // 11</a></li>
             
             </ul>
         </div>
@@ -117,6 +345,37 @@ Velocity = {};
     return;
   }
 
+  var isMeteor92OrNewer = function () {
+    if (Meteor.release) {
+      var versionRegExp = /(?:METEOR@)?(\d+)\.(\d+)\.(\d+)(?:\.(\d+))/;
+      var version = versionRegExp.exec(Meteor.release);
+      if (version) {
+        var majorVersion = Number(version[1]);
+        var minorVersion = Number(version[2]);
+        var patchVersion = Number(version[3]);
+        if (majorVersion &gt; 0 ||
+          (majorVersion == 0 &amp;&amp; minorVersion &gt; 9) ||
+          (majorVersion == 0 &amp;&amp; minorVersion == 9 &amp;&amp; patchVersion &gt;= 2)
+          ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  var getAssetPath = function (packageName, fileName) {
+    var serverAssetsPath = path.join(
+      process.env.PWD, &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;
+    );
+    if (isMeteor92OrNewer()) {
+      packageName = packageName.replace(&#x27;:&#x27;, &#x27;_&#x27;)
+    }
+
+    return path.join(serverAssetsPath, &#x27;packages&#x27;, packageName, fileName);
+  };
+
   var _ = Npm.require(&#x27;lodash&#x27;),
       fs = Npm.require(&#x27;fs&#x27;),
       fse = Npm.require(&#x27;fs-extra&#x27;),
@@ -133,22 +392,14 @@ Velocity = {};
       chokidar = Npm.require(&#x27;chokidar&#x27;),
       glob = Npm.require(&#x27;glob&#x27;),
       _config = {},
-      _testFrameworks,
       _preProcessors = [],
       _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp(&quot;-fixture.(js|coffee)$&quot;),
-      SERVER_ASSETS_PATH = path.join(process.env.PWD, &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;),
-      DEFAULT_FIXTURE_PATH = path.join(SERVER_ASSETS_PATH, &#x27;packages&#x27;, &#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);
+      DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);
 
   Meteor.startup(function initializeVelocity () {
     DEBUG &amp;&amp; console.log(&#x27;[velocity] PWD&#x27;, process.env.PWD);
-
-    // Prefer Velocity.registerTestingFramework over smart.json
-    _.defaults(_config, _loadTestPackageConfigs());
-    _testFrameworks = _.pluck(_config, function (config) {
-      return config.name;
-    });
     DEBUG &amp;&amp; console.log(&#x27;velocity config =&#x27;, JSON.stringify(_config, null, 2));
 
     // kick-off everything
@@ -189,14 +440,71 @@ Velocity = {};
        * Registers a testing framework plugin.
        *
        * @method registerTestingFramework
-       * @param name {String} The name of the testing framework.
-       * @param options {Object} Options for the testing framework.
-       * @param options.regex {String} The regular expression for
-       *                      test files that should be assigned
-       *                      to the testing framework.
+       * @param {String} name The name of the testing framework.
+       * @param {Object} [options] Options for the testing framework.
+       * @param {String} [options.regex] The regular expression for
+       *                                 test files that should be assigned
+       *                                 to the testing framework.
+       *                                 The path relative to the tests
+       *                                 folder is matched against it.
+       *                                 The default is &quot;name/.+\.js$&quot;
+       *                                 (name is the testing framework name).
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
+      },
+      parseXmlFiles: function  (selectedFramework){
+         var closeFunc = Meteor.bindEnvironment(function () {
+           console.log(&#x27;binding environment and parsing output xml files...&#x27;)
+
+            function hashCode (s) {
+              return s.split(&quot;&quot;).reduce(function (a, b) {
+                a = ((a &lt;&lt; 5) - a) + b.charCodeAt(0);
+                return a &amp; a;
+              }, 0);
+            }
+
+           var newResults = [];
+           //var globSearchString = parsePath(&#x27;**/FIREFOX*.xml&#x27;);
+           var globSearchString = path.join(&#x27;**&#x27;, &#x27;FIREFOX_*.xml&#x27;);
+           var xmlFiles = glob.sync(globSearchString, { cwd: testReportsPath });
+
+           console.log(&#x27;globSearchString&#x27;, globSearchString);
+
+           _.each(xmlFiles, function (xmlFile, index) {
+             parseString(fs.readFileSync(testReportsPath + path.sep + xmlFile), function (err, result) {
+               _.each(result.testsuites.testsuite, function (testsuite) {
+                 _.each(testsuite.testcase, function (testcase) {
+                   var result = ({
+                     name: testcase.$.name,
+                     framework: selectedFramework,
+                     result: testcase.failure ? &#x27;failed&#x27; : &#x27;passed&#x27;,
+                     timestamp: testsuite.$.timestamp,
+                     time: testcase.$.time,
+                     ancestors: [testcase.$.classname]
+                   });
+
+                   if (testcase.failure) {
+                     _.each(testcase.failure, function (failure) {
+                       result.failureType = failure.$.type;
+                       result.failureMessage = failure.$.message;
+                       result.failureStackTrace = failure._;
+                     });
+                   }
+                   result.id = selectedFramework + &#x27;:&#x27; + hashCode(xmlFile + testcase.$.classname + testcase.$.name);
+                   newResults.push(result.id);
+                   console.log(&#x27;result&#x27;, result);
+                   Meteor.call(&#x27;postResult&#x27;, result);
+                 });
+               });
+             });
+
+             if (index === xmlFiles.length - 1) {
+               Meteor.call(&#x27;resetReports&#x27;, {framework: selectedFramework, notIn: newResults});
+               Meteor.call(&#x27;completed&#x27;, {framework: selectedFramework});
+             }
+           });
+         });
       }
     });
   }
@@ -282,6 +590,7 @@ Velocity = {};
      *                   timestamp - Date
      */
     postLog: function (options) {
+      console.log
       check(options, {
         type: String,
         message: String,
@@ -322,6 +631,8 @@ Velocity = {};
      *                               ex. &#x27;Template.leaderboard.selected_name&#x27;
      */
     postResult: function (data) {
+      // Nightwatch doesn&#x27;t return failureType, failureMessage, feailureStackTrace, or ancestors
+      // we can&#x27;t assume that a test framework will have that informationPhoenix42
       check(data, Match.ObjectIncluding({
         id: String,
         name: String,
@@ -332,11 +643,11 @@ Velocity = {};
         browser: Match.Optional(_matchOneOf([&#x27;chrome&#x27;, &#x27;firefox&#x27;, &#x27;internet explorer&#x27;, &#x27;opera&#x27;, &#x27;safari&#x27;])), // TODO: Add missing values
         timestamp: Match.Optional(Match.OneOf(Date, String)),
         async: Match.Optional(Boolean),
-        timeOut: Match.Optional(Match.Any),
-        failureType: Match.Optional(String),
-        failureMessage: Match.Optional(String),
-        failureStackTrace: Match.Optional(Match.Any),
-        ancestors: Match.Optional([String])
+        timeOut: Match.Optional(Match.Any)
+        //failureType: Match.Optional(String),
+        //failureMessage: Match.Optional(String),
+        //failureStackTrace: Match.Optional(Match.Any),
+        //ancestors: Match.Optional([String])
       }));
 
       VelocityTestReports.upsert(data.id, {$set: data});
@@ -474,16 +785,16 @@ Velocity = {};
         );
         meteor.on(&#x27;close&#x27;, closeHandler);
 
+        var outputHandler = function (data) {
+          var lines = data.toString().split(/\r?\n/).slice(0, -1);
+          _.map(lines, function (line) {
+            console.log(&#x27;[velocity mirror] &#x27; + line);
+          });
+        };
         if (!!process.env.VELOCITY_DEBUG_MIRROR) {
-          var outputHandler = function (data) {
-            var lines = data.toString().split(/\r?\n/).slice(0, -1);
-            _.map(lines, function (line) {
-              console.log(&#x27;[velocity mirror] &#x27; + line);
-            });
-          };
           meteor.stdout.on(&#x27;data&#x27;, outputHandler);
-          meteor.stderr.on(&#x27;data&#x27;, outputHandler);
         }
+        meteor.stderr.on(&#x27;data&#x27;, outputHandler);
       };
       spawnMeteor();
 
@@ -523,6 +834,10 @@ Velocity = {};
 //////////////////////////////////////////////////////////////////////
 // Private functions
 //
+
+  function _getTestFrameworkNames() {
+    return _.pluck(_config, &#x27;name&#x27;);
+  }
 
   /**
    * Returns the MongoDB URL for the given database.
@@ -631,62 +946,11 @@ Velocity = {};
     });
   }
 
-  /**
-   * Locate all velocity-compatible test packages and return their config
-   * data.
-   *
-   * @example
-   *     // in &#x60;jasmine-unit&#x60; package&#x27;s &#x60;smart.json&#x60;:
-   *     {
-   *       &quot;name&quot;: &quot;jasmine-unit&quot;,
-   *       &quot;description&quot;: &quot;Velocity-compatible jasmine unit test package&quot;,
-   *       &quot;homepage&quot;: &quot;https://github.com/xolvio/jasmine-unit&quot;,
-   *       &quot;author&quot;: &quot;Sam Hatoum&quot;,
-   *       &quot;version&quot;: &quot;0.1.1&quot;,
-   *       &quot;git&quot;: &quot;https://github.com/xolvio/jasmine-unit.git&quot;,
-   *       &quot;test-package&quot;: true,
-   *       &quot;regex&quot;: &quot;-jasmine-unit\\.(js|coffee)$&quot;
-   *     }
-   *
-   * @method _loadTestPackageConfigs
-   * @return {Object} Hash of test package names and their normalized config data.
-   * @private
-   */
-  function _loadTestPackageConfigs () {
-    var pwd = process.env.PWD,
-        smartJsons = glob.sync(&#x27;packages/*/smart.json&#x27;, {cwd: pwd}),
-        testConfigDictionary;
-
-    DEBUG &amp;&amp; console.log(&#x27;Check for test package configs...&#x27;, smartJsons);
-
-    testConfigDictionary = _.reduce(smartJsons, function (memo, smartJsonPath) {
-      var contents,
-          config;
-
-      try {
-        contents = readFile(path.join(pwd, smartJsonPath));
-        config = JSON.parse(contents);
-        if (config.name &amp;&amp; config.testPackage) {
-          // add smart.json contents to our dictionary
-          memo[config.name] = _parseTestingFrameworkOptions(config.name, config);
-        }
-      } catch (ex) {
-        DEBUG &amp;&amp; console.log(&#x27;Error reading file:&#x27;, smartJsonPath, ex);
-      }
-      return memo;
-    }, {});
-
-    return testConfigDictionary;
-  }  // end _loadTestPackageConfigs
-
   function _parseTestingFrameworkOptions(name, options) {
+    options = options || {};
     _.defaults(options, {
       name: name,
-      // if test package hasn&#x27;t defined an explicit regex for the file
-      // watcher, default to the package name as a suffix.
-      // Ex. name = &quot;mocha-web&quot;
-      //     regex = &quot;-mocha-web.js&quot;
-      regex: &#x27;-&#x27; + name + &#x27;\\.js$&#x27;
+      regex: name + &#x27;\\&#x27; + path.sep + &#x27;.+\\.js$&#x27;
     });
 
     options._regexp = new RegExp(options.regex);
@@ -698,7 +962,7 @@ Velocity = {};
    * Initialize the directory/file watcher.
    *
    * @method _initWatcher
-   * @param {Object} config  See &#x60;_loadTestPackageConfigs&#x60;.
+   * @param {Object} config  See &#x60;registerTestingFramework&#x60;.
    * @private
    */
   function _initWatcher (config) {
@@ -777,7 +1041,7 @@ Velocity = {};
    * Re-init file watcher and clear all test results.
    *
    * @method _reset
-   * @param {Object} config  See &#x60;_loadTestPackageConfigs&#x60;.
+   * @param {Object} config  See &#x60;registerTestingFramework&#x60;.
    * @private
    */
   function _reset (config) {
@@ -802,7 +1066,7 @@ Velocity = {};
       name: &#x27;aggregateComplete&#x27;,
       result: &#x27;pending&#x27;
     });
-    _.each(_testFrameworks, function (testFramework) {
+    _.forEach(_getTestFrameworkNames(), function (testFramework) {
       VelocityAggregateReports.insert({
         name: testFramework,
         result: &#x27;pending&#x27;
@@ -823,28 +1087,54 @@ Velocity = {};
    * @private
    */
   function _updateAggregateReports () {
+    //console.log(&#x27;_updateAggregateReports&#x27;);
+    //console.log(&#x27;VelocityAggregateReports.find().fetch()&#x27;, VelocityAggregateReports.find().fetch());
 
-    var failedResult,
-        result;
+    // lets assuming that the framework wants to aggregate reports
+    // but not hang if it doesn&#x27;t
+    // TODO: remove this try/catch block and replace it with better logic
+    //try{
 
-    if (!VelocityTestReports.findOne({result: &#x27;&#x27;})) {
-      failedResult = VelocityTestReports.findOne({result: &#x27;failed&#x27;});
-      result = failedResult ? &#x27;failed&#x27; : &#x27;passed&#x27;;
+      var failedResult,
+          frameworkResult;
 
-      VelocityAggregateReports.update({ &#x27;name&#x27;: &#x27;aggregateResult&#x27;}, {$set: {result: result}});
-    }
+      // if all of our test reports have valid results
+      if (!VelocityTestReports.findOne({result: &#x27;&#x27;})) {
+        // look through them and see if we find any tests that failed
+        failedResult = VelocityTestReports.findOne({result: &#x27;failed&#x27;});
 
-    // if all test frameworks have completed, upsert an aggregate completed record
-    var completedFrameworksCount = VelocityAggregateReports.find({ &#x27;name&#x27;: {$in: _testFrameworks}, &#x27;result&#x27;: &#x27;completed&#x27;}).count();
+        // if any tests failed, set the framework as failed; otherwise set our framework to passed
+        frameworkResult = failedResult ? &#x27;failed&#x27; : &#x27;passed&#x27;;
 
-    if (VelocityAggregateReports.findOne({&#x27;name&#x27;: &#x27;aggregateComplete&#x27;}).result !== &#x27;completed&#x27; &amp;&amp; _testFrameworks.length === completedFrameworksCount) {
-      VelocityAggregateReports.update({&#x27;name&#x27;: &#x27;aggregateComplete&#x27;}, {$set: {&#x27;result&#x27;: &#x27;completed&#x27;}});
+        // update the global status
+        VelocityAggregateReports.update({ &#x27;name&#x27;: &#x27;aggregateResult&#x27;}, {$set: {result: frameworkResult}});
+      }
 
-      _.each(_postProcessors, function (reporter) {
-        reporter();
-      });
+      // if all test frameworks have completed, upsert an aggregate completed record
+      var completedFrameworksCount = VelocityAggregateReports.find({
+        &#x27;name&#x27;: {$in: _getTestFrameworkNames()},
+        &#x27;result&#x27;: &#x27;completed&#x27;
+      }).count();
 
-    }
+
+      // the following syntax is dangerous in case the database is flapping and the cursor hasn&#x27;t been instantiated
+      // VelocityAggregateReports.findOne({&#x27;name&#x27;: &#x27;aggregateComplete&#x27;}).result
+
+      var aggregateComplete = VelocityAggregateReports.findOne({&#x27;name&#x27;: &#x27;aggregateComplete&#x27;});
+      if(aggregateComplete){
+        if((aggregateComplete.result !== &#x27;completed&#x27;) &amp;&amp; (_getTestFrameworkNames().length === completedFrameworksCount)){
+          VelocityAggregateReports.update({&#x27;name&#x27;: &#x27;aggregateComplete&#x27;}, {$set: {&#x27;result&#x27;: &#x27;completed&#x27;}});
+
+          _.each(_postProcessors, function (reporter) {
+            reporter();
+          });
+
+        }
+      }
+    //}catch(error){
+    //  console.log(error)
+    //}
+
 
   }
 
