@@ -120,7 +120,7 @@ Velocity = {};
        * Registers a testing framework plugin.
        *
        * @method registerTestingFramework
-       * @param {String name The name of the testing framework.
+       * @param {String} name The name of the testing framework.
        * @param {Object} [options] Options for the testing framework.
        * @param {String} options.regex The regular expression for
        *                      test files that should be assigned
