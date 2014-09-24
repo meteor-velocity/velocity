@@ -25,9 +25,12 @@ Velocity = {};
     return;
   }
 
+  /*
+   * Returns true for Meteor versions >= 0.9.2
+   */
   var isMeteor92OrNewer = function () {
     if (Meteor.release) {
-      var versionRegExp = /(?:METEOR@)?(\d+)\.(\d+)\.(\d+)(?:\.(\d+))/;
+      var versionRegExp = /^(?:METEOR@)?(\d+)\.(\d+)\.(\d+)/;
       var version = versionRegExp.exec(Meteor.release);
       if (version) {
         var majorVersion = Number(version[1]);
