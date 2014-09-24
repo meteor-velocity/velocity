@@ -71,6 +71,7 @@ Velocity = {};
       spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
       glob = Npm.require('glob'),
+      mkdirp = Npm.require('mkdirp'),
       _config = {},
       _preProcessors = [],
       _postProcessors = [],
@@ -115,20 +116,23 @@ Velocity = {};
 
   if (Meteor.isServer) {
     _.extend(Velocity, {
-
       /**
        * Registers a testing framework plugin.
        *
        * @method registerTestingFramework
        * @param {String} name The name of the testing framework.
        * @param {Object} [options] Options for the testing framework.
-       * @param {String} [options.regex] The regular expression for
-       *                                 test files that should be assigned
-       *                                 to the testing framework.
+       * @param {String} options.regex The regular expression for
+       *                      test files that should be assigned
+       *                      to the testing framework.
        *                                 The path relative to the tests
        *                                 folder is matched against it.
        *                                 The default is "name/.+\.js$"
        *                                 (name is the testing framework name).
+       * @param options.sampleTestGenerator {Function} sampleTestGenerator
+       *    returns an array of fileObjects with the following fields:
+       * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
+       * @param options.sampleTestGenerator.contents {String} contents of the test file the path thats returned
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
@@ -372,28 +376,39 @@ Velocity = {};
         framework: String
       });
 
-      samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
-      testsPath = path.join(pwd, 'tests');
+      if (_config[options.framework].sampleTestGenerator){
+        var sampleTests = _config[options.framework].sampleTestGenerator(options);
+        DEBUG && console.log('[velocity] found ', sampleTests.length, 'sample test files for', options.framework);
+        sampleTests.forEach(function(testFile){
+          var fullTestPath = path.join(pwd, 'tests', testFile.path);
+          var testDir = path.dirname(fullTestPath);
+          mkdirp.sync(testDir);
+          fs.writeFileSync(fullTestPath, testFile.contents);
+        });
+      } else {
+        samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
+        testsPath = path.join(pwd, 'tests');
 
-      DEBUG && console.log('[velocity] checking for sample tests in', path.join(samplesPath, '*'));
+        DEBUG && console.log('[velocity] checking for sample tests in', path.join(samplesPath, '*'));
 
-      if (fs.existsSync(samplesPath)) {
-        command = 'mkdir -p ' + testsPath + ' && ' +
-          'rsync -au ' + path.join(samplesPath, '*') +
-          ' ' + testsPath + path.sep;
+        if (fs.existsSync(samplesPath)) {
+          command = 'mkdir -p ' + testsPath + ' && ' +
+            'rsync -au ' + path.join(samplesPath, '*') +
+            ' ' + testsPath + path.sep;
 
-        DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
+          DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
-        child_process.exec(command, Meteor.bindEnvironment(
-          function copySampleTestsExecHandler (err, stdout, stderr) {
-            if (err) {
-              console.log('ERROR', err);
-            }
-            console.log(stdout);
-            console.log(stderr);
-          },
-          'copySampleTestsExecHandler'
-        ));
+          child_process.exec(command, Meteor.bindEnvironment(
+            function copySampleTestsExecHandler (err, stdout, stderr) {
+              if (err) {
+                console.log('ERROR', err);
+              }
+              console.log(stdout);
+              console.log(stderr);
+            },
+            'copySampleTestsExecHandler'
+          ));
+        }
       }
     },  // end copySampleTests
 

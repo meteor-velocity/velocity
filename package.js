@@ -12,6 +12,7 @@ Npm.depends({
   'chokidar': '0.8.2',
   'lodash': '2.4.1',
   'glob': '3.2.9',
+  'mkdirp': "0.5.0",
   'rsync': '0.3.0',
   'fs-extra': '0.10.0',
   'freeport': '1.0.2'
