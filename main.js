@@ -30,6 +30,10 @@ Velocity = {};
    */
   var isMeteor92OrNewer = function () {
     if (Meteor.release) {
+      if (Meteor.release === "none"){
+        DEBUG && console.log("Running from checkout, assuming > 0.9.2");
+        return true;
+      }
       var versionRegExp = /^(?:METEOR@)?(\d+)\.(\d+)\.(\d+)/;
       var version = versionRegExp.exec(Meteor.release);
       if (version) {
