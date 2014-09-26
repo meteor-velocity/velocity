@@ -1,4 +1,4 @@
-/*jshint -W117, -W030 */
+/*jshint -W117, -W030, -W016 */
 /* global
  Velocity:true,
  DEBUG:true
@@ -30,7 +30,7 @@ Velocity = {};
    */
   var isMeteor92OrNewer = function () {
     if (Meteor.release) {
-      if (Meteor.release === "none"){
+      if (Meteor.release === "none") {
         DEBUG && console.log("Running from checkout, assuming > 0.9.2");
         return true;
       }
@@ -41,8 +41,8 @@ Velocity = {};
         var minorVersion = Number(version[2]);
         var patchVersion = Number(version[3]);
         if (majorVersion > 0 ||
-          (majorVersion == 0 && minorVersion > 9) ||
-          (majorVersion == 0 && minorVersion == 9 && patchVersion >= 2)
+          (majorVersion === 0 && minorVersion > 9) ||
+          (majorVersion === 0 && minorVersion === 9 && patchVersion >= 2)
           ) {
           return true;
         }
@@ -57,7 +57,7 @@ Velocity = {};
       process.env.PWD, '.meteor', 'local', 'build', 'programs', 'server', 'assets'
     );
     if (isMeteor92OrNewer()) {
-      packageName = packageName.replace(':', '_')
+      packageName = packageName.replace(':', '_');
     }
 
     return path.join(serverAssetsPath, 'packages', packageName, fileName);
@@ -66,7 +66,6 @@ Velocity = {};
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
       fse = Npm.require('fs-extra'),
-      readFile = Meteor._wrapAsync(fs.readFile),
       writeFile = Meteor._wrapAsync(fs.writeFile),
       copyFile = Meteor._wrapAsync(fse.copy),
       path = Npm.require('path'),
@@ -116,7 +115,7 @@ Velocity = {};
       _postProcessors.push(reporter);
     },
 
-    getReportGithubIssueMessage: function() {
+    getReportGithubIssueMessage: function () {
       return "Please report the issue here: https://github.com/xolvio/velocity/issues";
     }
   });
@@ -139,63 +138,10 @@ Velocity = {};
        * @param options.sampleTestGenerator {Function} sampleTestGenerator
        *    returns an array of fileObjects with the following fields:
        * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
-       * @param options.sampleTestGenerator.contents {String} contents of the test file the path thats returned
+       * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
-      },
-      parseXmlFiles: function  (selectedFramework){
-         var closeFunc = Meteor.bindEnvironment(function () {
-           console.log('binding environment and parsing output xml files...')
-
-            function hashCode (s) {
-              return s.split("").reduce(function (a, b) {
-                a = ((a << 5) - a) + b.charCodeAt(0);
-                return a & a;
-              }, 0);
-            }
-
-           var newResults = [];
-           //var globSearchString = parsePath('**/FIREFOX*.xml');
-           var globSearchString = path.join('**', 'FIREFOX_*.xml');
-           var xmlFiles = glob.sync(globSearchString, { cwd: testReportsPath });
-
-           console.log('globSearchString', globSearchString);
-
-           _.each(xmlFiles, function (xmlFile, index) {
-             parseString(fs.readFileSync(testReportsPath + path.sep + xmlFile), function (err, result) {
-               _.each(result.testsuites.testsuite, function (testsuite) {
-                 _.each(testsuite.testcase, function (testcase) {
-                   var result = ({
-                     name: testcase.$.name,
-                     framework: selectedFramework,
-                     result: testcase.failure ? 'failed' : 'passed',
-                     timestamp: testsuite.$.timestamp,
-                     time: testcase.$.time,
-                     ancestors: [testcase.$.classname]
-                   });
-
-                   if (testcase.failure) {
-                     _.each(testcase.failure, function (failure) {
-                       result.failureType = failure.$.type;
-                       result.failureMessage = failure.$.message;
-                       result.failureStackTrace = failure._;
-                     });
-                   }
-                   result.id = selectedFramework + ':' + hashCode(xmlFile + testcase.$.classname + testcase.$.name);
-                   newResults.push(result.id);
-                   console.log('result', result);
-                   Meteor.call('postResult', result);
-                 });
-               });
-             });
-
-             if (index === xmlFiles.length - 1) {
-               Meteor.call('resetReports', {framework: selectedFramework, notIn: newResults});
-               Meteor.call('completed', {framework: selectedFramework});
-             }
-           });
-         });
       }
     });
   }
@@ -281,7 +227,6 @@ Velocity = {};
      *                   timestamp - Date
      */
     postLog: function (options) {
-      console.log
       check(options, {
         type: String,
         message: String,
@@ -322,8 +267,6 @@ Velocity = {};
      *                               ex. 'Template.leaderboard.selected_name'
      */
     postResult: function (data) {
-      // Nightwatch doesn't return failureType, failureMessage, feailureStackTrace, or ancestors
-      // we can't assume that a test framework will have that informationPhoenix42
       check(data, Match.ObjectIncluding({
         id: String,
         name: String,
@@ -334,11 +277,11 @@ Velocity = {};
         browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
         timestamp: Match.Optional(Match.OneOf(Date, String)),
         async: Match.Optional(Boolean),
-        timeOut: Match.Optional(Match.Any)
-        //failureType: Match.Optional(String),
-        //failureMessage: Match.Optional(String),
-        //failureStackTrace: Match.Optional(Match.Any),
-        //ancestors: Match.Optional([String])
+        timeOut: Match.Optional(Match.Any),
+        failureType: Match.Optional(String),
+        failureMessage: Match.Optional(String),
+        failureStackTrace: Match.Optional(Match.Any),
+        ancestors: Match.Optional([String])
       }));
 
       VelocityTestReports.upsert(data.id, {$set: data});
@@ -383,10 +326,10 @@ Velocity = {};
         framework: String
       });
 
-      if (_config[options.framework].sampleTestGenerator){
+      if (_config[options.framework].sampleTestGenerator) {
         var sampleTests = _config[options.framework].sampleTestGenerator(options);
         DEBUG && console.log('[velocity] found ', sampleTests.length, 'sample test files for', options.framework);
-        sampleTests.forEach(function(testFile){
+        sampleTests.forEach(function (testFile) {
           var fullTestPath = path.join(pwd, 'tests', testFile.path);
           var testDir = path.dirname(fullTestPath);
           mkdirp.sync(testDir);
@@ -516,7 +459,7 @@ Velocity = {};
         } else {
           console.error('Mirror did not start correctly. Status code was ', statusCode);
         }
-      });
+      }, null, null);
 
     },  // end velocityStartMirror
 
@@ -537,7 +480,7 @@ Velocity = {};
 // Private functions
 //
 
-  function _getTestFrameworkNames() {
+  function _getTestFrameworkNames () {
     return _.pluck(_config, 'name');
   }
 
@@ -549,14 +492,13 @@ Velocity = {};
    */
   function _getMongoUrl (database) {
     var mongoLocationParts = url.parse(process.env.MONGO_URL);
-    var mongoLocation = url.format({
+    return url.format({
       protocol: mongoLocationParts.protocol,
       slashes: mongoLocationParts.slashes,
       hostname: mongoLocationParts.hostname,
       port: mongoLocationParts.port,
       pathname: '/' + database
     });
-    return mongoLocation;
   }
 
   /**
@@ -567,14 +509,13 @@ Velocity = {};
    */
   function _getMirrorUrl (port) {
     var rootUrlParts = url.parse(Meteor.absoluteUrl());
-    var mirrorLocation = url.format({
+    return url.format({
       protocol: rootUrlParts.protocol,
       slashes: rootUrlParts.slashes,
       hostname: rootUrlParts.hostname,
       port: port,
       pathname: rootUrlParts.pathname
     });
-    return mirrorLocation;
   }
 
   /**
@@ -648,7 +589,7 @@ Velocity = {};
     });
   }
 
-  function _parseTestingFrameworkOptions(name, options) {
+  function _parseTestingFrameworkOptions (name, options) {
     options = options || {};
     _.defaults(options, {
       name: name,
@@ -789,54 +730,39 @@ Velocity = {};
    * @private
    */
   function _updateAggregateReports () {
-    //console.log('_updateAggregateReports');
-    //console.log('VelocityAggregateReports.find().fetch()', VelocityAggregateReports.find().fetch());
 
-    // lets assuming that the framework wants to aggregate reports
-    // but not hang if it doesn't
-    // TODO: remove this try/catch block and replace it with better logic
-    //try{
+    var failedResult,
+        frameworkResult;
 
-      var failedResult,
-          frameworkResult;
+    // if all of our test reports have valid results
+    if (!VelocityTestReports.findOne({result: ''})) {
+      // look through them and see if we find any tests that failed
+      failedResult = VelocityTestReports.findOne({result: 'failed'});
 
-      // if all of our test reports have valid results
-      if (!VelocityTestReports.findOne({result: ''})) {
-        // look through them and see if we find any tests that failed
-        failedResult = VelocityTestReports.findOne({result: 'failed'});
+      // if any tests failed, set the framework as failed; otherwise set our framework to passed
+      frameworkResult = failedResult ? 'failed' : 'passed';
 
-        // if any tests failed, set the framework as failed; otherwise set our framework to passed
-        frameworkResult = failedResult ? 'failed' : 'passed';
+      // update the global status
+      VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
+    }
 
-        // update the global status
-        VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
+    // if all test frameworks have completed, upsert an aggregate completed record
+    var completedFrameworksCount = VelocityAggregateReports.find({
+      'name': {$in: _getTestFrameworkNames()},
+      'result': 'completed'
+    }).count();
+
+    var aggregateComplete = VelocityAggregateReports.findOne({'name': 'aggregateComplete'});
+    if (aggregateComplete) {
+      if ((aggregateComplete.result !== 'completed') && (_getTestFrameworkNames().length === completedFrameworksCount)) {
+        VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
+
+        _.each(_postProcessors, function (reporter) {
+          reporter();
+        });
+
       }
-
-      // if all test frameworks have completed, upsert an aggregate completed record
-      var completedFrameworksCount = VelocityAggregateReports.find({
-        'name': {$in: _getTestFrameworkNames()},
-        'result': 'completed'
-      }).count();
-
-
-      // the following syntax is dangerous in case the database is flapping and the cursor hasn't been instantiated
-      // VelocityAggregateReports.findOne({'name': 'aggregateComplete'}).result
-
-      var aggregateComplete = VelocityAggregateReports.findOne({'name': 'aggregateComplete'});
-      if(aggregateComplete){
-        if((aggregateComplete.result !== 'completed') && (_getTestFrameworkNames().length === completedFrameworksCount)){
-          VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
-
-          _.each(_postProcessors, function (reporter) {
-            reporter();
-          });
-
-        }
-      }
-    //}catch(error){
-    //  console.log(error)
-    //}
-
+    }
 
   }
 
@@ -882,7 +808,7 @@ Velocity = {};
         copyFile(fixture.absolutePath, fixtureLocationInMirror);
       });
 
-      // TODO remove this once jasmine and mocha-web are using the velocityStartMirror
+      // TODO this is causing an error as the mirror is trying to always restart
       Meteor.call('velocityStartMirror', {
         name: 'mocha-web',
         port: 5000
