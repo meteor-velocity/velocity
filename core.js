@@ -90,7 +90,7 @@ Velocity = {};
     DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
     // kick-off everything
-    _reset(_config);
+    _reset(_config, true);
   });
 
 //////////////////////////////////////////////////////////////////////
@@ -366,7 +366,8 @@ Velocity = {};
      * Meteor method: velocityStartMirror
      *
      * Starts a mirror and copies any specified fixture files into the mirror.
-     * TODO and will remove any registered frameworks and reporters from the mirror
+     * TODO This method also removes any registered frameworks and reporters from the mirror codebase
+     * TODO and sets an environment variable called MIRROR_NAME = name
      *
      * @method velocityStartMirror
      * @param {Object} options Required fields:
@@ -687,7 +688,7 @@ Velocity = {};
    * @param {Object} config  See `registerTestingFramework`.
    * @private
    */
-  function _reset (config) {
+  function _reset (config, initial) {
     if (_watcher) {
       _watcher.close();
     }
@@ -719,6 +720,19 @@ Velocity = {};
 
     // Meteor just reloaded us which means we should rsync the app files to the mirror
     _syncMirror();
+
+    if(initial) {
+      Meteor.call('velocityStartMirror', {
+        name: 'shared',
+        port: 5000
+      }, function (e, r) {
+        if (e) {
+          console.error('[velocity] mirror failed to start', e);
+        } else {
+          console.log('[velocity] Mirror started', r);
+        }
+      });
+    }
 
     _initWatcher(config);
   }
@@ -806,18 +820,6 @@ Velocity = {};
         var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
         DEBUG && console.log('[velocity] copying fixture', fixture.absolutePath, 'to', fixtureLocationInMirror);
         copyFile(fixture.absolutePath, fixtureLocationInMirror);
-      });
-
-      // TODO this is causing an error as the mirror is trying to always restart
-      Meteor.call('velocityStartMirror', {
-        name: 'mocha-web',
-        port: 5000
-      }, function (e, r) {
-        if (e) {
-          console.error('[velocity] mirror failed to start', e);
-        } else {
-          console.log('[velocity] Mirror started', r);
-        }
       });
 
     }));
