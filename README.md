@@ -127,11 +127,9 @@ First publish velocity:core on your development machine with `meteor publish`. T
 
 We are collaborating with an all-star team on unifying the Meteor testing landscape:
 
-* [Sam Hatoum](https://github.com/samhatoum) from [Xolv.io](http://xolv.io/), author of [RTD](https://github.com/xolvio/rtd)
-* [Arunoda Susiripala](https://github.com/arunoda) from [MeteorHacks](http://meteorhacks.com), author of [Laika](http://arunoda.github.io/laika/)
+* [Sam Hatoum](https://github.com/samhatoum) from [Xolv.io](http://xolv.io/), author of [The Meteor Testing Manual](https://www.meteortesting.com)
 * [Adrian Lanning](https://github.com/alanning) from [Share911](http://about.share911.com/), contributor to [all things Meteor](https://github.com/alanning?tab=repositories)
 * [Mike Risse](https://github.com/rissem) from [MadEye](https://madeye.io/), author of [mocha-web](https://github.com/mad-eye/meteor-mocha-web)
-* [Greg Thornton](https://github.com/xdissent) author of [meteor-cucumber](https://github.com/xdissent/meteor-cucumber)
 * [Ronen Babayoff](https://github.com/ronen-lavaina) from LaVaina Inc, co-author of [Munit](https://github.com/spacejamio/meteor-munit)
 * [Abigail Watson](https://github.com/awatson1978) from [Pentasyllabic](http://www.pentasyllabic.com), author of [Meteor Cookbook](https://github.com/awatson1978/meteor-cookbook), [Selenium-Nightwatch](https://github.com/awatson1978/selenium-nightwatch/)
 * [Robert Dickert](https://github.com/rdickert) from [Meteor Boulder](http://www.meetup.com/Meteor-Boulder), contributor to [all things Meteor](https://github.com/rdickert?tab=repositories)
