@@ -30,8 +30,8 @@ Velocity = {};
    */
   var isMeteor92OrNewer = function () {
     if (Meteor.release) {
-      if (Meteor.release === "none") {
-        DEBUG && console.log("Running from checkout, assuming > 0.9.2");
+      if (Meteor.release === 'none') {
+        DEBUG && console.log('Running from checkout, assuming > 0.9.2');
         return true;
       }
       var versionRegExp = /^(?:METEOR@)?(\d+)\.(\d+)\.(\d+)/;
@@ -76,21 +76,21 @@ Velocity = {};
       child_process = Npm.require('child_process'),
       spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
-      glob = Npm.require('glob'),
       mkdirp = Npm.require('mkdirp'),
       _config = {},
       _preProcessors = [],
       _postProcessors = [],
       _watcher,
-      FIXTURE_REG_EXP = new RegExp("-fixture.(js|coffee)$"),
-      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js');
+      FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$'),
+      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js'),
+      NO_MIRROR = process.env.NO_MIRROR;
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
     DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
     // kick-off everything
-    _reset(_config, true);
+    _reset(_config, !NO_MIRROR);
   });
 
 //////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ Velocity = {};
     },
 
     getReportGithubIssueMessage: function () {
-      return "Please report the issue here: https://github.com/xolvio/velocity/issues";
+      return 'Please report the issue here: https://github.com/xolvio/velocity/issues';
     }
   });
 
