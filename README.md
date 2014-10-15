@@ -87,7 +87,7 @@ Use `Velocity.registerTestingFramework(frameworkName, options)` to register your
 Sometimes you just don't what that mirror to start up, maybe the frameworks you have don't need it or you're developing a framework of your own. This is how:
 
 ```bash
-$ DISABLE_MIRROR=1 meteor
+$ NO_MIRROR=1 meteor
 ```
 
 ## Debug output
