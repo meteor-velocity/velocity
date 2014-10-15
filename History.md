@@ -1,3 +1,7 @@
+### next
+* Added ability to disable reports resetting for frameworks
+* Mirror can now be disabled with the environment variable NO_MIRROR 
+
 ## v0.2.0
 
 * Support for Meteor >= 0.9.1
