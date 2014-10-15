@@ -82,9 +82,9 @@ For example, you could write your logging like this:
 
 Use `Velocity.registerTestingFramework(frameworkName, options)` to register your package as testing framework. You can find a description of the expected arguments in the docs.
 
-## Debug output
+## Disable mirror
 
-Sometimes things break and its useful to get more debugging info.  Most of the test frameworks support some kind of debugging environment variable flag.  You can usually see a lot more details about what's happening if you run your app with this command:
+Sometimes you just don't what that mirror to start up, maybe the frameworks you have don't need it or you're developing a framework of your own. This is how:
 
 ```bash
 $ DISABLE_MIRROR=1 meteor
