@@ -126,15 +126,16 @@ Velocity = {};
        * Registers a testing framework plugin.
        *
        * @method registerTestingFramework
-       * @param {String} name The name of the testing framework.
-       * @param {Object} [options] Options for the testing framework.
-       * @param {String} options.regex The regular expression for
-       *                      test files that should be assigned
-       *                      to the testing framework.
-       *                                 The path relative to the tests
-       *                                 folder is matched against it.
-       *                                 The default is "name/.+\.js$"
-       *                                 (name is the testing framework name).
+       * @param {String} name                       The name of the testing framework.
+       * @param {Object} [options]                  Options for the testing framework.
+       * @param {String} options.disableAutoReset   Velocity's reset cycle will skip reports and logs for this framework
+       *                                            It will be the responsiblity of the framework to clean up its ****!
+       * @param {String} options.regex              The regular expression for test files that should be assigned
+       *                                            to the testing framework.
+       *                                            The path relative to the tests
+       *                                            folder is matched against it.
+       *                                            The default is "name/.+\.js$"
+       *                                            (name is the testing framework name).
        * @param options.sampleTestGenerator {Function} sampleTestGenerator
        *    returns an array of fileObjects with the following fields:
        * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
@@ -686,6 +687,7 @@ Velocity = {};
    *
    * @method _reset
    * @param {Object} config  See `registerTestingFramework`.
+   * @param {Object} initial  This is set if this is the first call after a server start/restart
    * @private
    */
   function _reset (config, initial) {
@@ -699,8 +701,10 @@ Velocity = {};
       _id: DEFAULT_FIXTURE_PATH,
       absolutePath: DEFAULT_FIXTURE_PATH
     });
-    VelocityTestReports.remove({});
-    VelocityLogs.remove({});
+    var frameworksWithDisableAutoReset = _.pluck(_.where(config, {disableAutoReset: true}), 'name');
+    DEBUG && console.log('[velocity] not resetting reports and logs for', frameworksWithDisableAutoReset);
+    VelocityTestReports.remove({ framework: { $nin: frameworksWithDisableAutoReset } });
+    VelocityLogs.remove({ framework: { $nin: frameworksWithDisableAutoReset } });
     VelocityAggregateReports.remove({});
     VelocityAggregateReports.insert({
       name: 'aggregateResult',
@@ -721,7 +725,7 @@ Velocity = {};
     // Meteor just reloaded us which means we should rsync the app files to the mirror
     _syncMirror();
 
-    if(initial) {
+    if (initial) {
       Meteor.call('velocityStartMirror', {
         name: 'shared',
         port: 5000
