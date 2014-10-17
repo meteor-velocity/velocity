@@ -113,21 +113,19 @@ Steps for publishing a new version of this package to Atmosphere:
 * Make code changes
 * Commit changes
 * Update History.md with summary of changes
-* Bump version numbers in History.md, smart.json, and yuidoc.json
+* Bump version numbers in package.js, History.md and yuidoc.json
 * Execute `yuidoc` command from velocity root path
 * Commit changes
-* Push to github
-* `mrt release .`   <-- create tag in github & push to atmosphere
-
-
-FYI, `mrt publish .`   <-- just pushes to atmosphere without creating the tag
+* `meteor publish`
+* Tag last commit with the new version `X.X.X`
+* Push to github. Also push the new tag! (`git push --tags`)
 
 
 ## Publishing to Meteor Package System
 
 We have to publish velocity:core for the different architectures (Mac OS, 64-bit Linux and 32-bit Linux).
 
-First publish velocity:core on your development machine with `meteor publish`. Then you will need machines with the other two architectures. Then use `meteor publish-for-arch velocity:core@VERSION --release 0.9.2.1` (also see [Meteor docs](http://docs.meteor.com/#meteorpublishforarch)).
+First publish velocity:core on your development machine with `meteor publish`. Then you will need machines with the other two architectures. Then use `meteor publish-for-arch velocity:core@VERSION --release 0.9.4` (also see [Meteor docs](http://docs.meteor.com/#meteorpublishforarch)).
 
 
 ##Contributors
