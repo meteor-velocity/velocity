@@ -106,9 +106,7 @@ $ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 VELOCITY_DEBUG_MIRROR=1 meteor
 Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
 
 
-## Publishing to Atmosphere (for package maintainers)
-
-Steps for publishing a new version of this package to Atmosphere:
+## Publishing to Meteor Package System
 
 * Make code changes
 * Commit changes
@@ -120,8 +118,6 @@ Steps for publishing a new version of this package to Atmosphere:
 * Tag last commit with the new version `X.X.X`
 * Push to github. Also push the new tag! (`git push --tags`)
 
-
-## Publishing to Meteor Package System
 
 We have to publish velocity:core for the different architectures (Mac OS, 64-bit Linux and 32-bit Linux).
 
