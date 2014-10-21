@@ -1,6 +1,12 @@
-### next
-* Added ability to disable reports resetting for frameworks
-* Mirror can now be disabled with the environment variable NO_MIRROR 
+## v0.2.15
+
+* Updated to use Meteor 1.0
+
+### For Velocity plugin developers
+* Rewrite mirroring approach
+  * Mirrors no longer startup by default and have to be requested by frameworks using requestMirror
+  * requestMirror now checks for existing mirrors by port and reuses them if they already exist
+  * velocityMirrors can contain multiple entries even if the entries share the same port
 
 ## v0.2.0
 
