@@ -43,7 +43,7 @@ Velocity = {};
         if (majorVersion > 0 ||
           (majorVersion === 0 && minorVersion > 9) ||
           (majorVersion === 0 && minorVersion === 9 && patchVersion >= 2)
-          ) {
+        ) {
           return true;
         }
       }
@@ -191,7 +191,7 @@ Velocity = {};
         query.framework = options.framework;
       }
       if (options.notIn) {
-        query = _.assign(query, {_id: {$nin: options.notIn }});
+        query = _.assign(query, {_id: {$nin: options.notIn}});
       }
       VelocityTestReports.remove(query);
       _updateAggregateReports();
@@ -280,6 +280,7 @@ Velocity = {};
         isServer: Match.Optional(Boolean),
         browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
         timestamp: Match.Optional(Match.OneOf(Date, String)),
+        duration: Match.Optional(Number),
         async: Match.Optional(Boolean),
         timeOut: Match.Optional(Match.Any),
         failureType: Match.Optional(String),
@@ -287,6 +288,8 @@ Velocity = {};
         failureStackTrace: Match.Optional(Match.Any),
         ancestors: Match.Optional([String])
       }));
+
+      data.timestamp = data.timestamp || new Date();
 
       VelocityTestReports.upsert(data.id, {$set: data});
       _updateAggregateReports();
@@ -346,8 +349,8 @@ Velocity = {};
 
         if (fs.existsSync(samplesPath)) {
           command = 'mkdir -p ' + testsPath + ' && ' +
-            'rsync -au ' + path.join(samplesPath, '*') +
-            ' ' + testsPath + path.sep;
+          'rsync -au ' + path.join(samplesPath, '*') +
+          ' ' + testsPath + path.sep;
 
           DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
@@ -424,7 +427,7 @@ Velocity = {};
               spawnMeteor();
             } else {
               console.error('[velocity] Mirror: could not be started on port ' + port + '.\n' +
-                'Please make sure that nothing else is using the port and then restart your app to try again.');
+              'Please make sure that nothing else is using the port and then restart your app to try again.');
             }
           }, 1000);
         };
@@ -670,8 +673,8 @@ Velocity = {};
       // Since we key on filePath and we only add files we're interested in,
       // we don't have to worry about inadvertently updating records for files
       // we don't care about.
-      VelocityFixtureFiles.update(filePath, { $set: {lastModified: Date.now()}});
-      VelocityTestFiles.update(filePath, { $set: {lastModified: Date.now()}});
+      VelocityFixtureFiles.update(filePath, {$set: {lastModified: Date.now()}});
+      VelocityTestFiles.update(filePath, {$set: {lastModified: Date.now()}});
     }));
 
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
@@ -725,7 +728,7 @@ Velocity = {};
     // Meteor just reloaded us which means we should rsync the app files to the mirror
     _syncMirror();
 
-    if(initial) {
+    if (initial) {
       Meteor.call('velocityStartMirror', {
         name: 'shared',
         port: 5000
@@ -761,7 +764,7 @@ Velocity = {};
       frameworkResult = failedResult ? 'failed' : 'passed';
 
       // update the global status
-      VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
+      VelocityAggregateReports.update({'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
     }
 
     // if all test frameworks have completed, upsert an aggregate completed record
