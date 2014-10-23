@@ -65,8 +65,10 @@ Velocity = {};
 
     // TODO remove this once frameworks have started using requestMirror
     if (!NO_MIRROR) {
-      _requestMirror({framework: 'shared', port: 5000});
+      Meteor.call('requestMirror', {framework: 'shared', port: 5000});
     }
+
+    console.log('NO_MIRROR', NO_MIRROR);
   });
 
 //////////////////////////////////////////////////////////////////////
@@ -341,10 +343,60 @@ Velocity = {};
     },  // end copySampleTests
 
     /**
-     * Meteor method: requestMirror see @link _requestMirror
+     * Meteor method: requestMirror
+     * Starts a new mirror if it has not already been started, and reuses an existing one if it is already started.
+     * This method will return a requestId. Frameworks need to observe the VelocityMirrors collection for a document for
+     * {requestId: requestId} to know when the mirror is ready.
+     *
+     * @method requestMirror
+     *
+     * @param {Object} options                  Options for the mirror.
+     * @param {String} options.framework        The name of the calling framework
+     * @param {String} [options.fixtureFiles]     Array of files with absolute paths
+     * @param {String} [options.port]             String use a specific port
+     *
+     * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
      */
     requestMirror: function (options) {
-      _requestMirror.apply(options);
+      check(options, {
+        framework: String,
+        port: Match.Optional(Number),
+        fixtureFiles: Match.Optional([String])
+      });
+      options.port = options.port || 5000;
+
+      // Create a requestId that will be returned to the client to wait for
+      var requestId = Random.id();
+
+      DEBUG && console.log('[velocity] Mirror requested', options, 'requestId:', requestId);
+
+      var mirrorLocation = _getMirrorUrl(options.port);
+      _retryHttpGet(mirrorLocation, function (error, result) {
+
+        // if this mirror already been started, reuse it
+        if (!error && result.statusCode === 200) {
+          DEBUG && console.log('[velocity] Requested mirror already exists. Reusing...');
+          _reuseExistingMirror(options);
+        }
+
+        // if the mirror not been started at all, start a new one
+        if (error && error.indexOf('ECONNREFUSED') !== -1) {
+          DEBUG && console.log('[velocity] Requested mirror not started. Starting...');
+          _velocityStartMirror(options);
+        }
+
+        // if a mirror exists but is failing for some other reason, let the user know why in the console
+        if (error && error.indexOf('ECONNREFUSED') === -1) {
+          DEBUG && console.log('[velocity] Mirror could not start', error);
+        } else if (!error && result.statusCode !== 200) {
+          DEBUG && console.log('[velocity] Mirror started but returnd non-200 response', result);
+        }
+
+
+      });
+
+      // frameworks know a mirror is ready by observing VelocityMirrors for this requestId
+      return requestId;
     },
 
     /**
@@ -362,64 +414,6 @@ Velocity = {};
 //////////////////////////////////////////////////////////////////////
 // Private functions
 //
-
-  /**
-   * Meteor method: requestMirror
-   * Starts a new mirror if it has not already been started, and reuses an existing one if it is already started.
-   * This method will return a requestId. Frameworks need to observe the VelocityMirrors collection for a document for
-   * {requestId: requestId} to know when the mirror is ready.
-   *
-   * @method requestMirror
-   *
-   * @param {Object} options                  Options for the mirror.
-   * @param {String} options.framework        The name of the calling framework
-   * @param {String} [options.fixtureFiles]     Array of files with absolute paths
-   * @param {Number} [options.port]             String use a specific port
-   *
-   * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
-   */
-  function _requestMirror (options) {
-    check(options, {
-      framework: String,
-      port: Match.Optional(Number),
-      fixtureFiles: Match.Optional([String])
-    });
-    options.port = options.port || 5000;
-
-    // Create a requestId that will be returned to the client to wait for
-    var requestId = Random.id();
-
-    DEBUG && console.log('[velocity] Mirror requested', options, 'requestId:', requestId);
-
-    var mirrorLocation = _getMirrorUrl(options.port);
-    _retryHttpGet(mirrorLocation, function (error, result) {
-
-      // if this mirror already been started, reuse it
-      if (!error && result.statusCode === 200) {
-        DEBUG && console.log('[velocity] Requested mirror already exists. Reusing...');
-        _reuseExistingMirror(options);
-      }
-
-      // if the mirror not been started at all, start a new one
-      if (error && error.indexOf('ECONNREFUSED') !== -1) {
-        DEBUG && console.log('[velocity] Requested mirror not started. Starting...');
-        _velocityStartMirror(options);
-      }
-
-      // if a mirror exists but is failing for some other reason, let the user know why in the console
-      if (error && error.indexOf('ECONNREFUSED') === -1) {
-        DEBUG && console.log('[velocity] Mirror could not start', error);
-      } else if (!error && result.statusCode !== 200) {
-        DEBUG && console.log('[velocity] Mirror started but returnd non-200 response', result);
-      }
-
-
-    });
-
-
-    // frameworks know a mirror is ready by observing VelocityMirrors for this requestId
-    return requestId;
-  }
 
 
   /**
@@ -540,7 +534,7 @@ Velocity = {};
     var existingMirror = VelocityMirrors.findOne({ framework: options.framework, port: options.port });
     if (existingMirror) {
       // if we already have this mirror metadata, update it
-      VelocityMirrors.update(existingMirror._id, { $set: {requestId: requestId}});
+      VelocityMirrors.update(existingMirror._id, { $set: { requestId: options.requestId }});
     } else {
       // if this is a request we haven't seen before, create a new metadata entry
       VelocityMirrors.insert({
