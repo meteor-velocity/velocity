@@ -129,15 +129,15 @@ Used to be encountered when you referenced the velocity repo directly in `smart.
 
 ### Publishing to Meteor Package System
 
-* Make code changes
-* Commit changes
-* Update History.md with summary of changes
-* Bump version numbers in package.js, History.md and yuidoc.json
-* Execute `yuidoc` command from velocity root path
-* Commit changes
-* `meteor publish`
-* Tag last commit with the new version `X.X.X`
-* Push to github. Also push the new tag! (`git push --tags`)
+1. Make code changes
+2. Commit changes
+3. Update History.md with summary of changes
+4. Bump version numbers in package.js, History.md and yuidoc.json
+5. Execute `yuidoc` command from velocity root path
+6. Commit changes
+7. `meteor publish`
+8. Tag last commit with the new version `X.X.X`
+9. Push to github. Also push the new tag! (`git push --tags`)
 
 
 We have to publish velocity:core for the different architectures (Mac OS, 64-bit Linux and 32-bit Linux).
