@@ -262,6 +262,7 @@ Velocity = {};
      *                   isServer - {Boolean} Is it a server test?
      *                   browser  - {String} In which browser did the test run?
      *                   timestamp - {Date} The time that the test started for this result
+     *                   timestamp - {Number} The duration of this test in milliseconds
      *                   async - // TODO @rissem to write
      *                   timeOut - // TODO @rissem to write
      *                   failureType - {String} ex 'expect' or 'assert'
