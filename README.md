@@ -87,7 +87,7 @@ Use `Velocity.registerTestingFramework(frameworkName, options)` to register your
 Sometimes you just don't what that mirror to start up, maybe the frameworks you have don't need it or you're developing a framework of your own. This is how:
 
 ```bash
-$ DISABLE_MIRROR=1 meteor
+$ NO_MIRROR=1 meteor
 ```
 
 ## Debug output
@@ -105,29 +105,44 @@ $ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 VELOCITY_DEBUG_MIRROR=1 meteor
 
 Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
 
+## For velocity:core maintainers
 
-## Publishing to Atmosphere (for package maintainers)
+### Developing with a local version of velocity:core
 
-Steps for publishing a new version of this package to Atmosphere:
+1. Clone https://github.com/meteor-velocity/velocity-example
+2. Create a symlink to your local velocity:core package:
 
-* Make code changes
-* Commit changes
-* Update History.md with summary of changes
-* Bump version numbers in History.md, smart.json, and yuidoc.json
-* Execute `yuidoc` command from velocity root path
-* Commit changes
-* Push to github
-* `mrt release .`   <-- create tag in github & push to atmosphere
+ ```bash
+ cd velocity-example
+ mkdir packages
+ cd packages
+ # Replace ~/velocity with your path 
+ ln -s ~/velocity velocity:core
+ ```
 
+3. Start the velocity-example. It will use your local velocity:core version.
 
-FYI, `mrt publish .`   <-- just pushes to atmosphere without creating the tag
+ ```bash
+ cd ..
+ meteor
+ ```
 
+### Publishing to Meteor Package System
 
-## Publishing to Meteor Package System
+1. Make code changes
+2. Commit changes
+3. Update History.md with summary of changes
+4. Bump version numbers in package.js, History.md and yuidoc.json
+5. Execute `yuidoc` command from velocity root path
+6. Commit changes
+7. `meteor publish`
+8. Tag last commit with the new version `X.X.X`
+9. Push to github. Also push the new tag! (`git push --tags`)
+
 
 We have to publish velocity:core for the different architectures (Mac OS, 64-bit Linux and 32-bit Linux).
 
-First publish velocity:core on your development machine with `meteor publish`. Then you will need machines with the other two architectures. Then use `meteor publish-for-arch velocity:core@VERSION --release 0.9.2.1` (also see [Meteor docs](http://docs.meteor.com/#meteorpublishforarch)).
+First publish velocity:core on your development machine with `meteor publish`. Then you will need machines with the other two architectures. Then use `meteor publish-for-arch velocity:core@VERSION --release 0.9.4` (also see [Meteor docs](http://docs.meteor.com/#meteorpublishforarch)).
 
 
 ##Contributors

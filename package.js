@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.2.14',
+  version: '0.2.15',
   git: 'https://github.com/xolvio/velocity.git'
 });
 
@@ -14,7 +14,7 @@ Npm.depends({
   'glob': '3.2.9',
   'mkdirp': "0.5.0",
   'rsync': '0.3.0',
-  'fs-extra': '0.10.0',
+  'fs-extra': '0.12.0',
   'freeport': '1.0.2'
 });
 
@@ -39,6 +39,7 @@ Package.on_use(function (api) {
   api.export('VelocityLogs', ['client', 'server']);
   api.export('VelocityMirrors', ['client', 'server']);
 
+  api.add_files('lib/meteor/files.js', 'server');
   api.add_files('core.js', 'server');
   api.add_files(['lib/FileCopier.js'], 'server');
 

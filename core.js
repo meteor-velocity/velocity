@@ -27,7 +27,7 @@ Velocity = {};
 
   var getAssetPath = function (packageName, fileName) {
     var serverAssetsPath = path.join(
-      process.env.PWD, '.meteor', 'local', 'build', 'programs', 'server', 'assets'
+      findAppDir(), '.meteor', 'local', 'build', 'programs', 'server', 'assets'
     );
 
     packageName = packageName.replace(':', '_');
@@ -38,7 +38,7 @@ Velocity = {};
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
       fse = Npm.require('fs-extra'),
-      writeFile = Meteor.wrapAsync(fs.writeFile),
+      outputFile = Meteor.wrapAsync(fse.outputFile),
       copyFile = Meteor.wrapAsync(fse.copy),
       path = Npm.require('path'),
       url = Npm.require('url'),
@@ -57,7 +57,7 @@ Velocity = {};
       NO_MIRROR = process.env.NO_MIRROR;
 
   Meteor.startup(function initializeVelocity () {
-    DEBUG && console.log('[velocity] PWD', process.env.PWD);
+    DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
     DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
     // kick-off everything
@@ -77,12 +77,16 @@ Velocity = {};
 
   _.extend(Velocity, {
 
+    getAppPath: function () {
+      return findAppDir()
+    },
+
     getMirrorPath: function () {
-      return path.join(process.env.PWD, '.meteor', 'local', '.mirror');
+      return path.join(Velocity.getAppPath(), '.meteor', 'local', '.mirror');
     },
 
     getTestsPath: function () {
-      return path.join(process.env.PWD, 'tests');
+      return path.join(Velocity.getAppPath(), 'tests');
     },
 
     addPreProcessor: function (preProcessor) {
@@ -296,8 +300,7 @@ Velocity = {};
      *     ex. {framework: 'jasmine-unit'}
      */
     copySampleTests: function (options) {
-      var pwd = process.env.PWD,
-          samplesPath,
+      var samplesPath,
           testsPath,
           command;
 
@@ -310,14 +313,14 @@ Velocity = {};
         var sampleTests = _config[options.framework].sampleTestGenerator(options);
         DEBUG && console.log('[velocity] found ', sampleTests.length, 'sample test files for', options.framework);
         sampleTests.forEach(function (testFile) {
-          var fullTestPath = path.join(pwd, 'tests', testFile.path);
+          var fullTestPath = path.join(Velocity.getTestsPath(), testFile.path);
           var testDir = path.dirname(fullTestPath);
           mkdirp.sync(testDir);
           fs.writeFileSync(fullTestPath, testFile.contents);
         });
       } else {
-        samplesPath = path.join(pwd, 'packages', options.framework, 'sample-tests');
-        testsPath = path.join(pwd, 'tests');
+        samplesPath = path.join(Velocity.getAppPath(), 'packages', options.framework, 'sample-tests');
+        testsPath = Velocity.getTestsPath();
 
         DEBUG && console.log('[velocity] checking for sample tests in', path.join(samplesPath, '*'));
 
@@ -453,7 +456,9 @@ Velocity = {};
       })
     };
 
-    writeFile(Velocity.getMirrorPath() + '/settings.json', JSON.stringify(Meteor.settings));
+
+    var settingsPath = path.join(Velocity.getMirrorPath(), 'settings.json');
+    outputFile(settingsPath, JSON.stringify(Meteor.settings));
 
     DEBUG && console.log('[velocity] Mirror: starting at', mirrorLocation);
 
@@ -474,7 +479,7 @@ Velocity = {};
       };
       var meteor = spawn(
         'meteor',
-        ['--port', port, '--settings', 'settings.json'],
+        ['--port', port, '--settings', settingsPath],
         opts
       );
       meteor.on('close', closeHandler);
@@ -683,7 +688,7 @@ Velocity = {};
 
       DEBUG && console.log('File added:', filePath);
 
-      relativePath = filePath.substring(process.env.PWD.length);
+      relativePath = filePath.substring(Velocity.getAppPath().length);
       if (relativePath[0] === path.sep) {
         relativePath = relativePath.substring(1);
       }
@@ -807,7 +812,7 @@ Velocity = {};
       frameworkResult = failedResult ? 'failed' : 'passed';
 
       // update the global status
-      VelocityAggregateReports.update({'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
+      VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
     }
 
     // if all test frameworks have completed, upsert an aggregate completed record
@@ -859,7 +864,7 @@ Velocity = {};
       .exclude('.meteor/local')
       .exclude('tests/.*')
       .exclude('packages')
-      .source(process.env.PWD + path.sep)
+      .source(Velocity.getAppPath() + path.sep)
       .destination(Velocity.getMirrorPath());
     var then = Date.now();
     cmd.execute(Meteor.bindEnvironment(function (error) {
