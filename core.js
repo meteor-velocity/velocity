@@ -52,7 +52,9 @@ Velocity = {};
       _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$'),
-      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js');
+      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js'),
+      // TODO remove this once frameworks have started using requestMirror
+      NO_MIRROR = process.env.NO_MIRROR;
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] PWD', process.env.PWD);
@@ -60,6 +62,11 @@ Velocity = {};
 
     // kick-off everything
     _reset(_config);
+
+    // TODO remove this once frameworks have started using requestMirror
+    if (!NO_MIRROR) {
+      _requestMirror({framework: 'shared', port: 5000});
+    }
   });
 
 //////////////////////////////////////////////////////////////////////
@@ -322,10 +329,10 @@ Velocity = {};
           child_process.exec(command, Meteor.bindEnvironment(
             function copySampleTestsExecHandler (err, stdout, stderr) {
               if (err) {
-                console.err('ERROR', err);
+                console.error('ERROR', err);
               }
               console.log(stdout);
-              console.err(stderr);
+              console.error(stderr);
             },
             'copySampleTestsExecHandler'
           ));
@@ -334,62 +341,10 @@ Velocity = {};
     },  // end copySampleTests
 
     /**
-     * Meteor method: requestMirror
-     * Starts a new mirror if it has not already been started, and reuses an existing one if it is already started.
-     * This method will return a requestId. Frameworks need to observe the VelocityMirrors collecton for a document with this requestId
-     * to know when the mirror is ready.
-     *
-     * @method requestMirror
-     *
-     * @param {Object} options                  Options for the mirror.
-     * @param {String} options.framework        The name of the calling framework
-     * @param {String} options.fixtureFiles     Array of files with absolute paths
-     * @param {String} options.port             String use a specific port instead of finding the next available one
-     *
-     * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
+     * Meteor method: requestMirror see @link _requestMirror
      */
     requestMirror: function (options) {
-      check(options, {
-        framework: String,
-        port: Match.Optional(Number),
-        fixtureFiles: Match.Optional([String])
-      });
-      options.port = options.port || 5000;
-
-      // Create a requestId that will be returned to the client to wait for
-      var requestId = Random.id();
-
-      DEBUG && console.log('[velocity] Mirror requested', options, 'requestId:', requestId);
-
-      var mirrorLocation = _getMirrorUrl(options.port);
-      _retryHttpGet(mirrorLocation, function (error, result) {
-
-        // if this mirror already been started, reuse it
-        if (!error && result.statusCode === 200) {
-          DEBUG && console.log('[velocity] Requested mirror already exists. Reusing...');
-          _reuseExistingMirror(options);
-        }
-
-        // if the mirror not been started at all, start a new one
-        if (error && error.indexOf('ECONNREFUSED') !== -1) {
-          DEBUG && console.log('[velocity] Requested mirror not started. Starting...');
-          _velocityStartMirror(options);
-        }
-
-        // if a mirror exists but is failing for some other reason, let the user know why in the console
-        if (error && error.indexOf('ECONNREFUSED') === -1) {
-          DEBUG && console.log('[velocity] Mirror could not start', error);
-        } else if (!error && result.statusCode !== 200) {
-          DEBUG && console.log('[velocity] Mirror started but returnd non-200 response', result);
-        }
-
-
-      });
-
-
-      // frameworks know a mirror is ready by observing VelocityMirrors for this requestId
-      return requestId;
-
+      _requestMirror.apply(options);
     },
 
     /**
@@ -408,7 +363,63 @@ Velocity = {};
 // Private functions
 //
 
+  /**
+   * Meteor method: requestMirror
+   * Starts a new mirror if it has not already been started, and reuses an existing one if it is already started.
+   * This method will return a requestId. Frameworks need to observe the VelocityMirrors collection for a document for
+   * {requestId: requestId} to know when the mirror is ready.
+   *
+   * @method requestMirror
+   *
+   * @param {Object} options                  Options for the mirror.
+   * @param {String} options.framework        The name of the calling framework
+   * @param {String} [options.fixtureFiles]     Array of files with absolute paths
+   * @param {Number} [options.port]             String use a specific port
+   *
+   * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
+   */
+  function _requestMirror (options) {
+    check(options, {
+      framework: String,
+      port: Match.Optional(Number),
+      fixtureFiles: Match.Optional([String])
+    });
+    options.port = options.port || 5000;
 
+    // Create a requestId that will be returned to the client to wait for
+    var requestId = Random.id();
+
+    DEBUG && console.log('[velocity] Mirror requested', options, 'requestId:', requestId);
+
+    var mirrorLocation = _getMirrorUrl(options.port);
+    _retryHttpGet(mirrorLocation, function (error, result) {
+
+      // if this mirror already been started, reuse it
+      if (!error && result.statusCode === 200) {
+        DEBUG && console.log('[velocity] Requested mirror already exists. Reusing...');
+        _reuseExistingMirror(options);
+      }
+
+      // if the mirror not been started at all, start a new one
+      if (error && error.indexOf('ECONNREFUSED') !== -1) {
+        DEBUG && console.log('[velocity] Requested mirror not started. Starting...');
+        _velocityStartMirror(options);
+      }
+
+      // if a mirror exists but is failing for some other reason, let the user know why in the console
+      if (error && error.indexOf('ECONNREFUSED') === -1) {
+        DEBUG && console.log('[velocity] Mirror could not start', error);
+      } else if (!error && result.statusCode !== 200) {
+        DEBUG && console.log('[velocity] Mirror started but returnd non-200 response', result);
+      }
+
+
+    });
+
+
+    // frameworks know a mirror is ready by observing VelocityMirrors for this requestId
+    return requestId;
+  }
 
 
   /**
@@ -474,7 +485,7 @@ Velocity = {};
       );
       meteor.on('close', closeHandler);
 
-      // FIXME there's a better wy to do this with streams
+      // FIXME there's a better way to do this with streams
       var outputHandler = function (data) {
         var lines = data.toString().split(/\r?\n/).slice(0, -1);
         _.map(lines, function (line) {
@@ -755,7 +766,7 @@ Velocity = {};
       _id: DEFAULT_FIXTURE_PATH,
       absolutePath: DEFAULT_FIXTURE_PATH
     });
-    var frameworksWithDisableAutoReset = _.pluck(_.where(config, {disableAutoReset: true}), 'name');
+    var frameworksWithDisableAutoReset = _(config).where({ disableAutoReset: true }).pluck('name').value();
     DEBUG && console.log('[velocity] not resetting reports and logs for', frameworksWithDisableAutoReset);
     VelocityTestReports.remove({ framework: { $nin: frameworksWithDisableAutoReset } });
     VelocityLogs.remove({ framework: { $nin: frameworksWithDisableAutoReset } });
@@ -802,7 +813,7 @@ Velocity = {};
       frameworkResult = failedResult ? 'failed' : 'passed';
 
       // update the global status
-      VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
+      VelocityAggregateReports.update({'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
     }
 
     // if all test frameworks have completed, upsert an aggregate completed record
