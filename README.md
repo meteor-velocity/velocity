@@ -105,8 +105,29 @@ $ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 VELOCITY_DEBUG_MIRROR=1 meteor
 
 Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
 
+## For velocity:core maintainers
 
-## Publishing to Meteor Package System
+### Developing with a local version of velocity:core
+
+1. Clone https://github.com/meteor-velocity/velocity-example
+2. Create a symlink to your local velocity:core package:
+
+ ```bash
+ cd velocity-example
+ mkdir packages
+ cd packages
+ # Replace ~/velocity with your path 
+ ln -s ~/velocity velocity:core
+ ```
+
+3. Start the velocity-example. It will use your local velocity:core version.
+
+ ```bash
+ cd ..
+ meteor
+ ```
+
+### Publishing to Meteor Package System
 
 * Make code changes
 * Commit changes
