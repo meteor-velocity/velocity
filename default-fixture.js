@@ -1,9 +1,11 @@
 /*jshint -W117, -W030 */
 
+var packageContext = this;
+
 (function () {
   'use strict';
 
-  var packageContext = this
+  // Shimming solution for to expose Velocity packages to the global context
   _.forEach(Package['velocity:core'], function (globalValue, globalName) {
     packageContext[globalName] = globalValue
   });
