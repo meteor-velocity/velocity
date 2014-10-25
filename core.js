@@ -242,6 +242,7 @@ Velocity = {};
      *                   isServer - {Boolean} Is it a server test?
      *                   browser  - {String} In which browser did the test run?
      *                   timestamp - {Date} The time that the test started for this result
+     *                   duration - {Number} The duration of this test in milliseconds
      *                   async - // TODO @rissem to write
      *                   timeOut - // TODO @rissem to write
      *                   failureType - {String} ex 'expect' or 'assert'
@@ -260,6 +261,7 @@ Velocity = {};
         isServer: Match.Optional(Boolean),
         browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
         timestamp: Match.Optional(Match.OneOf(Date, String)),
+        duration: Match.Optional(Number),
         async: Match.Optional(Boolean),
         timeOut: Match.Optional(Match.Any),
         failureType: Match.Optional(String),
@@ -267,6 +269,8 @@ Velocity = {};
         failureStackTrace: Match.Optional(Match.Any),
         ancestors: Match.Optional([String])
       }));
+
+      data.timestamp = data.timestamp || new Date();
 
       VelocityTestReports.upsert(data.id, {$set: data});
       _updateAggregateReports();
