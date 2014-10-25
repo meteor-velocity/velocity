@@ -3,6 +3,11 @@
 (function () {
   'use strict';
 
+  var packageContext = this
+  _.forEach(Package['velocity:core'], function (globalValue, globalName) {
+    packageContext[globalName] = globalValue
+  });
+
   if (Meteor.isServer) {
 
 //////////////////////////////////////////////////////////////////////
