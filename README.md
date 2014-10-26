@@ -29,6 +29,10 @@ Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=
 
 https://trello.com/b/VCmaj73b/velocity-project
 
+## Installation
+```sh
+meteor add velocity:core
+```
 
 ## Usage
 
