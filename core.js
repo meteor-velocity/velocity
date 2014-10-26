@@ -361,6 +361,7 @@ Velocity = {};
      * @param {String} options.framework        The name of the calling framework
      * @param {String} [options.fixtureFiles]     Array of files with absolute paths
      * @param {String} [options.port]             String use a specific port
+     * @param {String} [options.requestId]      Id for the mirror that is used to query the mirror info
      *
      * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
      */
@@ -368,14 +369,16 @@ Velocity = {};
       check(options, {
         framework: String,
         port: Match.Optional(Number),
-        fixtureFiles: Match.Optional([String])
+        fixtureFiles: Match.Optional([String]),
+        requestId: Match.Optional(String)
       });
       options.port = options.port || 5000;
+      options.requestId = options.requestId || Random.id();
 
-      // Create a requestId that will be returned to the client to wait for
-      var requestId = Random.id();
-
-      DEBUG && console.log('[velocity] Mirror requested', options, 'requestId:', requestId);
+      DEBUG && console.log(
+        '[velocity] Mirror requested', options,
+        'requestId:', options.requestId
+      );
 
       var mirrorLocation = _getMirrorUrl(options.port);
       _retryHttpGet(mirrorLocation, function (error, result) {
@@ -403,7 +406,7 @@ Velocity = {};
       });
 
       // frameworks know a mirror is ready by observing VelocityMirrors for this requestId
-      return requestId;
+      return options.requestId;
     },
 
     /**
