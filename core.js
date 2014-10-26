@@ -868,9 +868,9 @@ Velocity = {};
       .set('q')
       .set('delay-updates')
       .set('force')
-      .exclude('.meteor/local')
-      .exclude('tests/.*')
-      .exclude('packages')
+      .exclude('/.meteor/local')
+      .exclude('/tests/.*')
+      .exclude('/packages')
       .source(Velocity.getAppPath() + path.sep)
       .destination(Velocity.getMirrorPath());
     var then = Date.now();
