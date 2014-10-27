@@ -635,7 +635,7 @@ Velocity = {};
           throw(ex);
         }
 
-        if (tries < 5) {
+        if (tries < 10) {
           DEBUG && console.log('[velocity] retrying mirror at ', url);
           retry.retryLater(++tries, doGet);
         } else {
