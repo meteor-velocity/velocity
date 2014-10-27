@@ -238,8 +238,6 @@ Velocity = {};
      *                   result - String.  ex. 'failed', 'passed' or 'pending'
      *
      *                 Suggested fields:
-     *                   isClient - {Boolean] Is it a client test?
-     *                   isServer - {Boolean} Is it a server test?
      *                   browser  - {String} In which browser did the test run?
      *                   timestamp - {Date} The time that the test started for this result
      *                   duration - {Number} The duration of this test in milliseconds
@@ -257,8 +255,6 @@ Velocity = {};
         name: String,
         framework: _matchOneOf(_.keys(_config)),
         result: _matchOneOf(['passed', 'failed', 'pending']),
-        isClient: Match.Optional(Boolean),
-        isServer: Match.Optional(Boolean),
         browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
         timestamp: Match.Optional(Match.OneOf(Date, String)),
         duration: Match.Optional(Number),
