@@ -140,7 +140,7 @@ Velocity = {};
      * Meteor method: velocity/reset
      * Re-init file watcher and clear all test results.
      *
-     * @method reset
+     * @method velocity/reset
      */
     'velocity/reset': function () {
       _reset(_config);
@@ -150,7 +150,7 @@ Velocity = {};
      * Meteor method: velocity/reports/reset
      * Clear all test results.
      *
-     * @method resetReports
+     * @method velocity/reports/reset
      * @param {Object} [options] Optional, specify specific framework to clear
      *                 and/or define a list of tests to keep.
      *                 ex.
@@ -181,7 +181,7 @@ Velocity = {};
      * Meteor method: velocity/logs/reset
      * Clear all log entried.
      *
-     * @method resetLogs
+     * @method velocity/logs/reset
      * @param {Object} [options] Optional, specify specific framework to clear
      */
     'velocity/logs/reset': function (options) {
@@ -201,7 +201,7 @@ Velocity = {};
      * Meteor method: velocity/logs/submit
      * Log a method to the central Velocity log store.
      *
-     * @method postLog
+     * @method velocity/logs/submit
      * @param {Object} options Required parameters:
      *                   type - String
      *                   message - String
@@ -230,7 +230,7 @@ Velocity = {};
      * Meteor method: velocity/reports/submit
      * Record the results of a test run.
      *
-     * @method postResult
+     * @method velocity/reports/submit
      * @param {Object} data Required fields:
      *                   id - String
      *                   name - String
@@ -277,7 +277,7 @@ Velocity = {};
      * Frameworks must call this method to inform Velocity they have completed
      * their current test runs. Velocity uses this flag when running in CI mode.
      *
-     * @method completed
+     * @method velocity/reports/completed
      * @param {Object} data Required fields:
      *                   framework - String  ex. 'jasmine-unit'
      */
@@ -291,15 +291,15 @@ Velocity = {};
     },  // end completed
 
     /**
-     * Meteor method: velocity/frameworks/copySampleTests
+     * Meteor method: velocity/copySampleTests
      * Copy sample tests from frameworks `sample-tests` directories
      * to user's `app/tests` directory.
      *
-     * @method copySampleTests
+     * @method velocity/copySampleTests
      * @param {Object} options
      *     ex. {framework: 'jasmine-unit'}
      */
-    'velocity/frameworks/copySampleTests': function (options) {
+    'velocity/copySampleTests': function (options) {
       var samplesPath,
           testsPath,
           command;
@@ -351,7 +351,7 @@ Velocity = {};
      * This method will return a requestId. Frameworks need to observe the VelocityMirrors collection for a document for
      * {requestId: requestId} to know when the mirror is ready.
      *
-     * @method requestMirror
+     * @method velocity/mirrors/request
      *
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
@@ -406,12 +406,12 @@ Velocity = {};
     },
 
     /**
-     * Meteor method: velocity/mirrors/isMirror
+     * Meteor method: velocity/isMirror
      * Exposes the IS_MIRROR flag to clients
      *
-     * @method velocityIsMirror
+     * @method velocity/isMirror
      */
-    'velocity/mirrors/isMirror': function () {
+    'velocity/isMirror': function () {
       return !!process.env.IS_MIRROR;
     }
 

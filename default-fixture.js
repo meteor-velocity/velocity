@@ -17,22 +17,22 @@
     Meteor.methods({
 
       /**
-       * Meteor method: velocityIsMirror
+       * Meteor method: velocity/isMirror
        * Exposes the IS_MIRROR flag to mirror clients
        *
-       * @method velocityIsMirror
+       * @method velocity/isMirror
        */
-      velocityIsMirror: function () {
+      'velocity/isMirror': function () {
         return !!process.env.IS_MIRROR;
       },
 
       /**
-       * Meteor method: velocityResetDatabase
+       * Meteor method: velocity/resetDatabase
        * This truncate all collections in the app by using the native mongo object and calling collection.remove()
        *
-       * @method velocityResetDatabase
+       * @method velocity/resetDatabase
        */
-      velocityResetDatabase: function () {
+      'velocity/resetDatabase': function () {
 
         // safety check
         if (!process.env.IS_MIRROR) {

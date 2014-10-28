@@ -144,6 +144,14 @@ We have to publish velocity:core for the different architectures (Mac OS, 64-bit
 
 First publish velocity:core on your development machine with `meteor publish`. Then you will need machines with the other two architectures. Use `meteor publish-for-arch velocity:core@VERSION --release 0.9.4` on a computer with the right architecture. Also see [Meteor docs](http://docs.meteor.com/#meteorpublishforarch).
 
+### Meteor Method Naming Convention
+
+We have two naming schemas:
+
+1. When the method does something with a resource type: `velocity/<RESOURCE_NAME>/<ACTION>`
+2. When the method isn't specific to a resource type: `velocity/<ACTION>`
+
+All parts a camelCase and start with a lowercase letter.
 
 ##Contributors
 
