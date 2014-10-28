@@ -218,48 +218,61 @@ Velocity = {};
     },
 
     /**
-     * Meteor method: velocity/reports/submit
-     * Record the results of a test run.
+     * Meteor method: velocity/reports/submit 
      *
-     * @method velocity/reports/submit
-     * @param {Object} data Required fields:
-     *                   id - String
-     *                   name - String
-     *                   framework - String  ex. 'jasmine-unit'
-     *                   result - String.  ex. 'failed', 'passed' or 'pending'
+     * Record the results of a test run; a simple collector of test data.
      *
-     *                 Suggested fields:
-     *                   browser  - {String} In which browser did the test run?
-     *                   timestamp - {Date} The time that the test started for this result
-     *                   duration - {Number} The duration of this test in milliseconds
-     *                   async - // TODO @rissem to write
-     *                   timeOut - // TODO @rissem to write
-     *                   failureType - {String} ex 'expect' or 'assert'
-     *                   failureMessage - {String} The failure message from the test framework
-     *                   failureStackTrace - {String} The stack trace associated with the failure
-     *                   ancestors - The hierarchy of suites and blocks above this test
-     *                               ex. 'Template.leaderboard.selected_name'
+     * The `data` object is stored in its entirety; any field may be passed in.
+     * The optional fields documented here are suggestions based on what the
+     * standard html-reporter supports.  Whether or not a field is actually
+     * used is up to the specific test reporter that the user has installed.
+     *
+     * @method velocity/reports/submit 
+     * @param {Object} data
+     * @param {String} data.name
+     * @param {String} data.framework Name of a testing framework.
+     *                                For example, 'jasmine' or 'mocha'.
+     * @param {String} data.result The results of the test.  Standard values 
+     *                             are 'passed' and 'failed'.  Different test
+     *                             reporters can support other values.  For
+     *                             example, the aggregate tests collection uses
+     *                             'pending' to indicate that results are still
+     *                             coming in.
+     * @param {String} [data.id] Used to update a specific test result.  If not
+     *                           provided, frameworks can use the 'resetReports'
+     *                           Meteor method to clear all tests.
+     * @param {Array} [data.ancestors] The hierarchy of suites and blocks above
+     *                                 this test. For example,
+     *                              ['Template', 'leaderboard', 'selected_name']
+     * @param {Date} [data.timestamp] The time that the test started for this
+     *                                result.
+     * @param {Number} [data.duration] The test duration milliseconds.
+     * @param {String} [data.browser] Which browser did the test run in?
+     * @param {String} [data.failureType] For example, 'expect' or 'assert'
+     * @param {String} [data.failureMessage]
+     * @param {String} [data.failureStackTrace] The stack trace associated with
+     *                                          the failure
      */
     'velocity/reports/submit': function (data) {
       check(data, Match.ObjectIncluding({
-        id: String,
         name: String,
-        framework: _matchOneOf(_.keys(_config)),
-        result: _matchOneOf(['passed', 'failed', 'pending']),
-        browser: Match.Optional(_matchOneOf(['chrome', 'firefox', 'internet explorer', 'opera', 'safari'])), // TODO: Add missing values
+        framework: String,
+        result: String,
+        id: Match.Optional(String),
+        ancestors: Match.Optional([String]),
         timestamp: Match.Optional(Match.OneOf(Date, String)),
         duration: Match.Optional(Number),
-        async: Match.Optional(Boolean),
-        timeOut: Match.Optional(Match.Any),
+        browser: Match.Optional(String),
         failureType: Match.Optional(String),
         failureMessage: Match.Optional(String),
-        failureStackTrace: Match.Optional(Match.Any),
-        ancestors: Match.Optional([String])
+        failureStackTrace: Match.Optional(Match.Any)
       }));
 
       data.timestamp = data.timestamp || new Date();
+      data.id = data.id || Meteor.uuid()
 
       VelocityTestReports.upsert(data.id, {$set: data});
+
       _updateAggregateReports();
     },  // end postResult
 
@@ -638,17 +651,6 @@ Velocity = {};
     doGet();
   } // end _retryHttpGet
 
-  /**
-   * Matcher for checking if a value is one of the given values.
-   * @param {Array} values Valid values.
-   * @returns {*}
-   * @private
-   */
-  function _matchOneOf (values) {
-    return Match.Where(function (value) {
-      return (values.indexOf(value) !== -1);
-    });
-  }
 
   function _parseTestingFrameworkOptions (name, options) {
     options = options || {};
