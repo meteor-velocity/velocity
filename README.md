@@ -109,18 +109,18 @@ Used to be encountered when you referenced the velocity repo directly in `smart.
 
 ### Developing with a local version of velocity:core
 
-1. Clone https://github.com/meteor-velocity/velocity-example
+1. Clone https://github.com/meteor-velocity/velocity-examples.git
 2. Create a symlink to your local velocity:core package:
 
  ```bash
- cd velocity-example
+ cd velocity-examples/leaderboard-jasmine
  mkdir packages
  cd packages
  # Replace ~/velocity with your path 
  ln -s ~/velocity velocity:core
  ```
 
-3. Start the velocity-example. It will use your local velocity:core version.
+3. Start the velocity example app. It will use your local velocity:core version.
 
  ```bash
  cd ..
