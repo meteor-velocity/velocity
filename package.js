@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.2.15',
+  version: '1.0.0-rc.1',
   git: 'https://github.com/xolvio/velocity.git',
   debugOnly: true
 });
@@ -20,12 +20,8 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
-  if (api.versionsFrom) {
-    api.versionsFrom('METEOR@0.9.1');
-    // This is required for Meteor.Collection since Meteor 0.9.1
-    api.use('mongo');
-  }
-
+  api.versionsFrom('METEOR@1.0');
+  api.use('mongo');
   api.use('check');
   api.use('http');
   api.use('retry');
