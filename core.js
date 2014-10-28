@@ -52,9 +52,7 @@ Velocity = {};
       _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$'),
-      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js'),
-      // TODO remove this once frameworks have started using requestMirror
-      NO_MIRROR = process.env.NO_MIRROR;
+      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js');
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
@@ -62,13 +60,6 @@ Velocity = {};
 
     // kick-off everything
     _reset(_config);
-
-    // TODO remove this once frameworks have started using requestMirror
-    if (!NO_MIRROR) {
-      Meteor.call('requestMirror', {framework: 'shared', port: 5000});
-    }
-
-    console.log('NO_MIRROR', NO_MIRROR);
   });
 
 //////////////////////////////////////////////////////////////////////
@@ -78,7 +69,7 @@ Velocity = {};
   _.extend(Velocity, {
 
     getAppPath: function () {
-      return findAppDir()
+      return findAppDir();
     },
 
     getMirrorPath: function () {
