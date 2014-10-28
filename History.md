@@ -1,12 +1,15 @@
-## v0.2.15
+## v1.0.0.rc.1
 
 * Updated to use Meteor 1.0
+* mirror is disabled by default
 
 ### For Velocity plugin developers
 * Rewrite mirroring approach
   * Mirrors no longer startup by default and have to be requested by frameworks using requestMirror
   * requestMirror now checks for existing mirrors by port and reuses them if they already exist
   * velocityMirrors can contain multiple entries even if the entries share the same port
+  * frameworks can provide rootUrl when requesting mirrors
+  * 
 
 ## v0.2.0
 
