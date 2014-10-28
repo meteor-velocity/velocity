@@ -346,9 +346,11 @@ Velocity = {};
      *
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
-     * @param {String} [options.fixtureFiles]     Array of files with absolute paths
-     * @param {String} [options.port]             String use a specific port
+     * @param {String} [options.fixtureFiles]   Array of files with absolute paths
+     * @param {String} [options.port]           String use a specific port
      * @param {String} [options.requestId]      Id for the mirror that is used to query the mirror info
+     * @param {String} [options.rootUrl]        Overrides the auto-generated <protocol>://<host>:<port>. This is useful for frameworks that need to customize the
+     *                                          request parameters that velocity-ci uses
      *
      * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
      */
@@ -357,18 +359,19 @@ Velocity = {};
         framework: String,
         port: Match.Optional(Number),
         fixtureFiles: Match.Optional([String]),
-        requestId: Match.Optional(String)
+        requestId: Match.Optional(String),
+        rootUrl: Match.Optional(String)
       });
       options.port = options.port || 5000;
       options.requestId = options.requestId || Random.id();
+      options.rootUrl = options.rootUrl || _getMirrorUrl(options.port);
 
       DEBUG && console.log(
         '[velocity] Mirror requested', options,
         'requestId:', options.requestId
       );
 
-      var mirrorLocation = _getMirrorUrl(options.port);
-      _retryHttpGet(mirrorLocation, function (error, result) {
+      _retryHttpGet(options.rootUrl, function (error, result) {
 
         // if this mirror already been started, reuse it
         if (!error && result.statusCode === 200) {
@@ -419,6 +422,7 @@ Velocity = {};
    * @method velocityStartMirror
    * @param {Object} options Required fields:
    *                   framework - String ex. 'mocha-web-1'
+   *                   rootUrl - String ex. 'http://localhost:5000/x=y'
    *
    *                 Optional parameters:
    *                   fixtureFiles - Array of files with absolute paths
@@ -500,7 +504,7 @@ Velocity = {};
         }, {
           framework: options.framework,
           port: port,
-          rootUrl: mirrorLocation,
+          rootUrl: options.rootUrl,
           mongoUrl: mongoLocation,
           requestId: options.requestId
         });
@@ -539,7 +543,7 @@ Velocity = {};
       VelocityMirrors.insert({
         framework: options.framework,
         port: options.port,
-        rootUrl: _getMirrorUrl(options.port),
+        rootUrl: options.rootUrl,
         mongoUrl: _getMongoUrl(options.framework),
         requestId: options.requestId
       });
