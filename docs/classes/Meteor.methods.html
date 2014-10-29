@@ -96,7 +96,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/core.js.html#l170"><code>core.js:170</code></a>
+            Defined in: <a href="../files/core.js.html#l180"><code>core.js:180</code></a>
         </div>
     
 
@@ -253,6 +253,13 @@ Meteor methods.</p>
                                 
                             </li>
                         
+                            <li class="index-item method">
+                                <a href="#method_velocity/syncMirror">velocity/syncMirror</a>
+
+                                
+                                
+                            </li>
+                        
                             <li class="index-item method private">
                                 <a href="#method_velocityStartMirror">velocityStartMirror</a>
 
@@ -320,7 +327,7 @@ Meteor methods.</p>
             
         
         
-        <a href="../files/core.js.html#l731"><code>core.js:731</code></a>
+        <a href="../files/core.js.html#l765"><code>core.js:765</code></a>
         
         </p>
 
@@ -411,7 +418,7 @@ Meteor methods.</p>
             
         
         
-        <a href="../files/core.js.html#l810"><code>core.js:810</code></a>
+        <a href="../files/core.js.html#l844"><code>core.js:844</code></a>
         
         </p>
 
@@ -512,7 +519,7 @@ Meteor methods.</p>
             
         
         
-        <a href="../files/core.js.html#l678"><code>core.js:678</code></a>
+        <a href="../files/core.js.html#l712"><code>core.js:712</code></a>
         
         </p>
 
@@ -634,7 +641,7 @@ Uses a future to respond and the future return object can be provided.</p>
             
         
         
-        <a href="../files/core.js.html#l597"><code>core.js:597</code></a>
+        <a href="../files/core.js.html#l631"><code>core.js:631</code></a>
         
         </p>
 
@@ -718,7 +725,7 @@ Uses a future to respond and the future return object can be provided.</p>
             
         
         
-        <a href="../files/core.js.html#l953"><code>core.js:953</code></a>
+        <a href="../files/core.js.html#l987"><code>core.js:987</code></a>
         
         </p>
 
@@ -787,7 +794,7 @@ the symlinks inside it.</p>
             
         
         
-        <a href="../files/core.js.html#l898"><code>core.js:898</code></a>
+        <a href="../files/core.js.html#l932"><code>core.js:932</code></a>
         
         </p>
 
@@ -872,7 +879,7 @@ TODO - Strips out velocity and reporters from the mirror&#39;s .meteor/packages 
             
         
         
-        <a href="../files/core.js.html#l855"><code>core.js:855</code></a>
+        <a href="../files/core.js.html#l889"><code>core.js:889</code></a>
         
         </p>
 
@@ -937,7 +944,7 @@ TODO - Strips out velocity and reporters from the mirror&#39;s .meteor/packages 
             
         
         
-        <a href="../files/core.js.html#l342"><code>core.js:342</code></a>
+        <a href="../files/core.js.html#l357"><code>core.js:357</code></a>
         
         </p>
 
@@ -1038,7 +1045,7 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
             
         
         
-        <a href="../files/core.js.html#l472"><code>core.js:472</code></a>
+        <a href="../files/core.js.html#l495"><code>core.js:495</code></a>
         
         </p>
 
@@ -1117,7 +1124,7 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
             
         
         
-        <a href="../files/core.js.html#l217"><code>core.js:217</code></a>
+        <a href="../files/core.js.html#l227"><code>core.js:227</code></a>
         
         </p>
 
@@ -1128,7 +1135,7 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
     </div>
 
     <div class="description">
-        <p>Clear all log entried.</p>
+        <p>Clear all log entries.</p>
 
     </div>
 
@@ -1148,10 +1155,29 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
                     
 
                     <div class="param-description">
-                        <p>Optional, specify specific framework to clear</p>
-
+                         
                     </div>
 
+                    
+                        <ul class="params-list">
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[framework]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>The name of a specific framework
+                                    to clear logs for.</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                        </ul>
                     
                 </li>
             
@@ -1207,7 +1233,7 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
             
         
         
-        <a href="../files/core.js.html#l236"><code>core.js:236</code></a>
+        <a href="../files/core.js.html#l249"><code>core.js:249</code></a>
         
         </p>
 
@@ -1218,7 +1244,9 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
     </div>
 
     <div class="description">
-        <p>Log a method to the central Velocity log store.</p>
+        <p>Log a message to the Velocity log store.  This provides a central
+location for different reporters to query for test framework log 
+entries.</p>
 
     </div>
 
@@ -1237,15 +1265,70 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
                     
 
                     <div class="param-description">
-                        <p>Required parameters:
-                  type - String
-                  message - String
-                  framework - String  ex. &#39;jasmine-unit&#39;</p>
-<pre><code>            Optional parameters:
-              timestamp - Date</code></pre>
-
+                         
                     </div>
 
+                    
+                        <ul class="params-list">
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+                                
+
+                                <div class="param-description">
+                                    <p>The name of the test framework</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name">message</code>
+                                    <span class="type">String</span>
+                                
+
+                                <div class="param-description">
+                                    <p>The message to log</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[level]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>Log level.  Ex. &#39;error&#39;. Default: &#39;info&#39;</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[timestamp]</code>
+                                    <span class="type">Date</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    
+                                </div>
+
+                                
+                            </li>
+                            
+                        </ul>
                     
                 </li>
             
@@ -1305,7 +1388,7 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
             
         
         
-        <a href="../files/core.js.html#l398"><code>core.js:398</code></a>
+        <a href="../files/core.js.html#l425"><code>core.js:425</code></a>
         
         </p>
 
@@ -1318,10 +1401,8 @@ to the user&#39;s application&#39;s <code>tests</code> directory.</p>
     <div class="description">
         <p>Starts a new mirror if it has not already been started, and reuses an
 existing one if it is already started.</p>
-<p>This method will update the VelocityMirrors collection with <code>requestId</code>
-once the mirror is ready for use.  Frameworks need to observe the
-VelocityMirrors collection for a document matching 
-<code>{requestId: requestId}</code> to know when the mirror is ready.</p>
+<p>This method will update the <code>VelocityMirrors</code> collection with <code>requestId</code>
+once the mirror is ready for use.</p>
 
     </div>
 
@@ -1399,8 +1480,7 @@ VelocityMirrors collection for a document matching
                                 
 
                                 <div class="param-description">
-                                    <p>Id for the mirror which may be used
-                                    to query the mirror info.</p>
+                                    <p>Id for the mirror that may be used to query the mirror for status info</p>
 
                                 </div>
 
@@ -1409,16 +1489,15 @@ VelocityMirrors collection for a document matching
                             
                             <li class="param">
                                 
-                                    <code class="param-name optional">[rootUrl]</code>
+                                    <code class="param-name optional">[rootUrlPath]</code>
                                     <span class="type">String</span>
                                     <span class="flag optional" title="This parameter is optional.">optional</span>
                                 
 
                                 <div class="param-description">
-                                    <p>Overrides the auto-generated 
-                <code>&lt;protocol&gt;://&lt;host&gt;:&lt;port&gt;</code>. This is useful for 
-                frameworks that need to customize the request parameters
-                that velocity-ci uses.</p>
+                                    <p>Adds this string to the end of the root url in the VelocityMirrors collection.
+                                         eg. <code>/?jasmine=true</code>
+                                         Request parameters that velocity-ci uses.</p>
 
                                 </div>
 
@@ -1495,7 +1574,7 @@ VelocityMirrors collection for a document matching
             
         
         
-        <a href="../files/core.js.html#l324"><code>core.js:324</code></a>
+        <a href="../files/core.js.html#l338"><code>core.js:338</code></a>
         
         </p>
 
@@ -1526,11 +1605,27 @@ their current test runs. Velocity uses this flag when running in CI mode.</p>
                     
 
                     <div class="param-description">
-                        <p>Required fields:
-                  framework - String  ex. &#39;jasmine-unit&#39;</p>
-
+                         
                     </div>
 
+                    
+                        <ul class="params-list">
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+                                
+
+                                <div class="param-description">
+                                    <p>Name of a test framework.  Ex. &#39;jasmine&#39;</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                        </ul>
                     
                 </li>
             
@@ -1586,7 +1681,7 @@ their current test runs. Velocity uses this flag when running in CI mode.</p>
             
         
         
-        <a href="../files/core.js.html#l187"><code>core.js:187</code></a>
+        <a href="../files/core.js.html#l197"><code>core.js:197</code></a>
         
         </p>
 
@@ -1617,16 +1712,46 @@ their current test runs. Velocity uses this flag when running in CI mode.</p>
                     
 
                     <div class="param-description">
-                        <p>Optional, specify specific framework to clear
-                and/or define a list of tests to keep.
-                ex.
-                {
-                  framework: &#39;jasmine-unit&#39;,
-                  notIn: [&#39;tests/auth-jasmine-unit.js&#39;]
-                }</p>
-
+                         
                     </div>
 
+                    
+                        <ul class="params-list">
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[framework]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>The name of a specific framework
+                 to clear results for.  Ex. &#39;jasmine&#39; or &#39;mocha&#39;</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                            <li class="param">
+                                
+                                    <code class="param-name optional">[notIn]</code>
+                                    <span class="type">Array</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+                                
+
+                                <div class="param-description">
+                                    <p>A list of test Ids which should be kept
+                               (not cleared).  These Ids must match the
+                               ones passed to <code>velocity/reports/submit</code>.</p>
+
+                                </div>
+
+                                
+                            </li>
+                            
+                        </ul>
                     
                 </li>
             
@@ -1682,7 +1807,7 @@ their current test runs. Velocity uses this flag when running in CI mode.</p>
             
         
         
-        <a href="../files/core.js.html#l264"><code>core.js:264</code></a>
+        <a href="../files/core.js.html#l278"><code>core.js:278</code></a>
         
         </p>
 
@@ -1693,7 +1818,7 @@ their current test runs. Velocity uses this flag when running in CI mode.</p>
     </div>
 
     <div class="description">
-        <p>Record the results of an individual test run; a simple collector of 
+        <p>Record the results of an individual test run; a simple collector of
 test data.</p>
 <p>The <code>data</code> object is stored in its entirety; any field may be passed in.
 The optional fields documented here are suggestions based on what the
@@ -1759,7 +1884,7 @@ used is up to the specific test reporter that the user has installed.</p>
                                 
 
                                 <div class="param-description">
-                                    <p>The results of the test.  Standard values 
+                                    <p>The results of the test.  Standard values
                             are &#39;passed&#39; and &#39;failed&#39;.  Different test
                             reporters can support other values.  For
                             example, the aggregate tests collection uses
@@ -1780,8 +1905,8 @@ used is up to the specific test reporter that the user has installed.</p>
 
                                 <div class="param-description">
                                     <p>Used to update a specific test result.  If not
-                          provided, frameworks can use the 
-                          <code>velocity/reports/reset</code> Meteor method to 
+                          provided, frameworks can use the
+                          <code>velocity/reports/reset</code> Meteor method to
                           clear all tests.</p>
 
                                 </div>
@@ -1830,7 +1955,7 @@ used is up to the specific test reporter that the user has installed.</p>
                                 
 
                                 <div class="param-description">
-                                    <p>The test duration milliseconds.</p>
+                                    <p>The test duration in milliseconds.</p>
 
                                 </div>
 
@@ -1943,7 +2068,7 @@ used is up to the specific test reporter that the user has installed.</p>
             
         
         
-        <a href="../files/core.js.html#l178"><code>core.js:178</code></a>
+        <a href="../files/core.js.html#l188"><code>core.js:188</code></a>
         
         </p>
 
@@ -1955,6 +2080,61 @@ used is up to the specific test reporter that the user has installed.</p>
 
     <div class="description">
         <p>Re-init file watcher and clear all test results.</p>
+
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_velocity/syncMirror" class="method item">
+    <h3 class="name"><code>velocity/syncMirror</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/core.js.html#l505"><code>core.js:505</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Syncs the mirror filesystem on an adhoc basis. Used by the core when file changes are detected.</p>
 
     </div>
 
@@ -2010,7 +2190,7 @@ used is up to the specific test reporter that the user has installed.</p>
             
         
         
-        <a href="../files/core.js.html#l492"><code>core.js:492</code></a>
+        <a href="../files/core.js.html#l524"><code>core.js:524</code></a>
         
         </p>
 

@@ -54,7 +54,7 @@
             "namespaces": {},
             "tag": "module",
             "file": "core.js",
-            "line": 170
+            "line": 180
         }
     },
     "classes": {
@@ -130,7 +130,8 @@
             "module": "Velocity",
             "namespace": "",
             "file": "core.js",
-            "line": 12
+            "line": 12,
+            "description": "The `Velocity` object provides a common API for test frameworks to report\ntest results.  Frameworks can also request assets, such as a copy of the\nuser's application (the 'mirror') in which tests can be safely run without\nimpacting on-going development.\n\nTest results and log activity are reported via \n{{#crossLink \"Meteor.methods\"}}Meteor methods{{/crossLink}}."
         },
         "Meteor.methods": {
             "name": "Meteor.methods",
@@ -143,7 +144,7 @@
             "module": "Velocity",
             "namespace": "",
             "file": "core.js",
-            "line": 170,
+            "line": 180,
             "description": "Most communication with Velocity core is done via the following\nMeteor methods."
         }
     },
@@ -172,7 +173,7 @@
         },
         {
             "file": "core.js",
-            "line": 72,
+            "line": 82,
             "description": "Get application directory path.",
             "itemtype": "method",
             "name": "getAppPath",
@@ -185,7 +186,7 @@
         },
         {
             "file": "core.js",
-            "line": 82,
+            "line": 92,
             "description": "Get path to directory of the 'mirror' application.",
             "itemtype": "method",
             "name": "getMirrorPath",
@@ -198,7 +199,7 @@
         },
         {
             "file": "core.js",
-            "line": 92,
+            "line": 102,
             "description": "Get path to application's 'tests' directory",
             "itemtype": "method",
             "name": "getTestsPath",
@@ -211,7 +212,7 @@
         },
         {
             "file": "core.js",
-            "line": 102,
+            "line": 112,
             "description": "Add a callback which will execute when the mirror application\nis sync'ed up with latest application code.  Preprocessors will\nexecute before fixtures are added.",
             "itemtype": "method",
             "name": "addPreProcessor",
@@ -227,7 +228,7 @@
         },
         {
             "file": "core.js",
-            "line": 114,
+            "line": 124,
             "description": "Add a callback which will execute after all tests have completed\nand after the aggregate test results have been reported.",
             "itemtype": "method",
             "name": "addPostProcessor",
@@ -243,7 +244,7 @@
         },
         {
             "file": "core.js",
-            "line": 125,
+            "line": 135,
             "description": "Get a message that displays where bugs in Velocity core itself should\nbe reported.",
             "itemtype": "method",
             "name": "getReportGithubIssueMessage",
@@ -256,7 +257,7 @@
         },
         {
             "file": "core.js",
-            "line": 140,
+            "line": 150,
             "description": "Registers a testing framework plugin.",
             "itemtype": "method",
             "name": "registerTestingFramework",
@@ -307,7 +308,7 @@
         },
         {
             "file": "core.js",
-            "line": 178,
+            "line": 188,
             "description": "Re-init file watcher and clear all test results.",
             "itemtype": "method",
             "name": "velocity/reset",
@@ -316,16 +317,30 @@
         },
         {
             "file": "core.js",
-            "line": 187,
+            "line": 197,
             "description": "Clear all test results.",
             "itemtype": "method",
             "name": "velocity/reports/reset",
             "params": [
                 {
                     "name": "options",
-                    "description": "Optional, specify specific framework to clear\n                and/or define a list of tests to keep.\n                ex.\n                {\n                  framework: 'jasmine-unit',\n                  notIn: ['tests/auth-jasmine-unit.js']\n                }",
+                    "description": "",
                     "type": "Object",
-                    "optional": true
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "The name of a specific framework\n                 to clear results for.  Ex. 'jasmine' or 'mocha'",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "notIn",
+                            "description": "A list of test Ids which should be kept\n                               (not cleared).  These Ids must match the\n                               ones passed to `velocity/reports/submit`.",
+                            "type": "Array",
+                            "optional": true
+                        }
+                    ]
                 }
             ],
             "class": "Meteor.methods",
@@ -333,16 +348,24 @@
         },
         {
             "file": "core.js",
-            "line": 217,
-            "description": "Clear all log entried.",
+            "line": 227,
+            "description": "Clear all log entries.",
             "itemtype": "method",
             "name": "velocity/logs/reset",
             "params": [
                 {
                     "name": "options",
-                    "description": "Optional, specify specific framework to clear",
+                    "description": "",
                     "type": "Object",
-                    "optional": true
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "The name of a specific framework\n                                    to clear logs for.",
+                            "type": "String",
+                            "optional": true
+                        }
+                    ]
                 }
             ],
             "class": "Meteor.methods",
@@ -350,15 +373,39 @@
         },
         {
             "file": "core.js",
-            "line": 236,
-            "description": "Log a method to the central Velocity log store.",
+            "line": 249,
+            "description": "Log a message to the Velocity log store.  This provides a central\nlocation for different reporters to query for test framework log \nentries.",
             "itemtype": "method",
             "name": "velocity/logs/submit",
             "params": [
                 {
                     "name": "options",
-                    "description": "Required parameters:\n                  type - String\n                  message - String\n                  framework - String  ex. 'jasmine-unit'\n\n                Optional parameters:\n                  timestamp - Date",
-                    "type": "Object"
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "The name of the test framework",
+                            "type": "String"
+                        },
+                        {
+                            "name": "message",
+                            "description": "The message to log",
+                            "type": "String"
+                        },
+                        {
+                            "name": "level",
+                            "description": "Log level.  Ex. 'error'. Default: 'info'",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "timestamp",
+                            "description": "",
+                            "type": "Date",
+                            "optional": true
+                        }
+                    ]
                 }
             ],
             "class": "Meteor.methods",
@@ -366,8 +413,8 @@
         },
         {
             "file": "core.js",
-            "line": 264,
-            "description": "Record the results of an individual test run; a simple collector of \ntest data.\n\nThe `data` object is stored in its entirety; any field may be passed in.\nThe optional fields documented here are suggestions based on what the\nstandard html-reporter supports.  Whether or not a field is actually\nused is up to the specific test reporter that the user has installed.",
+            "line": 278,
+            "description": "Record the results of an individual test run; a simple collector of\ntest data.\n\nThe `data` object is stored in its entirety; any field may be passed in.\nThe optional fields documented here are suggestions based on what the\nstandard html-reporter supports.  Whether or not a field is actually\nused is up to the specific test reporter that the user has installed.",
             "itemtype": "method",
             "name": "velocity/reports/submit",
             "params": [
@@ -388,12 +435,12 @@
                         },
                         {
                             "name": "result",
-                            "description": "The results of the test.  Standard values \n                            are 'passed' and 'failed'.  Different test\n                            reporters can support other values.  For\n                            example, the aggregate tests collection uses\n                            'pending' to indicate that results are still\n                            coming in.",
+                            "description": "The results of the test.  Standard values\n                            are 'passed' and 'failed'.  Different test\n                            reporters can support other values.  For\n                            example, the aggregate tests collection uses\n                            'pending' to indicate that results are still\n                            coming in.",
                             "type": "String"
                         },
                         {
                             "name": "id",
-                            "description": "Used to update a specific test result.  If not\n                          provided, frameworks can use the \n                          `velocity/reports/reset` Meteor method to \n                          clear all tests.",
+                            "description": "Used to update a specific test result.  If not\n                          provided, frameworks can use the\n                          `velocity/reports/reset` Meteor method to\n                          clear all tests.",
                             "type": "String",
                             "optional": true
                         },
@@ -411,7 +458,7 @@
                         },
                         {
                             "name": "duration",
-                            "description": "The test duration milliseconds.",
+                            "description": "The test duration in milliseconds.",
                             "type": "Number",
                             "optional": true
                         },
@@ -447,15 +494,22 @@
         },
         {
             "file": "core.js",
-            "line": 324,
+            "line": 338,
             "description": "Frameworks must call this method to inform Velocity they have completed\ntheir current test runs. Velocity uses this flag when running in CI mode.",
             "itemtype": "method",
             "name": "velocity/reports/completed",
             "params": [
                 {
                     "name": "data",
-                    "description": "Required fields:\n                  framework - String  ex. 'jasmine-unit'",
-                    "type": "Object"
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "Name of a test framework.  Ex. 'jasmine'",
+                            "type": "String"
+                        }
+                    ]
                 }
             ],
             "class": "Meteor.methods",
@@ -463,7 +517,7 @@
         },
         {
             "file": "core.js",
-            "line": 342,
+            "line": 357,
             "description": "Copy sample tests from frameworks `sample-tests` directories\nto the user's application's `tests` directory.",
             "itemtype": "method",
             "name": "velocity/copySampleTests",
@@ -486,8 +540,8 @@
         },
         {
             "file": "core.js",
-            "line": 398,
-            "description": "Starts a new mirror if it has not already been started, and reuses an\nexisting one if it is already started.\n\nThis method will update the VelocityMirrors collection with `requestId`\nonce the mirror is ready for use.  Frameworks need to observe the\nVelocityMirrors collection for a document matching \n`{requestId: requestId}` to know when the mirror is ready.",
+            "line": 425,
+            "description": "Starts a new mirror if it has not already been started, and reuses an\nexisting one if it is already started.\n\nThis method will update the `VelocityMirrors` collection with `requestId`\nonce the mirror is ready for use.",
             "itemtype": "method",
             "name": "velocity/mirrors/request",
             "params": [
@@ -515,13 +569,13 @@
                         },
                         {
                             "name": "requestId",
-                            "description": "Id for the mirror which may be used\n                                    to query the mirror info.",
+                            "description": "Id for the mirror that may be used to query the mirror for status info",
                             "type": "String",
                             "optional": true
                         },
                         {
-                            "name": "rootUrl",
-                            "description": "Overrides the auto-generated \n                `<protocol>://<host>:<port>`. This is useful for \n                frameworks that need to customize the request parameters\n                that velocity-ci uses.",
+                            "name": "rootUrlPath",
+                            "description": "Adds this string to the end of the root url in the VelocityMirrors collection.\n                                         eg. `/?jasmine=true`\n                                         Request parameters that velocity-ci uses.",
                             "type": "String",
                             "optional": true
                         }
@@ -537,7 +591,7 @@
         },
         {
             "file": "core.js",
-            "line": 472,
+            "line": 495,
             "description": "Exposes the IS_MIRROR flag to clients",
             "itemtype": "method",
             "name": "velocity/isMirror",
@@ -550,7 +604,16 @@
         },
         {
             "file": "core.js",
-            "line": 492,
+            "line": 505,
+            "description": "Syncs the mirror filesystem on an adhoc basis. Used by the core when file changes are detected.",
+            "itemtype": "method",
+            "name": "velocity/syncMirror",
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "core.js",
+            "line": 524,
             "description": "Starts a mirror and copies any specified fixture files into the mirror.",
             "itemtype": "method",
             "name": "velocityStartMirror",
@@ -568,7 +631,7 @@
         },
         {
             "file": "core.js",
-            "line": 597,
+            "line": 631,
             "description": "Reuses a mirror is it has already been started and updated the VelocityMirrors collection",
             "itemtype": "method",
             "name": "_reuseExistingMirror",
@@ -586,7 +649,7 @@
         },
         {
             "file": "core.js",
-            "line": 630,
+            "line": 664,
             "description": "Returns the MongoDB URL for the given database.",
             "params": [
                 {
@@ -605,7 +668,7 @@
         },
         {
             "file": "core.js",
-            "line": 647,
+            "line": 681,
             "description": "Return URL for the mirror with the given port.",
             "params": [
                 {
@@ -624,7 +687,7 @@
         },
         {
             "file": "core.js",
-            "line": 664,
+            "line": 698,
             "description": "Add fixtures to the database.",
             "params": [
                 {
@@ -639,7 +702,7 @@
         },
         {
             "file": "core.js",
-            "line": 678,
+            "line": 712,
             "description": "Performs a http get and retries the specified number of times with the specified timeouts.\nUses a future to respond and the future return object can be provided.",
             "itemtype": "method",
             "name": "_retryHttpGet",
@@ -666,7 +729,7 @@
         },
         {
             "file": "core.js",
-            "line": 731,
+            "line": 765,
             "description": "Initialize the directory/file watcher.",
             "itemtype": "method",
             "name": "_initWatcher",
@@ -684,7 +747,7 @@
         },
         {
             "file": "core.js",
-            "line": 810,
+            "line": 844,
             "description": "Re-init file watcher and clear all test results.",
             "itemtype": "method",
             "name": "_reset",
@@ -702,7 +765,7 @@
         },
         {
             "file": "core.js",
-            "line": 855,
+            "line": 889,
             "description": "If any one test has failed, mark the aggregate test result as failed.",
             "itemtype": "method",
             "name": "_updateAggregateReports",
@@ -713,7 +776,7 @@
         },
         {
             "file": "core.js",
-            "line": 898,
+            "line": 932,
             "description": "Creates a physical mirror of the application under .meteor/local/.mirror\n\n    - Any files with the pattern tests/.*  are not copied, this stops .report\n    directory from also being copied.\n\n    TODO - Strips out velocity and reporters from the mirror's .meteor/packages file",
             "itemtype": "method",
             "name": "_syncMirror",
@@ -730,7 +793,7 @@
         },
         {
             "file": "core.js",
-            "line": 953,
+            "line": 987,
             "description": "Checks if the user has a local packages directory, if so it ensures it's symlinked in the mirror.\nThe reason this is needed is because the standard rsync will copy a the packages dir and not respect\nthe symlinks inside it.",
             "itemtype": "method",
             "name": "_symlinkPackagesDirIfPresent",
@@ -769,11 +832,11 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " core.js:630"
+            "line": " core.js:664"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " core.js:647"
+            "line": " core.js:681"
         },
         {
             "message": "Missing item type\nCopied from Meteor tools/files.js.\n\nIncludes:\n- Helper to find the app root path",
@@ -785,15 +848,15 @@
         },
         {
             "message": "Missing item type\nReturns the MongoDB URL for the given database.",
-            "line": " core.js:630"
+            "line": " core.js:664"
         },
         {
             "message": "Missing item type\nReturn URL for the mirror with the given port.",
-            "line": " core.js:647"
+            "line": " core.js:681"
         },
         {
             "message": "Missing item type\nAdd fixtures to the database.",
-            "line": " core.js:664"
+            "line": " core.js:698"
         }
     ]
 }

@@ -104,6 +104,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
  * @module Velocity
  */
 /**
+ * The &#x60;Velocity&#x60; object provides a common API for test frameworks to report
+ * test results.  Frameworks can also request assets, such as a copy of the
+ * user&#x27;s application (the &#x27;mirror&#x27;) in which tests can be safely run without
+ * impacting on-going development.
+ *
+ * Test results and log activity are reported via 
+ * {{#crossLink &quot;Meteor.methods&quot;}}Meteor methods{{/crossLink}}.
+ *
  * @class Velocity
  */
 Velocity = {};
@@ -115,7 +123,9 @@ Velocity = {};
 // Init
 //
 
-  if (process.env.NODE_ENV !== &#x27;development&#x27; || process.env.VELOCITY === &#x27;0&#x27; || process.env.IS_MIRROR) {
+  if (process.env.NODE_ENV !== &#x27;development&#x27; ||
+      process.env.VELOCITY === &#x27;0&#x27; ||
+      process.env.IS_MIRROR) {
     DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);
     return;
   }
@@ -184,7 +194,7 @@ Velocity = {};
     },
 
     /**
-     * Get path to application&#x27;s &#x27;tests&#x27; directory 
+     * Get path to application&#x27;s &#x27;tests&#x27; directory
      *
      * @method getTestsPath
      * @return {String} application&#x27;s tests directory
@@ -282,13 +292,12 @@ Velocity = {};
      * Clear all test results.
      *
      * @method velocity/reports/reset
-     * @param {Object} [options] Optional, specify specific framework to clear
-     *                 and/or define a list of tests to keep.
-     *                 ex.
-     *                 {
-     *                   framework: &#x27;jasmine-unit&#x27;,
-     *                   notIn: [&#x27;tests/auth-jasmine-unit.js&#x27;]
-     *                 }
+     * @param {Object} [options]
+     * @param {String} [options.framework] The name of a specific framework
+     *                  to clear results for.  Ex. &#x27;jasmine&#x27; or &#x27;mocha&#x27;
+     * @param {Array} [options.notIn] A list of test Ids which should be kept
+     *                                (not cleared).  These Ids must match the
+     *                                ones passed to &#x60;velocity/reports/submit&#x60;.
      */
     &#x27;velocity/reports/reset&#x27;: function (options) {
       options = options || {};
@@ -302,17 +311,20 @@ Velocity = {};
         query.framework = options.framework;
       }
       if (options.notIn) {
-        query = _.assign(query, {_id: {$nin: options.notIn }});
+        query = _.assign(query, {_id: {$nin: options.notIn}});
       }
       VelocityTestReports.remove(query);
       _updateAggregateReports();
     },
 
+
     /**
-     * Clear all log entried.
+     * Clear all log entries.
      *
      * @method velocity/logs/reset
-     * @param {Object} [options] Optional, specify specific framework to clear
+     * @param {Object} [options]
+     * @param {String} [options.framework] The name of a specific framework
+     *                                     to clear logs for.
      */
     &#x27;velocity/logs/reset&#x27;: function (options) {
       options = options || {};
@@ -327,36 +339,38 @@ Velocity = {};
       VelocityLogs.remove(query);
     },
 
+
     /**
-     * Log a method to the central Velocity log store.
+     * Log a message to the Velocity log store.  This provides a central
+     * location for different reporters to query for test framework log 
+     * entries.
      *
      * @method velocity/logs/submit
-     * @param {Object} options Required parameters:
-     *                   type - String
-     *                   message - String
-     *                   framework - String  ex. &#x27;jasmine-unit&#x27;
-     *
-     *                 Optional parameters:
-     *                   timestamp - Date
+     * @param {Object} options
+     * @param {String} options.framework The name of the test framework
+     * @param {String} options.message The message to log
+     * @param {String} [options.level] Log level.  Ex. &#x27;error&#x27;. Default: &#x27;info&#x27;
+     * @param {Date} [options.timestamp]
      */
     &#x27;velocity/logs/submit&#x27;: function (options) {
       check(options, {
-        type: String,
-        message: String,
         framework: String,
+        message: String,
+        level: Match.Optional(String),
         timestamp: Match.Optional(Match.OneOf(Date, String))
       });
 
       VelocityLogs.insert({
         timestamp: options.timestamp || new Date(),
-        type: options.type,
+        level: options.level || &#x27;info&#x27;,
         message: options.message,
         framework: options.framework
       });
     },
 
+
     /**
-     * Record the results of an individual test run; a simple collector of 
+     * Record the results of an individual test run; a simple collector of
      * test data.
      *
      * The &#x60;data&#x60; object is stored in its entirety; any field may be passed in.
@@ -364,27 +378,27 @@ Velocity = {};
      * standard html-reporter supports.  Whether or not a field is actually
      * used is up to the specific test reporter that the user has installed.
      *
-     * @method velocity/reports/submit 
+     * @method velocity/reports/submit
      * @param {Object} data
      * @param {String} data.name Name of the test that was executed.
      * @param {String} data.framework Name of a testing framework.
      *                                For example, &#x27;jasmine&#x27; or &#x27;mocha&#x27;.
-     * @param {String} data.result The results of the test.  Standard values 
+     * @param {String} data.result The results of the test.  Standard values
      *                             are &#x27;passed&#x27; and &#x27;failed&#x27;.  Different test
      *                             reporters can support other values.  For
      *                             example, the aggregate tests collection uses
      *                             &#x27;pending&#x27; to indicate that results are still
      *                             coming in.
      * @param {String} [data.id] Used to update a specific test result.  If not
-     *                           provided, frameworks can use the 
-     *                           &#x60;velocity/reports/reset&#x60; Meteor method to 
+     *                           provided, frameworks can use the
+     *                           &#x60;velocity/reports/reset&#x60; Meteor method to
      *                           clear all tests.
      * @param {Array} [data.ancestors] The hierarchy of suites and blocks above
      *                                 this test. For example,
      *                              [&#x27;Template&#x27;, &#x27;leaderboard&#x27;, &#x27;selected_name&#x27;]
      * @param {Date} [data.timestamp] The time that the test started for this
      *                                result.
-     * @param {Number} [data.duration] The test duration milliseconds.
+     * @param {Number} [data.duration] The test duration in milliseconds.
      * @param {String} [data.browser] Which browser did the test run in?
      * @param {String} [data.failureType] For example, &#x27;expect&#x27; or &#x27;assert&#x27;
      * @param {String} [data.failureMessage]
@@ -407,7 +421,7 @@ Velocity = {};
       }));
 
       data.timestamp = data.timestamp || new Date();
-      data.id = data.id || Random.id()
+      data.id = data.id || Random.id();
 
       VelocityTestReports.upsert(data.id, {$set: data});
 
@@ -420,15 +434,16 @@ Velocity = {};
      * their current test runs. Velocity uses this flag when running in CI mode.
      *
      * @method velocity/reports/completed
-     * @param {Object} data Required fields:
-     *                   framework - String  ex. &#x27;jasmine-unit&#x27;
+     * @param {Object} data
+     * @param {String} data.framework Name of a test framework.  Ex. &#x27;jasmine&#x27;
      */
     &#x27;velocity/reports/completed&#x27;: function (data) {
       check(data, {
         framework: String
       });
 
-      VelocityAggregateReports.upsert({&#x27;name&#x27;: data.framework}, {$set: {&#x27;result&#x27;: &#x27;completed&#x27;}});
+      VelocityAggregateReports.upsert({&#x27;name&#x27;: data.framework},
+                                      {$set: {&#x27;result&#x27;: &#x27;completed&#x27;}});
       _updateAggregateReports();
     },  // end completed
 
@@ -443,7 +458,8 @@ Velocity = {};
      * @param {String} options.framework Framework name. Ex. &#x27;jasmine&#x27;, &#x27;mocha&#x27;
      */
     &#x27;velocity/copySampleTests&#x27;: function (options) {
-      var samplesPath,
+      var sampleTests,
+          samplesPath,
           testsPath,
           command;
 
@@ -453,26 +469,36 @@ Velocity = {};
       });
 
       if (_config[options.framework].sampleTestGenerator) {
-        var sampleTests = _config[options.framework].sampleTestGenerator(options);
-        DEBUG &amp;&amp; console.log(&#x27;[velocity] found &#x27;, sampleTests.length, &#x27;sample test files for&#x27;, options.framework);
+
+        sampleTests = _config[options.framework].sampleTestGenerator(options);
+
+        DEBUG &amp;&amp; console.log(&#x27;[velocity] found &#x27;, sampleTests.length, 
+                             &#x27;sample test files for&#x27;, options.framework);
+
         sampleTests.forEach(function (testFile) {
           var fullTestPath = path.join(Velocity.getTestsPath(), testFile.path);
           var testDir = path.dirname(fullTestPath);
           mkdirp.sync(testDir);
           fs.writeFileSync(fullTestPath, testFile.contents);
         });
+
       } else {
-        samplesPath = path.join(Velocity.getAppPath(), &#x27;packages&#x27;, options.framework, &#x27;sample-tests&#x27;);
+
+        samplesPath = path.join(Velocity.getAppPath(), &#x27;packages&#x27;,
+                                options.framework, &#x27;sample-tests&#x27;);
         testsPath = Velocity.getTestsPath();
 
-        DEBUG &amp;&amp; console.log(&#x27;[velocity] checking for sample tests in&#x27;, path.join(samplesPath, &#x27;*&#x27;));
+        DEBUG &amp;&amp; console.log(&#x27;[velocity] checking for sample tests in&#x27;,
+                              path.join(samplesPath, &#x27;*&#x27;));
 
         if (fs.existsSync(samplesPath)) {
           command = &#x27;mkdir -p &#x27; + testsPath + &#x27; &amp;&amp; &#x27; +
-            &#x27;rsync -au &#x27; + path.join(samplesPath, &#x27;*&#x27;) +
-            &#x27; &#x27; + testsPath + path.sep;
+                    &#x27;rsync -au &#x27; + path.join(samplesPath, &#x27;*&#x27;) +
+                    &#x27; &#x27; + testsPath + path.sep;
 
-          DEBUG &amp;&amp; console.log(&#x27;[velocity] copying sample tests (if any) for framework&#x27;, options.framework, &#x27;-&#x27;, command);
+          DEBUG &amp;&amp; console.log(&#x27;[velocity] copying sample tests (if any) &#x27; +
+                               &#x27;for framework&#x27;, options.framework, &#x27;-&#x27;, 
+                               command);
 
           child_process.exec(command, Meteor.bindEnvironment(
             function copySampleTestsExecHandler (err, stdout, stderr) {
@@ -485,6 +511,7 @@ Velocity = {};
             &#x27;copySampleTestsExecHandler&#x27;
           ));
         }
+
       }
     },  // end copySampleTests
 
@@ -493,23 +520,20 @@ Velocity = {};
      * Starts a new mirror if it has not already been started, and reuses an
      * existing one if it is already started.
      *
-     * This method will update the VelocityMirrors collection with &#x60;requestId&#x60;
-     * once the mirror is ready for use.  Frameworks need to observe the
-     * VelocityMirrors collection for a document matching 
-     * &#x60;{requestId: requestId}&#x60; to know when the mirror is ready.
-     *  
+     * This method will update the &#x60;VelocityMirrors&#x60; collection with &#x60;requestId&#x60;
+     * once the mirror is ready for use.
+     *
      * @method velocity/mirrors/request
      *
-     * @param {Object} options Options for the mirror.
-     * @param {String} options.framework The name of the calling framework
-     * @param {String} [options.fixtureFiles] Array of files with absolute paths
-     * @param {String} [options.port] String use a specific port
-     * @param {String} [options.requestId] Id for the mirror which may be used
-     *                                     to query the mirror info.
-     * @param {String} [options.rootUrl] Overrides the auto-generated 
-     *                 &#x60;&lt;protocol&gt;://&lt;host&gt;:&lt;port&gt;&#x60;. This is useful for 
-     *                 frameworks that need to customize the request parameters
-     *                 that velocity-ci uses.
+     * @param {Object} options                  Options for the mirror.
+     * @param {String} options.framework        The name of the calling framework
+     * @param {String} [options.fixtureFiles]   Array of files with absolute paths
+     * @param {String} [options.port]           String use a specific port
+     * @param {String} [options.requestId]      Id for the mirror that may be used to query the mirror for status info
+     * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the VelocityMirrors collection.
+     *                                          eg. &#x60;/?jasmine=true&#x60;
+     *                                          Request parameters that velocity-ci uses.
+     *
      * @return {String} The &#x60;requestId&#x60; that can be used to query the mirror
      */
     &#x27;velocity/mirrors/request&#x27;: function (options) {
@@ -518,16 +542,16 @@ Velocity = {};
         port: Match.Optional(Number),
         fixtureFiles: Match.Optional([String]),
         requestId: Match.Optional(String),
-        rootUrl: Match.Optional(String)
+        rootUrlPath: Match.Optional(String)
       });
       options.port = options.port || 5000;
       options.requestId = options.requestId || Random.id();
-      options.rootUrl = options.rootUrl || _getMirrorUrl(options.port);
 
-      DEBUG &amp;&amp; console.log(
-        &#x27;[velocity] Mirror requested&#x27;, options,
-        &#x27;requestId:&#x27;, options.requestId
-      );
+      var rootUrlPath = (options.rootUrlPath || &#x27;&#x27;).replace(/\//, &#x27;&#x27;)
+      options.rootUrl = _getMirrorUrl(options.port) + rootUrlPath;
+
+      DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror requested&#x27;, options,
+                           &#x27;requestId:&#x27;, options.requestId);
 
       _retryHttpGet(options.rootUrl, function (error, result) {
 
@@ -554,10 +578,9 @@ Velocity = {};
                                &#x27;non-200 response&#x27;, result);
         }
 
-
       });
 
-      // frameworks know a mirror is ready by observing VelocityMirrors for 
+      // frameworks know a mirror is ready by observing VelocityMirrors for
       // this requestId
       return options.requestId;
     },
@@ -571,6 +594,15 @@ Velocity = {};
      */
     &#x27;velocity/isMirror&#x27;: function () {
       return !!process.env.IS_MIRROR;
+    },
+
+    /**
+     * Syncs the mirror filesystem on an adhoc basis. Used by the core when file changes are detected.
+     *
+     * @method velocity/syncMirror
+     */
+    &#x27;velocity/syncMirror&#x27;: function () {
+      _syncMirror();
     }
 
   });  // end Meteor methods
@@ -638,7 +670,7 @@ Velocity = {};
             spawnMeteor();
           } else {
             console.error(&#x27;[velocity] Mirror: could not be started on port &#x27; + port + &#x27;.\n&#x27; +
-              &#x27;Please make sure that nothing else is using the port and then restart your app to try again.&#x27;);
+            &#x27;Please make sure that nothing else is using the port and then restart your app to try again.&#x27;);
           }
         }, 1000);
       };
@@ -681,6 +713,8 @@ Velocity = {};
       if (!error &amp;&amp; result.statusCode === 200) {
         DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror started at&#x27;, mirrorLocation, &#x27;with result:&#x27;, result);
         storeMirrorMetadata();
+        // do a final rsync in case the user changes any files whilst the mirror is starting up
+        _syncMirror();
       } else {
         console.error(&#x27;Mirror did not start correctly.&#x27;, error || result);
       }
@@ -701,10 +735,10 @@ Velocity = {};
    */
   function _reuseExistingMirror (options) {
     // if this is a request we&#x27;ve seen before
-    var existingMirror = VelocityMirrors.findOne({ framework: options.framework, port: options.port });
+    var existingMirror = VelocityMirrors.findOne({framework: options.framework, port: options.port});
     if (existingMirror) {
       // if we already have this mirror metadata, update it
-      VelocityMirrors.update(existingMirror._id, { $set: { requestId: options.requestId }});
+      VelocityMirrors.update(existingMirror._id, {$set: {requestId: options.requestId}});
     } else {
       // if this is a request we haven&#x27;t seen before, create a new metadata entry
       VelocityMirrors.insert({
@@ -790,7 +824,7 @@ Velocity = {};
     var doGet = function () {
       try {
         var res = HTTP.get(url);
-        callback(null, { statusCode: res.statusCode });
+        callback(null, {statusCode: res.statusCode});
       } catch (ex) {
 
         if (ex.message.indexOf(&#x27;ECONNREFUSED&#x27;) === -1) {
@@ -886,8 +920,8 @@ Velocity = {};
       // Since we key on filePath and we only add files we&#x27;re interested in,
       // we don&#x27;t have to worry about inadvertently updating records for files
       // we don&#x27;t care about.
-      VelocityFixtureFiles.update(filePath, { $set: {lastModified: Date.now()}});
-      VelocityTestFiles.update(filePath, { $set: {lastModified: Date.now()}});
+      VelocityFixtureFiles.update(filePath, {$set: {lastModified: Date.now()}});
+      VelocityTestFiles.update(filePath, {$set: {lastModified: Date.now()}});
     }));
 
     _watcher.on(&#x27;unlink&#x27;, Meteor.bindEnvironment(function (filePath) {
@@ -919,10 +953,10 @@ Velocity = {};
       _id: DEFAULT_FIXTURE_PATH,
       absolutePath: DEFAULT_FIXTURE_PATH
     });
-    var frameworksWithDisableAutoReset = _(config).where({ disableAutoReset: true }).pluck(&#x27;name&#x27;).value();
+    var frameworksWithDisableAutoReset = _(config).where({disableAutoReset: true}).pluck(&#x27;name&#x27;).value();
     DEBUG &amp;&amp; console.log(&#x27;[velocity] not resetting reports and logs for&#x27;, frameworksWithDisableAutoReset);
-    VelocityTestReports.remove({ framework: { $nin: frameworksWithDisableAutoReset } });
-    VelocityLogs.remove({ framework: { $nin: frameworksWithDisableAutoReset } });
+    VelocityTestReports.remove({framework: {$nin: frameworksWithDisableAutoReset}});
+    VelocityLogs.remove({framework: {$nin: frameworksWithDisableAutoReset}});
     VelocityAggregateReports.remove({});
     VelocityAggregateReports.insert({
       name: &#x27;aggregateResult&#x27;,
@@ -966,7 +1000,7 @@ Velocity = {};
       frameworkResult = failedResult ? &#x27;failed&#x27; : &#x27;passed&#x27;;
 
       // update the global status
-      VelocityAggregateReports.update({ &#x27;name&#x27;: &#x27;aggregateResult&#x27;}, {$set: {result: frameworkResult}});
+      VelocityAggregateReports.update({&#x27;name&#x27;: &#x27;aggregateResult&#x27;}, {$set: {result: frameworkResult}});
     }
 
     // if all test frameworks have completed, upsert an aggregate completed record

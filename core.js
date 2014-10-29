@@ -10,6 +10,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
  * @module Velocity
  */
 /**
+ * The `Velocity` object provides a common API for test frameworks to report
+ * test results.  Frameworks can also request assets, such as a copy of the
+ * user's application (the 'mirror') in which tests can be safely run without
+ * impacting on-going development.
+ *
+ * Test results and log activity are reported via 
+ * {{#crossLink "Meteor.methods"}}Meteor methods{{/crossLink}}.
+ *
  * @class Velocity
  */
 Velocity = {};
@@ -21,7 +29,9 @@ Velocity = {};
 // Init
 //
 
-  if (process.env.NODE_ENV !== 'development' || process.env.VELOCITY === '0' || process.env.IS_MIRROR) {
+  if (process.env.NODE_ENV !== 'development' ||
+      process.env.VELOCITY === '0' ||
+      process.env.IS_MIRROR) {
     DEBUG && console.log('Not adding velocity code');
     return;
   }
@@ -243,9 +253,9 @@ Velocity = {};
      *
      * @method velocity/logs/submit
      * @param {Object} options
-     * @param {String} options.framework
-     * @param {String} options.message
-     * @param {String} [options.level] Ex. 'error'. Default: 'info'
+     * @param {String} options.framework The name of the test framework
+     * @param {String} options.message The message to log
+     * @param {String} [options.level] Log level.  Ex. 'error'. Default: 'info'
      * @param {Date} [options.timestamp]
      */
     'velocity/logs/submit': function (options) {
@@ -294,7 +304,7 @@ Velocity = {};
      *                              ['Template', 'leaderboard', 'selected_name']
      * @param {Date} [data.timestamp] The time that the test started for this
      *                                result.
-     * @param {Number} [data.duration] The test duration milliseconds.
+     * @param {Number} [data.duration] The test duration in milliseconds.
      * @param {String} [data.browser] Which browser did the test run in?
      * @param {String} [data.failureType] For example, 'expect' or 'assert'
      * @param {String} [data.failureMessage]
@@ -330,15 +340,16 @@ Velocity = {};
      * their current test runs. Velocity uses this flag when running in CI mode.
      *
      * @method velocity/reports/completed
-     * @param {Object} data Required fields:
-     *                   framework - String  ex. 'jasmine-unit'
+     * @param {Object} data
+     * @param {String} data.framework Name of a test framework.  Ex. 'jasmine'
      */
     'velocity/reports/completed': function (data) {
       check(data, {
         framework: String
       });
 
-      VelocityAggregateReports.upsert({'name': data.framework}, {$set: {'result': 'completed'}});
+      VelocityAggregateReports.upsert({'name': data.framework},
+                                      {$set: {'result': 'completed'}});
       _updateAggregateReports();
     },  // end completed
 
@@ -353,7 +364,8 @@ Velocity = {};
      * @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
      */
     'velocity/copySampleTests': function (options) {
-      var samplesPath,
+      var sampleTests,
+          samplesPath,
           testsPath,
           command;
 
@@ -363,26 +375,36 @@ Velocity = {};
       });
 
       if (_config[options.framework].sampleTestGenerator) {
-        var sampleTests = _config[options.framework].sampleTestGenerator(options);
-        DEBUG && console.log('[velocity] found ', sampleTests.length, 'sample test files for', options.framework);
+
+        sampleTests = _config[options.framework].sampleTestGenerator(options);
+
+        DEBUG && console.log('[velocity] found ', sampleTests.length, 
+                             'sample test files for', options.framework);
+
         sampleTests.forEach(function (testFile) {
           var fullTestPath = path.join(Velocity.getTestsPath(), testFile.path);
           var testDir = path.dirname(fullTestPath);
           mkdirp.sync(testDir);
           fs.writeFileSync(fullTestPath, testFile.contents);
         });
+
       } else {
-        samplesPath = path.join(Velocity.getAppPath(), 'packages', options.framework, 'sample-tests');
+
+        samplesPath = path.join(Velocity.getAppPath(), 'packages',
+                                options.framework, 'sample-tests');
         testsPath = Velocity.getTestsPath();
 
-        DEBUG && console.log('[velocity] checking for sample tests in', path.join(samplesPath, '*'));
+        DEBUG && console.log('[velocity] checking for sample tests in',
+                              path.join(samplesPath, '*'));
 
         if (fs.existsSync(samplesPath)) {
           command = 'mkdir -p ' + testsPath + ' && ' +
-          'rsync -au ' + path.join(samplesPath, '*') +
-          ' ' + testsPath + path.sep;
+                    'rsync -au ' + path.join(samplesPath, '*') +
+                    ' ' + testsPath + path.sep;
 
-          DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
+          DEBUG && console.log('[velocity] copying sample tests (if any) ' +
+                               'for framework', options.framework, '-', 
+                               command);
 
           child_process.exec(command, Meteor.bindEnvironment(
             function copySampleTestsExecHandler (err, stdout, stderr) {
@@ -395,6 +417,7 @@ Velocity = {};
             'copySampleTestsExecHandler'
           ));
         }
+
       }
     },  // end copySampleTests
 
@@ -405,7 +428,7 @@ Velocity = {};
      *
      * This method will update the `VelocityMirrors` collection with `requestId`
      * once the mirror is ready for use.
-
+     *
      * @method velocity/mirrors/request
      *
      * @param {Object} options                  Options for the mirror.
@@ -430,13 +453,11 @@ Velocity = {};
       options.port = options.port || 5000;
       options.requestId = options.requestId || Random.id();
 
-      var rootUrlPath = options.rootUrlPath ? options.rootUrlPath.replace(/\//, '') : '';
+      var rootUrlPath = (options.rootUrlPath || '').replace(/\//, '')
       options.rootUrl = _getMirrorUrl(options.port) + rootUrlPath;
 
-      DEBUG && console.log(
-        '[velocity] Mirror requested', options,
-        'requestId:', options.requestId
-      );
+      DEBUG && console.log('[velocity] Mirror requested', options,
+                           'requestId:', options.requestId);
 
       _retryHttpGet(options.rootUrl, function (error, result) {
 
@@ -462,7 +483,6 @@ Velocity = {};
           DEBUG && console.log('[velocity] Mirror started but returned ' +
                                'non-200 response', result);
         }
-
 
       });
 
