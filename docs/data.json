@@ -267,7 +267,7 @@
         {
             "file": "core.js",
             "line": 220,
-            "description": "Meteor method: velocity/reports/submit \n\nRecord the results of a test run; a simple collector of test data.\n\nThe `data` object is stored in its entirety; any field may be passed in.\nThe optional fields documented here are suggestions based on what the\nstandard html-reporter supports.  Whether or not a field is actually\nused is up to the specific test reporter that the user has installed.",
+            "description": "Meteor method: velocity/reports/submit \n\nRecord the results of an individual test run; a simple collector of \ntest data.\n\nThe `data` object is stored in its entirety; any field may be passed in.\nThe optional fields documented here are suggestions based on what the\nstandard html-reporter supports.  Whether or not a field is actually\nused is up to the specific test reporter that the user has installed.",
             "itemtype": "method",
             "name": "velocity/reports/submit",
             "params": [
@@ -278,7 +278,7 @@
                     "props": [
                         {
                             "name": "name",
-                            "description": "",
+                            "description": "Name of the test that was executed.",
                             "type": "String"
                         },
                         {
@@ -347,7 +347,7 @@
         },
         {
             "file": "core.js",
-            "line": 279,
+            "line": 280,
             "description": "Meteor method: velocity/reports/completed\nFrameworks must call this method to inform Velocity they have completed\ntheir current test runs. Velocity uses this flag when running in CI mode.",
             "itemtype": "method",
             "name": "velocity/reports/completed",
@@ -363,7 +363,7 @@
         },
         {
             "file": "core.js",
-            "line": 297,
+            "line": 298,
             "description": "Meteor method: velocity/copySampleTests\nCopy sample tests from frameworks `sample-tests` directories\nto user's `app/tests` directory.",
             "itemtype": "method",
             "name": "velocity/copySampleTests",
@@ -379,7 +379,7 @@
         },
         {
             "file": "core.js",
-            "line": 352,
+            "line": 353,
             "description": "Meteor method: velocity/mirrors/request\nStarts a new mirror if it has not already been started, and reuses an existing one if it is already started.\nThis method will return a requestId. Frameworks need to observe the VelocityMirrors collection for a document for\n{requestId: requestId} to know when the mirror is ready.",
             "itemtype": "method",
             "name": "velocity/mirrors/request",
@@ -429,7 +429,7 @@
         },
         {
             "file": "core.js",
-            "line": 415,
+            "line": 416,
             "description": "Meteor method: velocity/isMirror\nExposes the IS_MIRROR flag to clients",
             "itemtype": "method",
             "name": "velocity/isMirror",
@@ -438,7 +438,7 @@
         },
         {
             "file": "core.js",
-            "line": 432,
+            "line": 433,
             "description": "Starts a mirror and copies any specified fixture files into the mirror.",
             "itemtype": "method",
             "name": "velocityStartMirror",
@@ -456,7 +456,7 @@
         },
         {
             "file": "core.js",
-            "line": 537,
+            "line": 538,
             "description": "Reuses a mirror is it has already been started and updated the VelocityMirrors collection",
             "itemtype": "method",
             "name": "_reuseExistingMirror",
@@ -474,7 +474,7 @@
         },
         {
             "file": "core.js",
-            "line": 570,
+            "line": 571,
             "description": "Returns the MongoDB URL for the given database.",
             "params": [
                 {
@@ -493,7 +493,7 @@
         },
         {
             "file": "core.js",
-            "line": 587,
+            "line": 588,
             "description": "Return URL for the mirror with the given port.",
             "params": [
                 {
@@ -512,7 +512,7 @@
         },
         {
             "file": "core.js",
-            "line": 604,
+            "line": 605,
             "description": "Add fixtures to the database.",
             "params": [
                 {
@@ -527,7 +527,7 @@
         },
         {
             "file": "core.js",
-            "line": 618,
+            "line": 619,
             "description": "Performs a http get and retries the specified number of times with the specified timeouts.\n Uses a future to respond and the future return object can be provided.",
             "itemtype": "method",
             "name": "_retryHttpGet",
@@ -551,7 +551,7 @@
         },
         {
             "file": "core.js",
-            "line": 671,
+            "line": 672,
             "description": "Initialize the directory/file watcher.",
             "itemtype": "method",
             "name": "_initWatcher",
@@ -569,7 +569,7 @@
         },
         {
             "file": "core.js",
-            "line": 750,
+            "line": 751,
             "description": "Re-init file watcher and clear all test results.",
             "itemtype": "method",
             "name": "_reset",
@@ -587,7 +587,7 @@
         },
         {
             "file": "core.js",
-            "line": 795,
+            "line": 796,
             "description": "If any one test has failed, mark the aggregate test result as failed.",
             "itemtype": "method",
             "name": "_updateAggregateReports",
@@ -598,7 +598,7 @@
         },
         {
             "file": "core.js",
-            "line": 838,
+            "line": 839,
             "description": "Creates a physical mirror of the application under .meteor/local/.mirror\n\n    - Any files with the pattern tests/.*  are not copied, this stops .report\n    directory from also being copied.\n\n    TODO - Strips out velocity and reporters from the mirror's .meteor/packages file",
             "itemtype": "method",
             "name": "_syncMirror",
@@ -615,7 +615,7 @@
         },
         {
             "file": "core.js",
-            "line": 893,
+            "line": 894,
             "description": "Checks if the user has a local packages directory, if so it ensures it's symlinked in the mirror.\nThe reason this is needed is because the standard rsync will copy a the packages dir and not respect\nthe symlinks inside it.",
             "itemtype": "method",
             "name": "_symlinkPackagesDirIfPresent",
@@ -654,11 +654,11 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " core.js:570"
+            "line": " core.js:571"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " core.js:587"
+            "line": " core.js:588"
         },
         {
             "message": "Missing item type\nCopied from Meteor tools/files.js.\n\nIncludes:\n- Helper to find the app root path",
@@ -670,15 +670,15 @@
         },
         {
             "message": "Missing item type\nReturns the MongoDB URL for the given database.",
-            "line": " core.js:570"
+            "line": " core.js:571"
         },
         {
             "message": "Missing item type\nReturn URL for the mirror with the given port.",
-            "line": " core.js:587"
+            "line": " core.js:588"
         },
         {
             "message": "Missing item type\nAdd fixtures to the database.",
-            "line": " core.js:604"
+            "line": " core.js:605"
         }
     ]
 }

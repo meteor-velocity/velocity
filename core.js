@@ -220,7 +220,8 @@ Velocity = {};
     /**
      * Meteor method: velocity/reports/submit 
      *
-     * Record the results of a test run; a simple collector of test data.
+     * Record the results of an individual test run; a simple collector of 
+     * test data.
      *
      * The `data` object is stored in its entirety; any field may be passed in.
      * The optional fields documented here are suggestions based on what the
@@ -229,7 +230,7 @@ Velocity = {};
      *
      * @method velocity/reports/submit 
      * @param {Object} data
-     * @param {String} data.name
+     * @param {String} data.name Name of the test that was executed.
      * @param {String} data.framework Name of a testing framework.
      *                                For example, 'jasmine' or 'mocha'.
      * @param {String} data.result The results of the test.  Standard values 
