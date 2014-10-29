@@ -399,17 +399,21 @@ Velocity = {};
      * Starts a new mirror if it has not already been started, and reuses an
      * existing one if it is already started.
      *
+     * This method will update the `VelocityMirrors` collection with `requestId`
+     * once the mirror is ready for use.
+
      * @method velocity/mirrors/request
      *
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
      * @param {String} [options.fixtureFiles]   Array of files with absolute paths
      * @param {String} [options.port]           String use a specific port
-     * @param {String} [options.requestId]      Id for the mirror that is used to query the mirror info
-     * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the VelocityMirrors collection. eg. /?jasmine=true
-     *                                          request parameters that velocity-ci uses
+     * @param {String} [options.requestId]      Id for the mirror that may be used to query the mirror for status info
+     * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the VelocityMirrors collection.
+     *                                          eg. `/?jasmine=true`
+     *                                          Request parameters that velocity-ci uses.
      *
-     * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
+     * @return {String} The `requestId` that can be used to query the mirror
      */
     'velocity/mirrors/request': function (options) {
       check(options, {
