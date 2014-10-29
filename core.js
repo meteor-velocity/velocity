@@ -423,6 +423,16 @@ Velocity = {};
      */
     'velocity/isMirror': function () {
       return !!process.env.IS_MIRROR;
+    },
+
+    /**
+     * Meteor method: velocity/syncMirror
+     *
+     *
+     * @method velocity/syncMirror
+     */
+    'velocity/syncMirror': function () {
+      _syncMirror();
     }
 
   });  // end Meteor methods
@@ -530,6 +540,8 @@ Velocity = {};
       if (!error && result.statusCode === 200) {
         DEBUG && console.log('[velocity] Mirror started at', mirrorLocation, 'with result:', result);
         storeMirrorMetadata();
+        // do a final rsync in case the user changes any files whilst the mirror is starting up
+        _syncMirror();
       } else {
         console.error('Mirror did not start correctly.', error || result);
       }
