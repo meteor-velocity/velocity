@@ -218,9 +218,9 @@ Velocity = {};
     },
 
     /**
-     * Meteor method: velocity/reports/submit 
+     * Meteor method: velocity/reports/submit
      *
-     * Record the results of an individual test run; a simple collector of 
+     * Record the results of an individual test run; a simple collector of
      * test data.
      *
      * The `data` object is stored in its entirety; any field may be passed in.
@@ -228,12 +228,12 @@ Velocity = {};
      * standard html-reporter supports.  Whether or not a field is actually
      * used is up to the specific test reporter that the user has installed.
      *
-     * @method velocity/reports/submit 
+     * @method velocity/reports/submit
      * @param {Object} data
      * @param {String} data.name Name of the test that was executed.
      * @param {String} data.framework Name of a testing framework.
      *                                For example, 'jasmine' or 'mocha'.
-     * @param {String} data.result The results of the test.  Standard values 
+     * @param {String} data.result The results of the test.  Standard values
      *                             are 'passed' and 'failed'.  Different test
      *                             reporters can support other values.  For
      *                             example, the aggregate tests collection uses
@@ -270,7 +270,7 @@ Velocity = {};
       }));
 
       data.timestamp = data.timestamp || new Date();
-      data.id = data.id || Meteor.uuid()
+      data.id = data.id || Meteor.uuid();
 
       VelocityTestReports.upsert(data.id, {$set: data});
 
