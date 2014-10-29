@@ -162,7 +162,7 @@ Velocity = {};
         query.framework = options.framework;
       }
       if (options.notIn) {
-        query = _.assign(query, {_id: {$nin: options.notIn }});
+        query = _.assign(query, {_id: {$nin: options.notIn}});
       }
       VelocityTestReports.remove(query);
       _updateAggregateReports();
@@ -317,8 +317,8 @@ Velocity = {};
 
         if (fs.existsSync(samplesPath)) {
           command = 'mkdir -p ' + testsPath + ' && ' +
-            'rsync -au ' + path.join(samplesPath, '*') +
-            ' ' + testsPath + path.sep;
+          'rsync -au ' + path.join(samplesPath, '*') +
+          ' ' + testsPath + path.sep;
 
           DEBUG && console.log('[velocity] copying sample tests (if any) for framework', options.framework, '-', command);
 
@@ -349,7 +349,7 @@ Velocity = {};
      * @param {String} [options.fixtureFiles]   Array of files with absolute paths
      * @param {String} [options.port]           String use a specific port
      * @param {String} [options.requestId]      Id for the mirror that is used to query the mirror info
-     * @param {String} [options.rootUrl]        Overrides the auto-generated <protocol>://<host>:<port>. This is useful for frameworks that need to customize the
+     * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the VelocityMirrors collection. eg. /?jasmine=true
      *                                          request parameters that velocity-ci uses
      *
      * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
@@ -360,11 +360,13 @@ Velocity = {};
         port: Match.Optional(Number),
         fixtureFiles: Match.Optional([String]),
         requestId: Match.Optional(String),
-        rootUrl: Match.Optional(String)
+        rootUrlPath: Match.Optional(String)
       });
       options.port = options.port || 5000;
       options.requestId = options.requestId || Random.id();
-      options.rootUrl = options.rootUrl || _getMirrorUrl(options.port);
+
+      var rootUrlPath = options.rootUrlPath ? options.rootUrlPath.replace(/\//, '') : '';
+      options.rootUrl = _getMirrorUrl(options.port) + rootUrlPath;
 
       DEBUG && console.log(
         '[velocity] Mirror requested', options,
@@ -471,7 +473,7 @@ Velocity = {};
             spawnMeteor();
           } else {
             console.error('[velocity] Mirror: could not be started on port ' + port + '.\n' +
-              'Please make sure that nothing else is using the port and then restart your app to try again.');
+            'Please make sure that nothing else is using the port and then restart your app to try again.');
           }
         }, 1000);
       };
@@ -534,10 +536,10 @@ Velocity = {};
    */
   function _reuseExistingMirror (options) {
     // if this is a request we've seen before
-    var existingMirror = VelocityMirrors.findOne({ framework: options.framework, port: options.port });
+    var existingMirror = VelocityMirrors.findOne({framework: options.framework, port: options.port});
     if (existingMirror) {
       // if we already have this mirror metadata, update it
-      VelocityMirrors.update(existingMirror._id, { $set: { requestId: options.requestId }});
+      VelocityMirrors.update(existingMirror._id, {$set: {requestId: options.requestId}});
     } else {
       // if this is a request we haven't seen before, create a new metadata entry
       VelocityMirrors.insert({
@@ -623,7 +625,7 @@ Velocity = {};
     var doGet = function () {
       try {
         var res = HTTP.get(url);
-        callback(null, { statusCode: res.statusCode });
+        callback(null, {statusCode: res.statusCode});
       } catch (ex) {
 
         if (ex.message.indexOf('ECONNREFUSED') === -1) {
@@ -730,8 +732,8 @@ Velocity = {};
       // Since we key on filePath and we only add files we're interested in,
       // we don't have to worry about inadvertently updating records for files
       // we don't care about.
-      VelocityFixtureFiles.update(filePath, { $set: {lastModified: Date.now()}});
-      VelocityTestFiles.update(filePath, { $set: {lastModified: Date.now()}});
+      VelocityFixtureFiles.update(filePath, {$set: {lastModified: Date.now()}});
+      VelocityTestFiles.update(filePath, {$set: {lastModified: Date.now()}});
     }));
 
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
@@ -763,10 +765,10 @@ Velocity = {};
       _id: DEFAULT_FIXTURE_PATH,
       absolutePath: DEFAULT_FIXTURE_PATH
     });
-    var frameworksWithDisableAutoReset = _(config).where({ disableAutoReset: true }).pluck('name').value();
+    var frameworksWithDisableAutoReset = _(config).where({disableAutoReset: true}).pluck('name').value();
     DEBUG && console.log('[velocity] not resetting reports and logs for', frameworksWithDisableAutoReset);
-    VelocityTestReports.remove({ framework: { $nin: frameworksWithDisableAutoReset } });
-    VelocityLogs.remove({ framework: { $nin: frameworksWithDisableAutoReset } });
+    VelocityTestReports.remove({framework: {$nin: frameworksWithDisableAutoReset}});
+    VelocityLogs.remove({framework: {$nin: frameworksWithDisableAutoReset}});
     VelocityAggregateReports.remove({});
     VelocityAggregateReports.insert({
       name: 'aggregateResult',
@@ -810,7 +812,7 @@ Velocity = {};
       frameworkResult = failedResult ? 'failed' : 'passed';
 
       // update the global status
-      VelocityAggregateReports.update({ 'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
+      VelocityAggregateReports.update({'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
     }
 
     // if all test frameworks have completed, upsert an aggregate completed record
