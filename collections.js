@@ -36,14 +36,14 @@ VelocityMirrors = new Meteor.Collection('velocityMirrors');
     Meteor.publish('VelocityMirrors', function () {
       return VelocityMirrors.find({});
     });
+  }
 
-    if (Meteor.isClient) {
-      Meteor.subscribe('VelocityTestFiles');
-      Meteor.subscribe('VelocityFixtureFiles');
-      Meteor.subscribe('VelocityTestReports');
-      Meteor.subscribe('VelocityAggregateReports');
-      Meteor.subscribe('VelocityLogs');
-      Meteor.subscribe('VelocityMirrors');
-    }
+  if (Meteor.isClient) {
+    Meteor.subscribe('VelocityTestFiles');
+    Meteor.subscribe('VelocityFixtureFiles');
+    Meteor.subscribe('VelocityTestReports');
+    Meteor.subscribe('VelocityAggregateReports');
+    Meteor.subscribe('VelocityLogs');
+    Meteor.subscribe('VelocityMirrors');
   }
 })();
