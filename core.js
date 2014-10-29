@@ -188,13 +188,12 @@ Velocity = {};
      * Clear all test results.
      *
      * @method velocity/reports/reset
-     * @param {Object} [options] Optional, specify specific framework to clear
-     *                 and/or define a list of tests to keep.
-     *                 ex.
-     *                 {
-     *                   framework: 'jasmine-unit',
-     *                   notIn: ['tests/auth-jasmine-unit.js']
-     *                 }
+     * @param {Object} [options]
+     * @param {String} [options.framework] The name of a specific framework
+     *                  to clear results for.  Ex. 'jasmine' or 'mocha'
+     * @param {Array} [options.notIn] A list of test Ids which should be kept
+     *                                (not cleared).  These Ids must match the
+     *                                ones passed to `velocity/reports/submit`.
      */
     'velocity/reports/reset': function (options) {
       options = options || {};
@@ -214,11 +213,14 @@ Velocity = {};
       _updateAggregateReports();
     },
 
+
     /**
-     * Clear all log entried.
+     * Clear all log entries.
      *
      * @method velocity/logs/reset
-     * @param {Object} [options] Optional, specify specific framework to clear
+     * @param {Object} [options]
+     * @param {String} [options.framework] The name of a specific framework
+     *                                     to clear logs for.
      */
     'velocity/logs/reset': function (options) {
       options = options || {};
@@ -233,33 +235,35 @@ Velocity = {};
       VelocityLogs.remove(query);
     },
 
+
     /**
-     * Log a method to the central Velocity log store.
+     * Log a message to the Velocity log store.  This provides a central
+     * location for different reporters to query for test framework log 
+     * entries.
      *
      * @method velocity/logs/submit
-     * @param {Object} options Required parameters:
-     *                   type - String
-     *                   message - String
-     *                   framework - String  ex. 'jasmine-unit'
-     *
-     *                 Optional parameters:
-     *                   timestamp - Date
+     * @param {Object} options
+     * @param {String} options.framework
+     * @param {String} options.message
+     * @param {String} [options.level] Ex. 'error'. Default: 'info'
+     * @param {Date} [options.timestamp]
      */
     'velocity/logs/submit': function (options) {
       check(options, {
-        type: String,
-        message: String,
         framework: String,
+        message: String,
+        level: Match.Optional(String),
         timestamp: Match.Optional(Match.OneOf(Date, String))
       });
 
       VelocityLogs.insert({
         timestamp: options.timestamp || new Date(),
-        type: options.type,
+        level: options.level || 'info',
         message: options.message,
         framework: options.framework
       });
     },
+
 
     /**
      * Record the results of an individual test run; a simple collector of 
