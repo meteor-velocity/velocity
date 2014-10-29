@@ -20,28 +20,34 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
+
+  var SERVER = 'server',
+      CLIENT = 'client',
+      BOTH = [CLIENT, SERVER];
+
   api.versionsFrom('METEOR@1.0');
   api.use('mongo');
   api.use('check');
   api.use('http');
   api.use('retry');
 
-  api.add_files('collections.js', ['client', 'server']);
+  api.add_files('collections.js', BOTH);
 
-  api.export('Velocity', ['client', 'server']);
-  api.export('VelocityTestFiles', ['client', 'server']);
-  api.export('VelocityFixtureFiles', ['client', 'server']);
-  api.export('VelocityTestReports', ['client', 'server']);
-  api.export('VelocityAggregateReports', ['client', 'server']);
-  api.export('VelocityLogs', ['client', 'server']);
-  api.export('VelocityMirrors', ['client', 'server']);
+  api.export('Velocity', BOTH);
+  api.export('VelocityTestFiles', BOTH);
+  api.export('VelocityFixtureFiles', BOTH);
+  api.export('VelocityTestReports', BOTH);
+  api.export('VelocityAggregateReports', BOTH);
+  api.export('VelocityLogs', BOTH);
+  api.export('VelocityMirrors', BOTH);
 
-  api.add_files('lib/meteor/files.js', 'server');
-  api.add_files('core.js', 'server');
-  api.add_files(['lib/FileCopier.js'], 'server');
+  api.add_files('lib/meteor/files.js', SERVER);
+  api.add_files('core.js', SERVER);
+  api.add_files(['lib/FileCopier.js'], SERVER);
+  api.add_files('clientFileSync.js', CLIENT);
 
   // Assets
   api.add_files([
     'default-fixture.js'
-  ], 'server', {isAsset: true});
+  ], SERVER, {isAsset: true});
 });

@@ -90,7 +90,7 @@ Velocity = {};
     },
 
     /**
-     * Get path to application's 'tests' directory 
+     * Get path to application's 'tests' directory
      *
      * @method getTestsPath
      * @return {String} application's tests directory
@@ -266,7 +266,7 @@ Velocity = {};
 
 
     /**
-     * Record the results of an individual test run; a simple collector of 
+     * Record the results of an individual test run; a simple collector of
      * test data.
      *
      * The `data` object is stored in its entirety; any field may be passed in.
@@ -274,20 +274,20 @@ Velocity = {};
      * standard html-reporter supports.  Whether or not a field is actually
      * used is up to the specific test reporter that the user has installed.
      *
-     * @method velocity/reports/submit 
+     * @method velocity/reports/submit
      * @param {Object} data
      * @param {String} data.name Name of the test that was executed.
      * @param {String} data.framework Name of a testing framework.
      *                                For example, 'jasmine' or 'mocha'.
-     * @param {String} data.result The results of the test.  Standard values 
+     * @param {String} data.result The results of the test.  Standard values
      *                             are 'passed' and 'failed'.  Different test
      *                             reporters can support other values.  For
      *                             example, the aggregate tests collection uses
      *                             'pending' to indicate that results are still
      *                             coming in.
      * @param {String} [data.id] Used to update a specific test result.  If not
-     *                           provided, frameworks can use the 
-     *                           `velocity/reports/reset` Meteor method to 
+     *                           provided, frameworks can use the
+     *                           `velocity/reports/reset` Meteor method to
      *                           clear all tests.
      * @param {Array} [data.ancestors] The hierarchy of suites and blocks above
      *                                 this test. For example,
@@ -317,7 +317,7 @@ Velocity = {};
       }));
 
       data.timestamp = data.timestamp || new Date();
-      data.id = data.id || Random.id()
+      data.id = data.id || Random.id();
 
       VelocityTestReports.upsert(data.id, {$set: data});
 
@@ -466,7 +466,7 @@ Velocity = {};
 
       });
 
-      // frameworks know a mirror is ready by observing VelocityMirrors for 
+      // frameworks know a mirror is ready by observing VelocityMirrors for
       // this requestId
       return options.requestId;
     },
@@ -480,6 +480,15 @@ Velocity = {};
      */
     'velocity/isMirror': function () {
       return !!process.env.IS_MIRROR;
+    },
+
+    /**
+     * Syncs the mirror filesystem on an adhoc basis. Used by the core when file changes are detected.
+     *
+     * @method velocity/syncMirror
+     */
+    'velocity/syncMirror': function () {
+      _syncMirror();
     }
 
   });  // end Meteor methods
@@ -590,6 +599,8 @@ Velocity = {};
       if (!error && result.statusCode === 200) {
         DEBUG && console.log('[velocity] Mirror started at', mirrorLocation, 'with result:', result);
         storeMirrorMetadata();
+        // do a final rsync in case the user changes any files whilst the mirror is starting up
+        _syncMirror();
       } else {
         console.error('Mirror did not start correctly.', error || result);
       }
