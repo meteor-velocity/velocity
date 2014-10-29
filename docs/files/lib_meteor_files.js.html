@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>default-fixture.js - Velocity</title>
+    <title>lib/meteor/files.js - Velocity</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
     <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
@@ -86,86 +86,66 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1 class="file-heading">File: default-fixture.js</h1>
+                        <h1 class="file-heading">File: lib/meteor/files.js</h1>
 
 <div class="file">
     <pre class="code prettyprint linenums">
-/*jshint -W117, -W030 */
+/**
+ * Copied from Meteor tools/files.js.
+ *
+ * Includes:
+ * - Helper to find the app root path
+ */
 
-(function () {
-  &#x27;use strict&#x27;;
+var path = Npm.require(&#x27;path&#x27;);
+var fs = Npm.require(&#x27;fs&#x27;);
 
-  if (Meteor.isServer) {
-
-//////////////////////////////////////////////////////////////////////
-// Meteor Methods
+// given a predicate function and a starting path, traverse upwards
+// from the path until we find a path that satisfies the predicate.
 //
-
-    var Future;
-    Meteor.startup(function () {
-      Future = Npm.require(&#x27;fibers/future&#x27;);
-    });
-
-    Meteor.methods({
-
-      /**
-       * Meteor method: velocity/isMirror
-       * Exposes the IS_MIRROR flag to mirror clients
-       *
-       * @method velocity/isMirror
-       */
-      &#x27;velocity/isMirror&#x27;: function () {
-        return !!process.env.IS_MIRROR;
-      },
-
-      /**
-       * Meteor method: velocity/resetDatabase
-       * This truncate all collections in the app by using the native mongo object and calling collection.remove()
-       *
-       * @method velocity/resetDatabase
-       */
-      &#x27;velocity/resetDatabase&#x27;: function () {
-
-        // safety check
-        if (!process.env.IS_MIRROR) {
-          console.err(&#x27;[velocity] velocityReset is not allowed outside of a mirror. Something has gone wrong.&#x27;, Velocity.getReportGithubIssueMessage());
-          return false;
-        }
-
-        var fut = new Future();
-
-        var collectionsRemoved = 0;
-        var db = VelocityLogs.find()._mongo.db;
-        db.collections(function (err, collections) {
-
-          var appCollections = _.reject(collections, function (col) {
-            return col.collectionName.indexOf(&#x27;velocity&#x27;) === 0 || col.collectionName === &#x27;system.indexes&#x27;;
-          });
-
-          _.each(appCollections, function (appCollection) {
-            appCollection.remove(function (e) {
-              if (e) {
-                fut.return(&#x27;fail: &#x27; + e);
-              }
-              collectionsRemoved++;
-              if (appCollections.length === collectionsRemoved) {
-                fut[&#x27;return&#x27;](&#x27;success&#x27;);
-              }
-            });
-          });
-
-        });
-
-        return fut.wait();
-
-      } // end velocityResetDatabase
-
-    });
-
+// returns either the path to the lowest level directory that passed
+// the test or null for none found. if starting path isn&#x27;t given, use
+// cwd.
+var findUpwards = function (predicate, startPath) {
+  var testDir = startPath || process.cwd();
+  while (testDir) {
+    if (predicate(testDir)) {
+      break;
+    }
+    var newDir = path.dirname(testDir);
+    if (newDir === testDir) {
+      testDir = null;
+    } else {
+      testDir = newDir;
+    }
   }
+  if (!testDir)
+    return null;
 
+  return testDir;
+};
 
-})();
+// Determine if &#x27;filepath&#x27; (a path, or omit for cwd) is within an app
+// directory. If so, return the top-level app directory.
+findAppDir = function (filepath) {
+  var isAppDir = function (filepath) {
+    // XXX once we are done with the transition to engine, this should
+    // change to: &#x60;return fs.existsSync(path.join(filepath, &#x27;.meteor&#x27;,
+    // &#x27;release&#x27;))&#x60;
+
+    // .meteor/packages can be a directory, if .meteor is a warehouse
+    // directory.  since installing meteor initializes a warehouse at
+    // $HOME/.meteor, we want to make sure your home directory (and all
+    // subdirectories therein) don&#x27;t count as being within a meteor app.
+    try { // use try/catch to avoid the additional syscall to fs.existsSync
+      return fs.statSync(path.join(filepath, &#x27;.meteor&#x27;, &#x27;packages&#x27;)).isFile();
+    } catch (e) {
+      return false;
+    }
+  };
+
+  return findUpwards(isAppDir, filepath);
+};
 
     </pre>
 </div>
