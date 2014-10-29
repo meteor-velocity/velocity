@@ -503,7 +503,8 @@ Velocity = {};
     },
 
     /**
-     * Syncs the mirror filesystem on an adhoc basis. Used by the core when file changes are detected.
+     * Syncs the mirror filesystem on an adhoc basis.
+     * Used by the core when file changes are detected.
      *
      * @method velocity/syncMirror
      */
