@@ -5,6 +5,7 @@
  */
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
+
 /**
  * @module Velocity
  */
@@ -68,30 +69,70 @@ Velocity = {};
 
   _.extend(Velocity, {
 
+    /**
+     * Get application directory path.
+     *
+     * @method getAppPath
+     * @return {String} app directory path
+     */
     getAppPath: function () {
       return findAppDir();
     },
 
+    /**
+     * Get path to directory of the 'mirror' application.
+     *
+     * @method getMirrorPath
+     * @return {String} mirror directory path
+     */
     getMirrorPath: function () {
       return path.join(Velocity.getAppPath(), '.meteor', 'local', '.mirror');
     },
 
+    /**
+     * Get path to application's 'tests' directory
+     *
+     * @method getTestsPath
+     * @return {String} application's tests directory
+     */
     getTestsPath: function () {
       return path.join(Velocity.getAppPath(), 'tests');
     },
 
+    /**
+     * Add a callback which will execute when the mirror application
+     * is sync'ed up with latest application code.  Preprocessors will
+     * execute before fixtures are added.
+     *
+     * @method addPreProcessor
+     * @param {Function} preprocessor
+     */
     addPreProcessor: function (preProcessor) {
       _preProcessors.push(preProcessor);
     },
 
+    /**
+     * Add a callback which will execute after all tests have completed
+     * and after the aggregate test results have been reported.
+     *
+     * @method addPostProcessor
+     * @param {Function} reporter
+     */
     addPostProcessor: function (reporter) {
       _postProcessors.push(reporter);
     },
 
+    /**
+     * Get a message that displays where bugs in Velocity core itself should
+     * be reported.
+     *
+     * @method getReportGithubIssueMessage
+     * @return {String} message with bug repo url
+     */
     getReportGithubIssueMessage: function () {
-      return 'Please report the issue here: https://github.com/xolvio/velocity/issues';
+      return 'Please report the issue here: ' +
+             'https://github.com/meteor-velocity/velocity/issues';
     }
-
   });
 
   if (Meteor.isServer) {
@@ -121,14 +162,20 @@ Velocity = {};
     });
   }
 
+
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
 //
 
+  /**
+   * Most communication with Velocity core is done via the following
+   * Meteor methods.
+   *
+   * @class Meteor.methods
+   */
   Meteor.methods({
 
     /**
-     * Meteor method: velocity/reset
      * Re-init file watcher and clear all test results.
      *
      * @method velocity/reset
@@ -138,7 +185,6 @@ Velocity = {};
     },
 
     /**
-     * Meteor method: velocity/reports/reset
      * Clear all test results.
      *
      * @method velocity/reports/reset
@@ -169,7 +215,6 @@ Velocity = {};
     },
 
     /**
-     * Meteor method: velocity/logs/reset
      * Clear all log entried.
      *
      * @method velocity/logs/reset
@@ -189,7 +234,6 @@ Velocity = {};
     },
 
     /**
-     * Meteor method: velocity/logs/submit
      * Log a method to the central Velocity log store.
      *
      * @method velocity/logs/submit
@@ -218,8 +262,6 @@ Velocity = {};
     },
 
     /**
-     * Meteor method: velocity/reports/submit
-     *
      * Record the results of an individual test run; a simple collector of
      * test data.
      *
@@ -240,8 +282,9 @@ Velocity = {};
      *                             'pending' to indicate that results are still
      *                             coming in.
      * @param {String} [data.id] Used to update a specific test result.  If not
-     *                           provided, frameworks can use the 'resetReports'
-     *                           Meteor method to clear all tests.
+     *                           provided, frameworks can use the
+     *                           `velocity/reports/reset` Meteor method to
+     *                           clear all tests.
      * @param {Array} [data.ancestors] The hierarchy of suites and blocks above
      *                                 this test. For example,
      *                              ['Template', 'leaderboard', 'selected_name']
@@ -270,15 +313,15 @@ Velocity = {};
       }));
 
       data.timestamp = data.timestamp || new Date();
-      data.id = data.id || Meteor.uuid();
+      data.id = data.id || Random.id();
 
       VelocityTestReports.upsert(data.id, {$set: data});
 
       _updateAggregateReports();
     },  // end postResult
 
+
     /**
-     * Meteor method: velocity/reports/completed
      * Frameworks must call this method to inform Velocity they have completed
      * their current test runs. Velocity uses this flag when running in CI mode.
      *
@@ -295,14 +338,15 @@ Velocity = {};
       _updateAggregateReports();
     },  // end completed
 
+
     /**
-     * Meteor method: velocity/copySampleTests
      * Copy sample tests from frameworks `sample-tests` directories
-     * to user's `app/tests` directory.
+     * to the user's application's `tests` directory.
      *
      * @method velocity/copySampleTests
+     *
      * @param {Object} options
-     *     ex. {framework: 'jasmine-unit'}
+     * @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
      */
     'velocity/copySampleTests': function (options) {
       var samplesPath,
@@ -350,23 +394,26 @@ Velocity = {};
       }
     },  // end copySampleTests
 
+
     /**
-     * Meteor method: velocity/mirrors/request
-     * Starts a new mirror if it has not already been started, and reuses an existing one if it is already started.
-     * This method will return a requestId. Frameworks need to observe the VelocityMirrors collection for a document for
-     * {requestId: requestId} to know when the mirror is ready.
+     * Starts a new mirror if it has not already been started, and reuses an
+     * existing one if it is already started.
      *
+     * This method will update the `VelocityMirrors` collection with `requestId`
+     * once the mirror is ready for use.
+
      * @method velocity/mirrors/request
      *
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
      * @param {String} [options.fixtureFiles]   Array of files with absolute paths
      * @param {String} [options.port]           String use a specific port
-     * @param {String} [options.requestId]      Id for the mirror that is used to query the mirror info
-     * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the VelocityMirrors collection. eg. /?jasmine=true
-     *                                          request parameters that velocity-ci uses
+     * @param {String} [options.requestId]      Id for the mirror that may be used to query the mirror for status info
+     * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the VelocityMirrors collection.
+     *                                          eg. `/?jasmine=true`
+     *                                          Request parameters that velocity-ci uses.
      *
-     * @return requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use
+     * @return {String} The `requestId` that can be used to query the mirror
      */
     'velocity/mirrors/request': function (options) {
       check(options, {
@@ -391,43 +438,48 @@ Velocity = {};
 
         // if this mirror already been started, reuse it
         if (!error && result.statusCode === 200) {
-          DEBUG && console.log('[velocity] Requested mirror already exists. Reusing...');
+          DEBUG && console.log('[velocity] Requested mirror already exists. ' +
+                               'Reusing...');
           _reuseExistingMirror(options);
         }
 
         // if the mirror not been started at all, start a new one
         if (error && error.indexOf('ECONNREFUSED') !== -1) {
-          DEBUG && console.log('[velocity] Requested mirror not started. Starting...');
+          DEBUG && console.log('[velocity] Requested mirror not started. ' +
+                               'Starting...');
           _velocityStartMirror(options);
         }
 
-        // if a mirror exists but is failing for some other reason, let the user know why in the console
+        // if a mirror exists but is failing for some other reason, let the
+        // user know why in the console
         if (error && error.indexOf('ECONNREFUSED') === -1) {
           DEBUG && console.log('[velocity] Mirror could not start', error);
         } else if (!error && result.statusCode !== 200) {
-          DEBUG && console.log('[velocity] Mirror started but returnd non-200 response', result);
+          DEBUG && console.log('[velocity] Mirror started but returned ' +
+                               'non-200 response', result);
         }
 
 
       });
 
-      // frameworks know a mirror is ready by observing VelocityMirrors for this requestId
+      // frameworks know a mirror is ready by observing VelocityMirrors for
+      // this requestId
       return options.requestId;
     },
 
+
     /**
-     * Meteor method: velocity/isMirror
      * Exposes the IS_MIRROR flag to clients
      *
      * @method velocity/isMirror
+     * @return {Boolean} true if currently running in mirror
      */
     'velocity/isMirror': function () {
       return !!process.env.IS_MIRROR;
     },
 
     /**
-     * Meteor method: velocity/syncMirror
-     *
+     * Syncs the mirror filesystem on an adhoc basis. Used by the core when file changes are detected.
      *
      * @method velocity/syncMirror
      */
@@ -436,6 +488,9 @@ Velocity = {};
     }
 
   });  // end Meteor methods
+
+
+
 
 //////////////////////////////////////////////////////////////////////
 // Private functions
@@ -631,15 +686,15 @@ Velocity = {};
   }
 
   /**
-   *
    * Performs a http get and retries the specified number of times with the specified timeouts.
    * Uses a future to respond and the future return object can be provided.
    *
    * @method _retryHttpGet
-   * @param url                   requiredFields  The target location
-   * @param callback              calls back with (error, result) where error is the exception and result is the status code
    *
-   * @return    A future that can be used in meteor methods (or for other async needs)
+   * @param {String} url The target location
+   * @param {Function} callback Called with (error, result) where error is the exception and result is the status code
+   *
+   * @return {Future} A future that can be used in meteor methods (or for other async needs)
    * @private
    */
   function _retryHttpGet (url, callback) {

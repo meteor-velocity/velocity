@@ -43,6 +43,8 @@
             
                 <li><a href="../classes/FileCopier.html">FileCopier</a></li>
             
+                <li><a href="../classes/Meteor.methods.html">Meteor.methods</a></li>
+            
                 <li><a href="../classes/Velocity.html">Velocity</a></li>
             
             </ul>
@@ -94,7 +96,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="../files/core.js.html#l11"><code>core.js:11</code></a>
+            Defined in: <a href="../files/core.js.html#l12"><code>core.js:12</code></a>
         </div>
     
 
@@ -137,50 +139,43 @@
 
                     <ul class="index-list methods">
                         
-                            <li class="index-item method private">
-                                <a href="#method__initWatcher">_initWatcher</a>
+                            <li class="index-item method">
+                                <a href="#method_addPostProcessor">addPostProcessor</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method private">
-                                <a href="#method__reset">_reset</a>
+                            <li class="index-item method">
+                                <a href="#method_addPreProcessor">addPreProcessor</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method private">
-                                <a href="#method__retryHttpGet">_retryHttpGet</a>
+                            <li class="index-item method">
+                                <a href="#method_getAppPath">getAppPath</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method private">
-                                <a href="#method__reuseExistingMirror">_reuseExistingMirror</a>
+                            <li class="index-item method">
+                                <a href="#method_getMirrorPath">getMirrorPath</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method private">
-                                <a href="#method__symlinkPackagesDirIfPresent">_symlinkPackagesDirIfPresent</a>
+                            <li class="index-item method">
+                                <a href="#method_getReportGithubIssueMessage">getReportGithubIssueMessage</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method private">
-                                <a href="#method__syncMirror">_syncMirror</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
-                                <a href="#method__updateAggregateReports">_updateAggregateReports</a>
+                            <li class="index-item method">
+                                <a href="#method_getTestsPath">getTestsPath</a>
 
                                 
                                 
@@ -188,76 +183,6 @@
                         
                             <li class="index-item method">
                                 <a href="#method_registerTestingFramework">registerTestingFramework</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/copySampleTests">velocity/copySampleTests</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/isMirror">velocity/isMirror</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/logs/reset">velocity/logs/reset</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/logs/submit">velocity/logs/submit</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/mirrors/request">velocity/mirrors/request</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/reports/completed">velocity/reports/completed</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/reports/reset">velocity/reports/reset</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/reports/submit">velocity/reports/submit</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_velocity/reset">velocity/reset</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method private">
-                                <a href="#method_velocityStartMirror">velocityStartMirror</a>
 
                                 
                                 
@@ -279,8 +204,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method__initWatcher" class="method item private">
-    <h3 class="name"><code>_initWatcher</code></h3>
+                    <div id="method_addPostProcessor" class="method item">
+    <h3 class="name"><code>addPostProcessor</code></h3>
 
     
         <div class="args">
@@ -288,7 +213,7 @@
             
                 <li class="arg">
                     
-                        <code>config</code>
+                        <code>reporter</code>
                     
                 </li>
             
@@ -300,8 +225,6 @@
 
     
 
-    
-        <span class="flag private">private</span>
     
 
     
@@ -323,7 +246,7 @@
             
         
         
-        <a href="../files/core.js.html#l672"><code>core.js:672</code></a>
+        <a href="../files/core.js.html#l114"><code>core.js:114</code></a>
         
         </p>
 
@@ -334,7 +257,8 @@
     </div>
 
     <div class="description">
-        <p>Initialize the directory/file watcher.</p>
+        <p>Add a callback which will execute after all tests have completed
+and after the aggregate test results have been reported.</p>
 
     </div>
 
@@ -346,15 +270,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">config</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">reporter</code>
+                        <span class="type">Function</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>See <code>registerTestingFramework</code>.</p>
-
+                         
                     </div>
 
                     
@@ -370,8 +293,8 @@
 </div>
 
                 
-                    <div id="method__reset" class="method item private">
-    <h3 class="name"><code>_reset</code></h3>
+                    <div id="method_addPreProcessor" class="method item">
+    <h3 class="name"><code>addPreProcessor</code></h3>
 
     
         <div class="args">
@@ -379,7 +302,7 @@
             
                 <li class="arg">
                     
-                        <code>config</code>
+                        <code>preprocessor</code>
                     
                 </li>
             
@@ -391,8 +314,6 @@
 
     
 
-    
-        <span class="flag private">private</span>
     
 
     
@@ -414,7 +335,7 @@
             
         
         
-        <a href="../files/core.js.html#l751"><code>core.js:751</code></a>
+        <a href="../files/core.js.html#l102"><code>core.js:102</code></a>
         
         </p>
 
@@ -425,7 +346,9 @@
     </div>
 
     <div class="description">
-        <p>Re-init file watcher and clear all test results.</p>
+        <p>Add a callback which will execute when the mirror application
+is sync&#39;ed up with latest application code.  Preprocessors will
+execute before fixtures are added.</p>
 
     </div>
 
@@ -437,15 +360,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">config</code>
-                        <span class="type">Object</span>
+                        <code class="param-name">preprocessor</code>
+                        <span class="type">Function</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>See <code>registerTestingFramework</code>.</p>
-
+                         
                     </div>
 
                     
@@ -461,40 +383,22 @@
 </div>
 
                 
-                    <div id="method__retryHttpGet" class="method item private">
-    <h3 class="name"><code>_retryHttpGet</code></h3>
+                    <div id="method_getAppPath" class="method item">
+    <h3 class="name"><code>getAppPath</code></h3>
 
     
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>url</code>
-                    
-                </li>
-            
-                <li class="arg">
-                    
-                        <code>callback</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
+        <span class="paren">()</span>
     
 
     
         <span class="returns-inline">
-            <span class="type"></span>
+            <span class="type">String</span>
         </span>
     
 
     
 
     
-        <span class="flag private">private</span>
-    
 
     
 
@@ -515,7 +419,7 @@
             
         
         
-        <a href="../files/core.js.html#l619"><code>core.js:619</code></a>
+        <a href="../files/core.js.html#l72"><code>core.js:72</code></a>
         
         </p>
 
@@ -526,51 +430,10 @@
     </div>
 
     <div class="description">
-        <p>Performs a http get and retries the specified number of times with the specified timeouts.
- Uses a future to respond and the future return object can be provided.</p>
+        <p>Get application directory path.</p>
 
     </div>
 
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">url</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>requiredFields  The target location</p>
-
-                    </div>
-
-                    
-                </li>
-            
-                <li class="param">
-                    
-                        <code class="param-name">callback</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>calls back with (error, result) where error is the exception and result is the status code</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
 
     
@@ -580,7 +443,9 @@
             <div class="returns-description">
                 
                     
-                    <p>A future that can be used in meteor methods (or for other async needs)</p>
+                        <span class="type">String</span>:
+                    
+                    <p>app directory path</p>
 
                 
             </div>
@@ -591,182 +456,21 @@
 </div>
 
                 
-                    <div id="method__reuseExistingMirror" class="method item private">
-    <h3 class="name"><code>_reuseExistingMirror</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>options</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l538"><code>core.js:538</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Reuses a mirror is it has already been started and updated the VelocityMirrors collection</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">options</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Required fields:
-                  framework - String ex. &#39;mocha-web-1&#39;
-                  port - String use a specific port
-                  requestId - the request id to put in the mirror metadata</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method__symlinkPackagesDirIfPresent" class="method item private">
-    <h3 class="name"><code>_symlinkPackagesDirIfPresent</code></h3>
+                    <div id="method_getMirrorPath" class="method item">
+    <h3 class="name"><code>getMirrorPath</code></h3>
 
     
         <span class="paren">()</span>
     
 
     
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
     
 
     
 
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l894"><code>core.js:894</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Checks if the user has a local packages directory, if so it ensures it&#39;s symlinked in the mirror.
-The reason this is needed is because the standard rsync will copy a the packages dir and not respect
-the symlinks inside it.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method__syncMirror" class="method item private">
-    <h3 class="name"><code>_syncMirror</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>force</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
     
 
     
@@ -788,7 +492,7 @@ the symlinks inside it.</p>
             
         
         
-        <a href="../files/core.js.html#l839"><code>core.js:839</code></a>
+        <a href="../files/core.js.html#l82"><code>core.js:82</code></a>
         
         </p>
 
@@ -799,59 +503,47 @@ the symlinks inside it.</p>
     </div>
 
     <div class="description">
-        <p>Creates a physical mirror of the application under .meteor/local/.mirror</p>
-<pre class="code prettyprint"><code>- Any files with the pattern tests/.*  are not copied, this stops .report
-directory from also being copied.
-
-TODO - Strips out velocity and reporters from the mirror&#39;s .meteor/packages file</code></pre>
+        <p>Get path to directory of the &#39;mirror&#39; application.</p>
 
     </div>
 
     
-        <div class="params">
-            <h4>Parameters:</h4>
 
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">force</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>performs an rsync even if no mirrors have been requested</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
     
+        <div class="returns">
+            <h4>Returns:</h4>
 
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>mirror directory path</p>
+
+                
+            </div>
+        </div>
     
 
     
 </div>
 
                 
-                    <div id="method__updateAggregateReports" class="method item private">
-    <h3 class="name"><code>_updateAggregateReports</code></h3>
+                    <div id="method_getReportGithubIssueMessage" class="method item">
+    <h3 class="name"><code>getReportGithubIssueMessage</code></h3>
 
     
         <span class="paren">()</span>
     
 
     
-
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
     
 
     
-        <span class="flag private">private</span>
+
     
 
     
@@ -873,7 +565,7 @@ TODO - Strips out velocity and reporters from the mirror&#39;s .meteor/packages 
             
         
         
-        <a href="../files/core.js.html#l796"><code>core.js:796</code></a>
+        <a href="../files/core.js.html#l125"><code>core.js:125</code></a>
         
         </p>
 
@@ -884,12 +576,100 @@ TODO - Strips out velocity and reporters from the mirror&#39;s .meteor/packages 
     </div>
 
     <div class="description">
-        <p>If any one test has failed, mark the aggregate test result as failed.</p>
+        <p>Get a message that displays where bugs in Velocity core itself should
+be reported.</p>
 
     </div>
 
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>message with bug repo url</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getTestsPath" class="method item">
+    <h3 class="name"><code>getTestsPath</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/core.js.html#l92"><code>core.js:92</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Get path to application&#39;s &#39;tests&#39; directory</p>
+
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                    <p>application&#39;s tests directory</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -944,7 +724,7 @@ TODO - Strips out velocity and reporters from the mirror&#39;s .meteor/packages 
             
         
         
-        <a href="../files/core.js.html#l99"><code>core.js:99</code></a>
+        <a href="../files/core.js.html#l140"><code>core.js:140</code></a>
         
         </p>
 
@@ -1074,1138 +854,6 @@ TODO - Strips out velocity and reporters from the mirror&#39;s .meteor/packages 
                             </li>
                             
                         </ul>
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/copySampleTests" class="method item">
-    <h3 class="name"><code>velocity/copySampleTests</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>options!~YUIDOC_LINE~!</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l298"><code>core.js:298</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/copySampleTests
-Copy sample tests from frameworks <code>sample-tests</code> directories
-to user&#39;s <code>app/tests</code> directory.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">options!~YUIDOC_LINE~!</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>ex. {framework: &#39;jasmine-unit&#39;}</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/isMirror" class="method item">
-    <h3 class="name"><code>velocity/isMirror</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l416"><code>core.js:416</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/isMirror
-Exposes the IS_MIRROR flag to clients</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/logs/reset" class="method item">
-    <h3 class="name"><code>velocity/logs/reset</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code class="optional">[options]</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l171"><code>core.js:171</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/logs/reset
-Clear all log entried.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[options]</code>
-                        <span class="type">Object</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Optional, specify specific framework to clear</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/logs/submit" class="method item">
-    <h3 class="name"><code>velocity/logs/submit</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>options</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l191"><code>core.js:191</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/logs/submit
-Log a method to the central Velocity log store.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">options</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Required parameters:
-                  type - String
-                  message - String
-                  framework - String  ex. &#39;jasmine-unit&#39;</p>
-<pre><code>            Optional parameters:
-              timestamp - Date</code></pre>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/mirrors/request" class="method item">
-    <h3 class="name"><code>velocity/mirrors/request</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>options</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type"></span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l353"><code>core.js:353</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/mirrors/request
-Starts a new mirror if it has not already been started, and reuses an existing one if it is already started.
-This method will return a requestId. Frameworks need to observe the VelocityMirrors collection for a document for
-{requestId: requestId} to know when the mirror is ready.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">options</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Options for the mirror.</p>
-
-                    </div>
-
-                    
-                        <ul class="params-list">
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name">framework</code>
-                                    <span class="type">String</span>
-                                
-
-                                <div class="param-description">
-                                    <p>The name of the calling framework</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[fixtureFiles]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Array of files with absolute paths</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[port]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>String use a specific port</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[requestId]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Id for the mirror that is used to query the mirror info</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[rootUrl]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Overrides the auto-generated <protocol>://<host>:<port>. This is useful for frameworks that need to customize the
-                                         request parameters that velocity-ci uses</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                    <p>requestId    this method will update the VelocityMirrors collection with a requestId once the mirror is ready for use</p>
-
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/reports/completed" class="method item">
-    <h3 class="name"><code>velocity/reports/completed</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>data</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l280"><code>core.js:280</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/reports/completed
-Frameworks must call this method to inform Velocity they have completed
-their current test runs. Velocity uses this flag when running in CI mode.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">data</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Required fields:
-                  framework - String  ex. &#39;jasmine-unit&#39;</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/reports/reset" class="method item">
-    <h3 class="name"><code>velocity/reports/reset</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code class="optional">[options]</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l140"><code>core.js:140</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/reports/reset
-Clear all test results.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name optional">[options]</code>
-                        <span class="type">Object</span>
-                        <span class="flag optional" title="This parameter is optional.">optional</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Optional, specify specific framework to clear
-                and/or define a list of tests to keep.
-                ex.
-                {
-                  framework: &#39;jasmine-unit&#39;,
-                  notIn: [&#39;tests/auth-jasmine-unit.js&#39;]
-                }</p>
-
-                    </div>
-
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/reports/submit" class="method item">
-    <h3 class="name"><code>velocity/reports/submit</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>data</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l220"><code>core.js:220</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/reports/submit </p>
-<p>Record the results of an individual test run; a simple collector of 
-test data.</p>
-<p>The <code>data</code> object is stored in its entirety; any field may be passed in.
-The optional fields documented here are suggestions based on what the
-standard html-reporter supports.  Whether or not a field is actually
-used is up to the specific test reporter that the user has installed.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">data</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                         
-                    </div>
-
-                    
-                        <ul class="params-list">
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name">name</code>
-                                    <span class="type">String</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Name of the test that was executed.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name">framework</code>
-                                    <span class="type">String</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Name of a testing framework.
-                               For example, &#39;jasmine&#39; or &#39;mocha&#39;.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name">result</code>
-                                    <span class="type">String</span>
-                                
-
-                                <div class="param-description">
-                                    <p>The results of the test.  Standard values 
-                            are &#39;passed&#39; and &#39;failed&#39;.  Different test
-                            reporters can support other values.  For
-                            example, the aggregate tests collection uses
-                            &#39;pending&#39; to indicate that results are still
-                            coming in.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[id]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Used to update a specific test result.  If not
-                          provided, frameworks can use the &#39;resetReports&#39;
-                          Meteor method to clear all tests.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[ancestors]</code>
-                                    <span class="type">Array</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>The hierarchy of suites and blocks above
-                                this test. For example,
-                             [&#39;Template&#39;, &#39;leaderboard&#39;, &#39;selected_name&#39;]</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[timestamp]</code>
-                                    <span class="type">Date</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>The time that the test started for this
-                               result.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[duration]</code>
-                                    <span class="type">Number</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>The test duration milliseconds.</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[browser]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>Which browser did the test run in?</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[failureType]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>For example, &#39;expect&#39; or &#39;assert&#39;</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[failureMessage]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    
-                                </div>
-
-                                
-                            </li>
-                            
-                            <li class="param">
-                                
-                                    <code class="param-name optional">[failureStackTrace]</code>
-                                    <span class="type">String</span>
-                                    <span class="flag optional" title="This parameter is optional.">optional</span>
-                                
-
-                                <div class="param-description">
-                                    <p>The stack trace associated with
-                                         the failure</p>
-
-                                </div>
-
-                                
-                            </li>
-                            
-                        </ul>
-                    
-                </li>
-            
-            </ul>
-        </div>
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocity/reset" class="method item">
-    <h3 class="name"><code>velocity/reset</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l130"><code>core.js:130</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Meteor method: velocity/reset
-Re-init file watcher and clear all test results.</p>
-
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_velocityStartMirror" class="method item private">
-    <h3 class="name"><code>velocityStartMirror</code></h3>
-
-    
-        <div class="args">
-            <span class="paren">(</span><ul class="args-list inline commas">
-            
-                <li class="arg">
-                    
-                        <code>options</code>
-                    
-                </li>
-            
-            </ul><span class="paren">)</span>
-        </div>
-    
-
-    
-
-    
-
-    
-        <span class="flag private">private</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="../files/core.js.html#l433"><code>core.js:433</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>Starts a mirror and copies any specified fixture files into the mirror.</p>
-
-    </div>
-
-    
-        <div class="params">
-            <h4>Parameters:</h4>
-
-            <ul class="params-list">
-            
-                <li class="param">
-                    
-                        <code class="param-name">options</code>
-                        <span class="type">Object</span>
-                    
-
-                    
-
-                    <div class="param-description">
-                        <p>Required fields:
-                  framework - String ex. &#39;mocha-web-1&#39;
-                  rootUrl - String ex. &#39;<a href="http://localhost:5000/x=y">http://localhost:5000/x=y</a>&#39;</p>
-<pre><code>            Optional parameters:
-              fixtureFiles - Array of files with absolute paths
-              port - String use a specific port instead of finding the next available one</code></pre>
-
-                    </div>
-
                     
                 </li>
             
