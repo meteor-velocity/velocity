@@ -168,6 +168,9 @@ Velocity = {};
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
+
+        // make sure the appropriate aggregate records are added
+        _reset(_config)
       }
     });
   }
