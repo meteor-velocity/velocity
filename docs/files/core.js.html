@@ -41,17 +41,173 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="../classes/_symlinkPackagesDirIfPresent                                                                              // 1002.html">_symlinkPackagesDirIfPresent                                                                              // 1002</a></li>
+            
                 <li><a href="../classes/FileCopier.html">FileCopier</a></li>
             
                 <li><a href="../classes/Meteor.methods.html">Meteor.methods</a></li>
             
+                <li><a href="../classes/registerTestingFramework                                                                              // 153.html">registerTestingFramework                                                                              // 153</a></li>
+            
+                <li><a href="../classes/registerTestingFramework                                                                              // 153.html">registerTestingFramework                                                                              // 153</a></li>
+            
                 <li><a href="../classes/Velocity.html">Velocity</a></li>
+            
+                <li><a href="../classes/Velocity                                                                                                     // 21
+/                                                                                                                    // 22
+Velocity = {};                                                                                                         // 23
+                                                                                                                      // 24
+(function () {                                                                                                         // 25
+ &#x27;use strict&#x27;;                                                                                                        // 26
+                                                                                                                      // 27
+//////////////////////////////////////////////////////////////////////                                                 // 28
+// Init                                                                                                                // 29
+//                                                                                                                     // 30
+                                                                                                                      // 31
+ if (process.env.NODE_ENV !== &#x27;development&#x27; ||                                                                        // 32
+     process.env.VELOCITY === &#x27;0&#x27; ||                                                                                  // 33
+     process.env.IS_MIRROR) {                                                                                         // 34
+   DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);                                                                  // 35
+   return;                                                                                                            // 36
+ }                                                                                                                    // 37
+                                                                                                                      // 38
+ var getAssetPath = function (packageName, fileName) {                                                                // 39
+   var serverAssetsPath = path.join(                                                                                  // 40
+     findAppDir(), &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;                                        // 41
+   );                                                                                                                 // 42
+                                                                                                                      // 43
+   packageName = packageName.replace(&#x27;:&#x27;, &#x27;_&#x27;);                                                                       // 44
+                                                                                                                      // 45
+   return path.join(serverAssetsPath, &#x27;packages&#x27;, packageName, fileName);                                             // 46
+ };                                                                                                                   // 47
+                                                                                                                      // 48
+ var _ = Npm.require(&#x27;lodash&#x27;),                                                                                       // 49
+     fs = Npm.require(&#x27;fs&#x27;),                                                                                          // 50
+     fse = Npm.require(&#x27;fs-extra&#x27;),                                                                                   // 51
+     outputFile = Meteor.wrapAsync(fse.outputFile),                                                                   // 52
+     copyFile = Meteor.wrapAsync(fse.copy),                                                                           // 53
+     path = Npm.require(&#x27;path&#x27;),                                                                                      // 54
+     url = Npm.require(&#x27;url&#x27;),                                                                                        // 55
+     Rsync = Npm.require(&#x27;rsync&#x27;),                                                                                    // 56
+     child_process = Npm.require(&#x27;child_process&#x27;),                                                                    // 57
+     spawn = child_process.spawn,                                                                                     // 58
+     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                              // 59
+     mkdirp = Npm.require(&#x27;mkdirp&#x27;),                                                                                  // 60
+     _config = {},                                                                                                    // 61
+     _preProcessors = [],                                                                                             // 62
+     _postProcessors = [],                                                                                            // 63
+     _watcher,                                                                                                        // 64
+     FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),                                                           // 65
+     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);                                      // 66
+                                                                                                                      // 67
+ Meteor.startup(function initializeVelocity () {                                                                      // 68
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] app dir&#x27;, Velocity.getAppPath());                                                 // 69
+   DEBUG &amp;&amp; console.log(&#x27;velocity config =&#x27;, JSON.stringify(_config, null, 2));                                       // 70
+                                                                                                                      // 71
+   // kick-off everything                                                                                             // 72
+   _reset(_config);                                                                                                   // 73
+ });                                                                                                                  // 74
+                                                                                                                      // 75
+//////////////////////////////////////////////////////////////////////                                                 // 76
+// Public Methods                                                                                                      // 77
+//                                                                                                                     // 78
+                                                                                                                      // 79
+ _.extend(Velocity, {                                                                                                 // 80
+                                                                                                                      // 81
+   /**                                                                                                                // 82
+Get application directory path.                                                                                 // 83
+                                                                                                                // 84.html">Velocity                                                                                                     // 21
+/                                                                                                                    // 22
+Velocity = {};                                                                                                         // 23
+                                                                                                                      // 24
+(function () {                                                                                                         // 25
+ &#x27;use strict&#x27;;                                                                                                        // 26
+                                                                                                                      // 27
+//////////////////////////////////////////////////////////////////////                                                 // 28
+// Init                                                                                                                // 29
+//                                                                                                                     // 30
+                                                                                                                      // 31
+ if (process.env.NODE_ENV !== &#x27;development&#x27; ||                                                                        // 32
+     process.env.VELOCITY === &#x27;0&#x27; ||                                                                                  // 33
+     process.env.IS_MIRROR) {                                                                                         // 34
+   DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);                                                                  // 35
+   return;                                                                                                            // 36
+ }                                                                                                                    // 37
+                                                                                                                      // 38
+ var getAssetPath = function (packageName, fileName) {                                                                // 39
+   var serverAssetsPath = path.join(                                                                                  // 40
+     findAppDir(), &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;                                        // 41
+   );                                                                                                                 // 42
+                                                                                                                      // 43
+   packageName = packageName.replace(&#x27;:&#x27;, &#x27;_&#x27;);                                                                       // 44
+                                                                                                                      // 45
+   return path.join(serverAssetsPath, &#x27;packages&#x27;, packageName, fileName);                                             // 46
+ };                                                                                                                   // 47
+                                                                                                                      // 48
+ var _ = Npm.require(&#x27;lodash&#x27;),                                                                                       // 49
+     fs = Npm.require(&#x27;fs&#x27;),                                                                                          // 50
+     fse = Npm.require(&#x27;fs-extra&#x27;),                                                                                   // 51
+     outputFile = Meteor.wrapAsync(fse.outputFile),                                                                   // 52
+     copyFile = Meteor.wrapAsync(fse.copy),                                                                           // 53
+     path = Npm.require(&#x27;path&#x27;),                                                                                      // 54
+     url = Npm.require(&#x27;url&#x27;),                                                                                        // 55
+     Rsync = Npm.require(&#x27;rsync&#x27;),                                                                                    // 56
+     child_process = Npm.require(&#x27;child_process&#x27;),                                                                    // 57
+     spawn = child_process.spawn,                                                                                     // 58
+     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                              // 59
+     mkdirp = Npm.require(&#x27;mkdirp&#x27;),                                                                                  // 60
+     _config = {},                                                                                                    // 61
+     _preProcessors = [],                                                                                             // 62
+     _postProcessors = [],                                                                                            // 63
+     _watcher,                                                                                                        // 64
+     FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),                                                           // 65
+     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);                                      // 66
+                                                                                                                      // 67
+ Meteor.startup(function initializeVelocity () {                                                                      // 68
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] app dir&#x27;, Velocity.getAppPath());                                                 // 69
+   DEBUG &amp;&amp; console.log(&#x27;velocity config =&#x27;, JSON.stringify(_config, null, 2));                                       // 70
+                                                                                                                      // 71
+   // kick-off everything                                                                                             // 72
+   _reset(_config);                                                                                                   // 73
+ });                                                                                                                  // 74
+                                                                                                                      // 75
+//////////////////////////////////////////////////////////////////////                                                 // 76
+// Public Methods                                                                                                      // 77
+//                                                                                                                     // 78
+                                                                                                                      // 79
+ _.extend(Velocity, {                                                                                                 // 80
+                                                                                                                      // 81
+   /**                                                                                                                // 82
+Get application directory path.                                                                                 // 83
+                                                                                                                // 84</a></li>
             
             </ul>
 
             <ul id="api-modules" class="apis modules">
             
                 <li><a href="../modules/Velocity.html">Velocity</a></li>
+            
+                <li><a href="../modules/Velocity                                                                                                    __ 10
+_                                                                                                                    __ 11
+_**                                                                                                                    __ 12
+The &#x60;Velocity&#x60; object provides a common API for test frameworks to report                                           __ 13
+test results.  Frameworks can also request assets, such as a copy of the                                            __ 14
+user&#x27;s application (the &#x27;mirror&#x27;) in which tests can be safely run without                                          __ 15
+impacting on-going development.                                                                                     __ 16
+                                                                                                                    __ 17
+Test results and log activity are reported via                                                                      __ 18
+{{#crossLink &quot;Meteor.methods&quot;}}Meteor methods{{_crossLink}}.                                                        __ 19
+                                                                                                                    __ 20.html">Velocity                                                                                                    // 10
+/                                                                                                                    // 11
+/**                                                                                                                    // 12
+The &#x60;Velocity&#x60; object provides a common API for test frameworks to report                                           // 13
+test results.  Frameworks can also request assets, such as a copy of the                                            // 14
+user&#x27;s application (the &#x27;mirror&#x27;) in which tests can be safely run without                                          // 15
+impacting on-going development.                                                                                     // 16
+                                                                                                                    // 17
+Test results and log activity are reported via                                                                      // 18
+{{#crossLink &quot;Meteor.methods&quot;}}Meteor methods{{/crossLink}}.                                                        // 19
+                                                                                                                    // 20</a></li>
             
             </ul>
         </div>
@@ -262,6 +418,9 @@ Velocity = {};
        */
       registerTestingFramework: function (name, options) {
         _config[name] = _parseTestingFrameworkOptions(name, options);
+
+        // make sure the appropriate aggregate records are added
+        _reset(_config)
       }
     });
   }
