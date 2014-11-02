@@ -15,7 +15,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
  * user's application (the 'mirror') in which tests can be safely run without
  * impacting on-going development.
  *
- * Test results and log activity are reported via 
+ * Test results and log activity are reported via
  * {{#crossLink "Meteor.methods"}}Meteor methods{{/crossLink}}.
  *
  * @class Velocity
@@ -251,7 +251,7 @@ Velocity = {};
 
     /**
      * Log a message to the Velocity log store.  This provides a central
-     * location for different reporters to query for test framework log 
+     * location for different reporters to query for test framework log
      * entries.
      *
      * @method velocity/logs/submit
@@ -381,7 +381,7 @@ Velocity = {};
 
         sampleTests = _config[options.framework].sampleTestGenerator(options);
 
-        DEBUG && console.log('[velocity] found ', sampleTests.length, 
+        DEBUG && console.log('[velocity] found ', sampleTests.length,
                              'sample test files for', options.framework);
 
         sampleTests.forEach(function (testFile) {
@@ -406,7 +406,7 @@ Velocity = {};
                     ' ' + testsPath + path.sep;
 
           DEBUG && console.log('[velocity] copying sample tests (if any) ' +
-                               'for framework', options.framework, '-', 
+                               'for framework', options.framework, '-',
                                command);
 
           child_process.exec(command, Meteor.bindEnvironment(
@@ -962,6 +962,9 @@ Velocity = {};
       .exclude('/.meteor/local')
       .exclude('/tests/.*')
       .exclude('/packages')
+      // This file is created by velocity:core.
+      // It must be excluded to prevent rsync from deleting it.
+      .exclude('/settings.json')
       .source(Velocity.getAppPath() + path.sep)
       .destination(Velocity.getMirrorPath());
     var then = Date.now();
