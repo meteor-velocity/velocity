@@ -472,7 +472,7 @@ Velocity = {};
         }
 
         // if the mirror not been started at all, start a new one
-        if (error && error.indexOf('ECONNREFUSED') !== -1) {
+        if (error && (error.indexOf('ECONNREFUSED') !== -1 || result.statusCode === 502)) {
           DEBUG && console.log('[velocity] Requested mirror not started. ' +
                                'Starting...');
           _velocityStartMirror(options);
@@ -734,18 +734,18 @@ Velocity = {};
     var doGet = function () {
       try {
         var res = HTTP.get(url);
+         
         callback(null, {statusCode: res.statusCode});
       } catch (ex) {
-
-        if (ex.message.indexOf('ECONNREFUSED') === -1) {
-          throw(ex);
+        if (ex.message.indexOf('ECONNREFUSED') === -1 && ex.response.statusCode !== 502) {
+          throw ex;
         }
 
         if (tries < 10) {
           DEBUG && console.log('[velocity] retrying mirror at ', url);
           retry.retryLater(++tries, doGet);
         } else {
-          callback(ex.message);
+          callback(ex.message, {statusCode: ex.response.statusCode});
         }
       }
     };
