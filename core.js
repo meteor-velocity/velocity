@@ -745,6 +745,7 @@ Velocity = {};
           DEBUG && console.log('[velocity] retrying mirror at ', url);
           retry.retryLater(++tries, doGet);
         } else {
+          ex.response = ex.response || {};
           callback(ex.message, {statusCode: ex.response.statusCode});
         }
       }
