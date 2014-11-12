@@ -31,6 +31,7 @@
     "VelocityTestFiles": false,
     "VelocityTestReports": false,
     "VelocityAggregateReports": false,
-    "VelocityLogs": false
+    "VelocityLogs": false,
+    "VelocityVars": false
   }
 }

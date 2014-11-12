@@ -1,7 +1,11 @@
-## v.NEXT
+## v1.0.0.rc.3
 
 * Mirror output is now visible by default
+* Mirrors now use DDP to notify frameworks of up-ness
+* Fixed mirror dying on server restarts (YAY!)
 
+## v1.0.0.rc.2
+???
 
 ## v1.0.0.rc.1
 
