@@ -1,3 +1,8 @@
+## v.NEXT
+
+* Mirror output is now visible by default
+
+
 ## v1.0.0.rc.1
 
 * Updated to use Meteor 1.0

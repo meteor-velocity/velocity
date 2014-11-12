@@ -473,8 +473,7 @@ Velocity = {};
 
         // if the mirror not been started at all, start a new one
         if (error && (error.indexOf('ECONNREFUSED') !== -1 || result.statusCode === 502)) {
-          DEBUG && console.log('[velocity] Requested mirror not started. ' +
-                               'Starting...');
+          DEBUG && console.log('[velocity] Requested mirror not started. ');
           _velocityStartMirror(options);
         }
 
@@ -548,6 +547,8 @@ Velocity = {};
     var mongoLocation = _getMongoUrl(options.framework);
     var mirrorLocation = _getMirrorUrl(port);
 
+    console.log('[velocity] Starting mirror on', options.mirrorLocation, 'with mongo', mongoLocation);
+
     if (options.fixtureFiles) {
       _addFixtures(options.fixtureFiles);
     }
@@ -566,8 +567,6 @@ Velocity = {};
 
     var settingsPath = path.join(Velocity.getMirrorPath(), 'settings.json');
     outputFile(settingsPath, JSON.stringify(Meteor.settings));
-
-    DEBUG && console.log('[velocity] Mirror: starting at', mirrorLocation);
 
     var spawnAttempts = 10;
     var spawnMeteor = function () {
@@ -598,9 +597,7 @@ Velocity = {};
           console.log('[velocity mirror] ' + line);
         });
       };
-      if (!!process.env.VELOCITY_DEBUG_MIRROR) {
-        meteor.stdout.on('data', outputHandler);
-      }
+      meteor.stdout.on('data', outputHandler);
       meteor.stderr.on('data', outputHandler);
     };
     spawnMeteor();
@@ -730,11 +727,14 @@ Velocity = {};
       baseTimeout: 100,
       maxTimeout: 2000
     });
+
+    DEBUG && console.log('[velocity] _retryHttpGet', url);
+
     var tries = 0;
     var doGet = function () {
       try {
         var res = HTTP.get(url);
-         
+
         callback(null, {statusCode: res.statusCode});
       } catch (ex) {
         if (ex.message.indexOf('ECONNREFUSED') === -1 && ex.response.statusCode !== 502) {
