@@ -41,13 +41,11 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
-                <li><a href="../classes/_symlinkPackagesDirIfPresent                                                                              // 1002.html">_symlinkPackagesDirIfPresent                                                                              // 1002</a></li>
+                <li><a href="../classes/_symlinkPackagesDirIfPresent                                                                              // 1022.html">_symlinkPackagesDirIfPresent                                                                              // 1022</a></li>
             
                 <li><a href="../classes/FileCopier.html">FileCopier</a></li>
             
                 <li><a href="../classes/Meteor.methods.html">Meteor.methods</a></li>
-            
-                <li><a href="../classes/registerTestingFramework                                                                              // 153.html">registerTestingFramework                                                                              // 153</a></li>
             
                 <li><a href="../classes/registerTestingFramework                                                                              // 153.html">registerTestingFramework                                                                              // 153</a></li>
             
@@ -67,7 +65,7 @@ Velocity = {};                                                                  
  if (process.env.NODE_ENV !== &#x27;development&#x27; ||                                                                        // 32
      process.env.VELOCITY === &#x27;0&#x27; ||                                                                                  // 33
      process.env.IS_MIRROR) {                                                                                         // 34
-   DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);                                                                  // 35
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] &#x27; + (process.env.IS_MIRROR ? &#x27;Mirror detected -&#x27; : &#x27;&#x27;) + &#x27;Not adding velocity core&#x27;);
    return;                                                                                                            // 36
  }                                                                                                                    // 37
                                                                                                                       // 38
@@ -90,15 +88,15 @@ Velocity = {};                                                                  
      url = Npm.require(&#x27;url&#x27;),                                                                                        // 55
      Rsync = Npm.require(&#x27;rsync&#x27;),                                                                                    // 56
      child_process = Npm.require(&#x27;child_process&#x27;),                                                                    // 57
-     spawn = child_process.spawn,                                                                                     // 58
-     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                              // 59
-     mkdirp = Npm.require(&#x27;mkdirp&#x27;),                                                                                  // 60
-     _config = {},                                                                                                    // 61
-     _preProcessors = [],                                                                                             // 62
-     _postProcessors = [],                                                                                            // 63
-     _watcher,                                                                                                        // 64
-     FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),                                                           // 65
-     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);                                      // 66
+     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                              // 58
+     mkdirp = Npm.require(&#x27;mkdirp&#x27;),                                                                                  // 59
+     _config = {},                                                                                                    // 60
+     _preProcessors = [],                                                                                             // 61
+     _postProcessors = [],                                                                                            // 62
+     _watcher,                                                                                                        // 63
+     FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),                                                           // 64
+     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;),                                      // 65
+     MIRROR_PID_VAR_TEMPLATE = &#x27;mirror.@PORT.pid&#x27;;                                                                    // 66
                                                                                                                       // 67
  Meteor.startup(function initializeVelocity () {                                                                      // 68
    DEBUG &amp;&amp; console.log(&#x27;[velocity] app dir&#x27;, Velocity.getAppPath());                                                 // 69
@@ -130,7 +128,7 @@ Velocity = {};                                                                  
  if (process.env.NODE_ENV !== &#x27;development&#x27; ||                                                                        // 32
      process.env.VELOCITY === &#x27;0&#x27; ||                                                                                  // 33
      process.env.IS_MIRROR) {                                                                                         // 34
-   DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);                                                                  // 35
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] &#x27; + (process.env.IS_MIRROR ? &#x27;Mirror detected -&#x27; : &#x27;&#x27;) + &#x27;Not adding velocity core&#x27;);
    return;                                                                                                            // 36
  }                                                                                                                    // 37
                                                                                                                       // 38
@@ -153,15 +151,143 @@ Velocity = {};                                                                  
      url = Npm.require(&#x27;url&#x27;),                                                                                        // 55
      Rsync = Npm.require(&#x27;rsync&#x27;),                                                                                    // 56
      child_process = Npm.require(&#x27;child_process&#x27;),                                                                    // 57
-     spawn = child_process.spawn,                                                                                     // 58
-     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                              // 59
-     mkdirp = Npm.require(&#x27;mkdirp&#x27;),                                                                                  // 60
-     _config = {},                                                                                                    // 61
-     _preProcessors = [],                                                                                             // 62
-     _postProcessors = [],                                                                                            // 63
-     _watcher,                                                                                                        // 64
-     FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),                                                           // 65
-     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);                                      // 66
+     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                              // 58
+     mkdirp = Npm.require(&#x27;mkdirp&#x27;),                                                                                  // 59
+     _config = {},                                                                                                    // 60
+     _preProcessors = [],                                                                                             // 61
+     _postProcessors = [],                                                                                            // 62
+     _watcher,                                                                                                        // 63
+     FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),                                                           // 64
+     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;),                                      // 65
+     MIRROR_PID_VAR_TEMPLATE = &#x27;mirror.@PORT.pid&#x27;;                                                                    // 66
+                                                                                                                      // 67
+ Meteor.startup(function initializeVelocity () {                                                                      // 68
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] app dir&#x27;, Velocity.getAppPath());                                                 // 69
+   DEBUG &amp;&amp; console.log(&#x27;velocity config =&#x27;, JSON.stringify(_config, null, 2));                                       // 70
+                                                                                                                      // 71
+   // kick-off everything                                                                                             // 72
+   _reset(_config);                                                                                                   // 73
+ });                                                                                                                  // 74
+                                                                                                                      // 75
+//////////////////////////////////////////////////////////////////////                                                 // 76
+// Public Methods                                                                                                      // 77
+//                                                                                                                     // 78
+                                                                                                                      // 79
+ _.extend(Velocity, {                                                                                                 // 80
+                                                                                                                      // 81
+   /**                                                                                                                // 82
+Get application directory path.                                                                                 // 83
+                                                                                                                // 84</a></li>
+            
+                <li><a href="../classes/Velocity                                                                                                     // 21
+/                                                                                                                    // 22
+Velocity = {};                                                                                                         // 23
+                                                                                                                      // 24
+(function () {                                                                                                         // 25
+ &#x27;use strict&#x27;;                                                                                                        // 26
+                                                                                                                      // 27
+//////////////////////////////////////////////////////////////////////                                                 // 28
+// Init                                                                                                                // 29
+//                                                                                                                     // 30
+                                                                                                                      // 31
+ if (process.env.NODE_ENV !== &#x27;development&#x27; ||                                                                        // 32
+   process.env.VELOCITY === &#x27;0&#x27; ||                                                                                    // 33
+   process.env.IS_MIRROR) {                                                                                           // 34
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] &#x27; + (process.env.IS_MIRROR ? &#x27;Mirror detected -&#x27; : &#x27;&#x27;) + &#x27;Not adding velocity core&#x27;);
+   return;                                                                                                            // 36
+ }                                                                                                                    // 37
+                                                                                                                      // 38
+ var getAssetPath = function (packageName, fileName) {                                                                // 39
+   var serverAssetsPath = path.join(                                                                                  // 40
+     findAppDir(), &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;                                        // 41
+   );                                                                                                                 // 42
+                                                                                                                      // 43
+   packageName = packageName.replace(&#x27;:&#x27;, &#x27;_&#x27;);                                                                       // 44
+                                                                                                                      // 45
+   return path.join(serverAssetsPath, &#x27;packages&#x27;, packageName, fileName);                                             // 46
+ };                                                                                                                   // 47
+                                                                                                                      // 48
+ var _ = Npm.require(&#x27;lodash&#x27;),                                                                                       // 49
+     fs = Npm.require(&#x27;fs&#x27;),                                                                                          // 50
+     fse = Npm.require(&#x27;fs-extra&#x27;),                                                                                   // 51
+     outputFile = Meteor.wrapAsync(fse.outputFile),                                                                   // 52
+     copyFile = Meteor.wrapAsync(fse.copy),                                                                           // 53
+     path = Npm.require(&#x27;path&#x27;),                                                                                      // 54
+     url = Npm.require(&#x27;url&#x27;),                                                                                        // 55
+     Rsync = Npm.require(&#x27;rsync&#x27;),                                                                                    // 56
+     child_process = Npm.require(&#x27;child_process&#x27;),                                                                    // 57
+     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                              // 58
+     mkdirp = Npm.require(&#x27;mkdirp&#x27;),                                                                                  // 59
+     _config = {},                                                                                                    // 60
+     _preProcessors = [],                                                                                             // 61
+     _postProcessors = [],                                                                                            // 62
+     _watcher,                                                                                                        // 63
+     FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),                                                           // 64
+     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;),                                      // 65
+     MIRROR_PID_VAR_TEMPLATE = &#x27;mirror.@PORT.pid&#x27;;                                                                    // 66
+                                                                                                                      // 67
+ Meteor.startup(function initializeVelocity () {                                                                      // 68
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] app dir&#x27;, Velocity.getAppPath());                                                 // 69
+   DEBUG &amp;&amp; console.log(&#x27;velocity config =&#x27;, JSON.stringify(_config, null, 2));                                       // 70
+                                                                                                                      // 71
+   // kick-off everything                                                                                             // 72
+   _reset(_config);                                                                                                   // 73
+ });                                                                                                                  // 74
+                                                                                                                      // 75
+//////////////////////////////////////////////////////////////////////                                                 // 76
+// Public Methods                                                                                                      // 77
+//                                                                                                                     // 78
+                                                                                                                      // 79
+ _.extend(Velocity, {                                                                                                 // 80
+                                                                                                                      // 81
+   /**                                                                                                                // 82
+Get application directory path.                                                                                 // 83
+                                                                                                                // 84.html">Velocity                                                                                                     // 21
+/                                                                                                                    // 22
+Velocity = {};                                                                                                         // 23
+                                                                                                                      // 24
+(function () {                                                                                                         // 25
+ &#x27;use strict&#x27;;                                                                                                        // 26
+                                                                                                                      // 27
+//////////////////////////////////////////////////////////////////////                                                 // 28
+// Init                                                                                                                // 29
+//                                                                                                                     // 30
+                                                                                                                      // 31
+ if (process.env.NODE_ENV !== &#x27;development&#x27; ||                                                                        // 32
+   process.env.VELOCITY === &#x27;0&#x27; ||                                                                                    // 33
+   process.env.IS_MIRROR) {                                                                                           // 34
+   DEBUG &amp;&amp; console.log(&#x27;[velocity] &#x27; + (process.env.IS_MIRROR ? &#x27;Mirror detected -&#x27; : &#x27;&#x27;) + &#x27;Not adding velocity core&#x27;);
+   return;                                                                                                            // 36
+ }                                                                                                                    // 37
+                                                                                                                      // 38
+ var getAssetPath = function (packageName, fileName) {                                                                // 39
+   var serverAssetsPath = path.join(                                                                                  // 40
+     findAppDir(), &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;build&#x27;, &#x27;programs&#x27;, &#x27;server&#x27;, &#x27;assets&#x27;                                        // 41
+   );                                                                                                                 // 42
+                                                                                                                      // 43
+   packageName = packageName.replace(&#x27;:&#x27;, &#x27;_&#x27;);                                                                       // 44
+                                                                                                                      // 45
+   return path.join(serverAssetsPath, &#x27;packages&#x27;, packageName, fileName);                                             // 46
+ };                                                                                                                   // 47
+                                                                                                                      // 48
+ var _ = Npm.require(&#x27;lodash&#x27;),                                                                                       // 49
+     fs = Npm.require(&#x27;fs&#x27;),                                                                                          // 50
+     fse = Npm.require(&#x27;fs-extra&#x27;),                                                                                   // 51
+     outputFile = Meteor.wrapAsync(fse.outputFile),                                                                   // 52
+     copyFile = Meteor.wrapAsync(fse.copy),                                                                           // 53
+     path = Npm.require(&#x27;path&#x27;),                                                                                      // 54
+     url = Npm.require(&#x27;url&#x27;),                                                                                        // 55
+     Rsync = Npm.require(&#x27;rsync&#x27;),                                                                                    // 56
+     child_process = Npm.require(&#x27;child_process&#x27;),                                                                    // 57
+     chokidar = Npm.require(&#x27;chokidar&#x27;),                                                                              // 58
+     mkdirp = Npm.require(&#x27;mkdirp&#x27;),                                                                                  // 59
+     _config = {},                                                                                                    // 60
+     _preProcessors = [],                                                                                             // 61
+     _postProcessors = [],                                                                                            // 62
+     _watcher,                                                                                                        // 63
+     FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),                                                           // 64
+     DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;),                                      // 65
+     MIRROR_PID_VAR_TEMPLATE = &#x27;mirror.@PORT.pid&#x27;;                                                                    // 66
                                                                                                                       // 67
  Meteor.startup(function initializeVelocity () {                                                                      // 68
    DEBUG &amp;&amp; console.log(&#x27;[velocity] app dir&#x27;, Velocity.getAppPath());                                                 // 69
@@ -265,7 +391,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
  * user&#x27;s application (the &#x27;mirror&#x27;) in which tests can be safely run without
  * impacting on-going development.
  *
- * Test results and log activity are reported via 
+ * Test results and log activity are reported via
  * {{#crossLink &quot;Meteor.methods&quot;}}Meteor methods{{/crossLink}}.
  *
  * @class Velocity
@@ -282,7 +408,7 @@ Velocity = {};
   if (process.env.NODE_ENV !== &#x27;development&#x27; ||
       process.env.VELOCITY === &#x27;0&#x27; ||
       process.env.IS_MIRROR) {
-    DEBUG &amp;&amp; console.log(&#x27;Not adding velocity code&#x27;);
+    DEBUG &amp;&amp; console.log(&#x27;[velocity] &#x27; + (process.env.IS_MIRROR ? &#x27;Mirror detected -&#x27; : &#x27;&#x27;) + &#x27;Not adding velocity core&#x27;);
     return;
   }
 
@@ -305,7 +431,6 @@ Velocity = {};
       url = Npm.require(&#x27;url&#x27;),
       Rsync = Npm.require(&#x27;rsync&#x27;),
       child_process = Npm.require(&#x27;child_process&#x27;),
-      spawn = child_process.spawn,
       chokidar = Npm.require(&#x27;chokidar&#x27;),
       mkdirp = Npm.require(&#x27;mkdirp&#x27;),
       _config = {},
@@ -313,7 +438,8 @@ Velocity = {};
       _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp(&#x27;-fixture.(js|coffee)$&#x27;),
-      DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;);
+      DEFAULT_FIXTURE_PATH = getAssetPath(&#x27;velocity:core&#x27;, &#x27;default-fixture.js&#x27;),
+      MIRROR_PID_VAR_TEMPLATE = &#x27;mirror.@PORT.pid&#x27;;
 
   Meteor.startup(function initializeVelocity () {
     DEBUG &amp;&amp; console.log(&#x27;[velocity] app dir&#x27;, Velocity.getAppPath());
@@ -420,7 +546,7 @@ Velocity = {};
         _config[name] = _parseTestingFrameworkOptions(name, options);
 
         // make sure the appropriate aggregate records are added
-        _reset(_config)
+        _reset(_config);
       }
     });
   }
@@ -501,7 +627,7 @@ Velocity = {};
 
     /**
      * Log a message to the Velocity log store.  This provides a central
-     * location for different reporters to query for test framework log 
+     * location for different reporters to query for test framework log
      * entries.
      *
      * @method velocity/logs/submit
@@ -631,7 +757,7 @@ Velocity = {};
 
         sampleTests = _config[options.framework].sampleTestGenerator(options);
 
-        DEBUG &amp;&amp; console.log(&#x27;[velocity] found &#x27;, sampleTests.length, 
+        DEBUG &amp;&amp; console.log(&#x27;[velocity] found &#x27;, sampleTests.length,
                              &#x27;sample test files for&#x27;, options.framework);
 
         sampleTests.forEach(function (testFile) {
@@ -656,7 +782,7 @@ Velocity = {};
                     &#x27; &#x27; + testsPath + path.sep;
 
           DEBUG &amp;&amp; console.log(&#x27;[velocity] copying sample tests (if any) &#x27; +
-                               &#x27;for framework&#x27;, options.framework, &#x27;-&#x27;, 
+                               &#x27;for framework&#x27;, options.framework, &#x27;-&#x27;,
                                command);
 
           child_process.exec(command, Meteor.bindEnvironment(
@@ -706,41 +832,34 @@ Velocity = {};
       options.port = options.port || 5000;
       options.requestId = options.requestId || Random.id();
 
-      var rootUrlPath = (options.rootUrlPath || &#x27;&#x27;).replace(/\//, &#x27;&#x27;)
+      var rootUrlPath = (options.rootUrlPath || &#x27;&#x27;).replace(/\//, &#x27;&#x27;);
       options.rootUrl = _getMirrorUrl(options.port) + rootUrlPath;
 
       DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror requested&#x27;, options,
                            &#x27;requestId:&#x27;, options.requestId);
 
-      _retryHttpGet(options.rootUrl, function (error, result) {
 
-        // if this mirror already been started, reuse it
-        if (!error &amp;&amp; result.statusCode === 200) {
-          DEBUG &amp;&amp; console.log(&#x27;[velocity] Requested mirror already exists. &#x27; +
-                               &#x27;Reusing...&#x27;);
-          _reuseExistingMirror(options);
-        }
+      var connectToMirrorViaDDP = function () {
+        DEBUG &amp;&amp; console.log(&#x27;[velocity] Connecting to mirror via DDP...&#x27;);
+        var ddpConnection = DDP.connect(options.rootUrl);
+        ddpConnection.onReconnect = function () {
+          DEBUG &amp;&amp; console.log(&#x27;[velocity] Connected, updating mirror metadata&#x27;);
+          _updateMirrorMetadata(options);
+          this.disconnect();
+        };
+      };
 
-        // if the mirror not been started at all, start a new one
-        if (error &amp;&amp; error.indexOf(&#x27;ECONNREFUSED&#x27;) !== -1) {
-          DEBUG &amp;&amp; console.log(&#x27;[velocity] Requested mirror not started. &#x27; +
-                               &#x27;Starting...&#x27;);
-          _velocityStartMirror(options);
-        }
+      DEBUG &amp;&amp; console.log(&#x27;[velocity] Checking if requested mirror is already started.&#x27;);
+      if (!_isProcessRunningForRegisteredMirrorPid(options.port)) {
+        DEBUG &amp;&amp; console.log(&#x27;[velocity] Requested mirror not started. Starting...&#x27;);
+        _velocityStartMirror(options, function () {
+          connectToMirrorViaDDP();
+        });
+      } else {
+        DEBUG &amp;&amp; console.log(&#x27;[velocity] Requested mirror pid already running. Reusing...&#x27;);
+        connectToMirrorViaDDP();
+      }
 
-        // if a mirror exists but is failing for some other reason, let the
-        // user know why in the console
-        if (error &amp;&amp; error.indexOf(&#x27;ECONNREFUSED&#x27;) === -1) {
-          DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror could not start&#x27;, error);
-        } else if (!error &amp;&amp; result.statusCode !== 200) {
-          DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror started but returned &#x27; +
-                               &#x27;non-200 response&#x27;, result);
-        }
-
-      });
-
-      // frameworks know a mirror is ready by observing VelocityMirrors for
-      // this requestId
       return options.requestId;
     },
 
@@ -786,10 +905,11 @@ Velocity = {};
    *                 Optional parameters:
    *                   fixtureFiles - Array of files with absolute paths
    *                   port - String use a specific port instead of finding the next available one
+   *                   next - function to call after the mirror has started
    *
    * @private
    */
-  function _velocityStartMirror (options) {
+  function _velocityStartMirror (options, next) {
 
     // perform a forced rsync as we are about to start a mirror
     _syncMirror(true);
@@ -813,101 +933,115 @@ Velocity = {};
       })
     };
 
-
     var settingsPath = path.join(Velocity.getMirrorPath(), &#x27;settings.json&#x27;);
     outputFile(settingsPath, JSON.stringify(Meteor.settings));
 
-    DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror: starting at&#x27;, mirrorLocation);
+    console.log(&#x27;[velocity] Starting mirror at&#x27;, mirrorLocation);
 
-    var spawnAttempts = 10;
-    var spawnMeteor = function () {
-      var closeHandler = function (code, signal) {
-        console.log(&#x27;[velocity] Mirror: exited with code &#x27; + code + &#x27; signal &#x27; + signal);
-        setTimeout(function () {
-          DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror: trying to restart&#x27;);
-          spawnAttempts--;
-          if (spawnAttempts) {
-            spawnMeteor();
-          } else {
-            console.error(&#x27;[velocity] Mirror: could not be started on port &#x27; + port + &#x27;.\n&#x27; +
-            &#x27;Please make sure that nothing else is using the port and then restart your app to try again.&#x27;);
-          }
-        }, 1000);
-      };
-      var meteor = spawn(
-        &#x27;meteor&#x27;,
-        [&#x27;--port&#x27;, port, &#x27;--settings&#x27;, settingsPath],
-        opts
-      );
-      meteor.on(&#x27;close&#x27;, closeHandler);
-
-      // FIXME there&#x27;s a better way to do this with streams
-      var outputHandler = function (data) {
-        var lines = data.toString().split(/\r?\n/).slice(0, -1);
-        _.map(lines, function (line) {
-          console.log(&#x27;[velocity mirror] &#x27; + line);
-        });
-      };
-      if (!!process.env.VELOCITY_DEBUG_MIRROR) {
-        meteor.stdout.on(&#x27;data&#x27;, outputHandler);
-      }
-      meteor.stderr.on(&#x27;data&#x27;, outputHandler);
-    };
-    spawnMeteor();
-
-    var storeMirrorMetadata = function () {
-      VelocityMirrors.upsert(
-        {
-          framework: options.framework,
-          port: port
-        }, {
-          framework: options.framework,
-          port: port,
-          rootUrl: options.rootUrl,
-          mongoUrl: mongoLocation,
-          requestId: options.requestId
-        });
-    };
-
-    _retryHttpGet(mirrorLocation, function (error, result) {
-      if (!error &amp;&amp; result.statusCode === 200) {
-        DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror started at&#x27;, mirrorLocation, &#x27;with result:&#x27;, result);
-        storeMirrorMetadata();
-        // do a final rsync in case the user changes any files whilst the mirror is starting up
-        _syncMirror();
-      } else {
-        console.error(&#x27;Mirror did not start correctly.&#x27;, error || result);
-      }
+    _startMeteor(port, settingsPath, opts, function () {
+      // do another forced sync in case the user changes any files whilst the mirror is starting up
+      _syncMirror(true);
+      next();
     });
 
   } // end velocityStartMirror
 
   /**
-   * Reuses a mirror is it has already been started and updated the VelocityMirrors collection
+   * Updated the VelocityMirrors collection with metadata about a newly started or reused mirror
    *
-   * @method _reuseExistingMirror
+   * @method _updateMirrorMetadata
    * @param {Object} options Required fields:
    *                   framework - String ex. &#x27;mocha-web-1&#x27;
-   *                   port - String use a specific port
+   *                   port - String the port the mirror that just started / was reused is using
    *                   requestId - the request id to put in the mirror metadata
    *
    * @private
    */
-  function _reuseExistingMirror (options) {
+  function _updateMirrorMetadata (options) {
     // if this is a request we&#x27;ve seen before
-    var existingMirror = VelocityMirrors.findOne({framework: options.framework, port: options.port});
+    var existingMirror = VelocityMirrors.findOne({
+      framework: options.framework,
+      port: options.port
+    });
     if (existingMirror) {
       // if we already have this mirror metadata, update it
       VelocityMirrors.update(existingMirror._id, {$set: {requestId: options.requestId}});
     } else {
       // if this is a request we haven&#x27;t seen before, create a new metadata entry
-      VelocityMirrors.insert({
-        framework: options.framework,
-        port: options.port,
-        rootUrl: options.rootUrl,
-        mongoUrl: _getMongoUrl(options.framework),
-        requestId: options.requestId
-      });
+      VelocityMirrors.upsert(
+        {
+          framework: options.framework,
+          port: options.port
+        }, {
+          framework: options.framework,
+          port: options.port,
+          rootUrl: options.rootUrl,
+          mongoUrl: _getMongoUrl(options.framework),
+          requestId: options.requestId
+        });
+    }
+  }
+
+  // TODO DOC IT UP
+  function _startMeteor (port, settingsPath, procOpts, next) {
+
+    var meteorArgs = [];
+    meteorArgs.push(&#x27;--port&#x27;, port);
+    meteorArgs.push(&#x27;--settings&#x27;, settingsPath);
+
+    var meteorProc = child_process.execFile(&#x27;meteor&#x27;, meteorArgs, procOpts);
+    meteorProc.stdout.pipe(process.stdout);
+    meteorProc.stderr.pipe(process.stderr);
+    var stopMeteorProc = function () {
+      DEBUG &amp;&amp; console.log(&#x27;[velocity] killing mirror&#x27;);
+      meteorProc.kill();
+    };
+    process.on(&#x27;SIGINT&#x27;, stopMeteorProc);
+
+    meteorProc.on(&#x27;exit&#x27;, function (code, signal) {
+      DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror exited with code:&#x27;, code, &#x27; signal:&#x27;, signal);
+      process.removeListener(&#x27;SIGINT&#x27;, stopMeteorProc);
+      // should we respawn here based on code/signal?
+    });
+
+    meteorProc.stdout.setEncoding(&#x27;utf8&#x27;);
+    var processMeteorStartup = Meteor.bindEnvironment(function (data) {
+      if (data.match(/Started Proxy/i)) {
+        console.log(&#x27;[velocity] Mirror started.&#x27;);
+        var mirrorPidId = MIRROR_PID_VAR_TEMPLATE.replace(&#x27;@PORT&#x27;, port);
+        VelocityVars.upsert({_id: mirrorPidId}, {_id: mirrorPidId, value: meteorProc.pid});
+        meteorProc.stdout.removeListener(&#x27;data&#x27;, processMeteorStartup);
+        next(null, meteorProc);
+      }
+      else if (data.match(/Perhaps another Meteor is running/i)) {
+        next(new Error(data));
+      }
+      // TODO there are more scenarios where meteor exists and we need to have those covered
+    });
+    meteorProc.stdout.on(&#x27;data&#x27;, processMeteorStartup);
+  }
+
+  /**
+   * Returns true if a mirror with the specified port was started by Velocity and if the pid stored
+   * at the time is currently running. This method DOES NOT check the actual connection
+   * @param port this is used to look up the PID for the mirror if it was started by Velocity
+   * @returns {string} true if the registered mirror process is running
+   * @private
+   */
+  function _isProcessRunningForRegisteredMirrorPid (port) {
+    var mirrorPid = MIRROR_PID_VAR_TEMPLATE.replace(&#x27;@PORT&#x27;, port);
+    var pid = VelocityVars.findOne(mirrorPid);
+    if (!pid) {
+      return false;
+    }
+    DEBUG &amp;&amp; console.log(&#x27;[velocity] Checking if mirror is running with pid&#x27;, pid);
+    try {
+      process.kill(pid.value, 0);
+      DEBUG &amp;&amp; console.log(&#x27;[velocity] process with pid&#x27;, pid, &#x27;is running&#x27;);
+      return true;
+    } catch (e) {
+      DEBUG &amp;&amp; console.log(&#x27;[velocity] process with &#x27;, pid, &#x27;is not running&#x27;);
+      return false;
     }
   }
 
@@ -963,47 +1097,6 @@ Velocity = {};
     });
   }
 
-  /**
-   * Performs a http get and retries the specified number of times with the specified timeouts.
-   * Uses a future to respond and the future return object can be provided.
-   *
-   * @method _retryHttpGet
-   *
-   * @param {String} url The target location
-   * @param {Function} callback Called with (error, result) where error is the exception and result is the status code
-   *
-   * @return {Future} A future that can be used in meteor methods (or for other async needs)
-   * @private
-   */
-  function _retryHttpGet (url, callback) {
-    var retry = new Retry({
-      baseTimeout: 100,
-      maxTimeout: 2000
-    });
-    var tries = 0;
-    var doGet = function () {
-      try {
-        var res = HTTP.get(url);
-        callback(null, {statusCode: res.statusCode});
-      } catch (ex) {
-
-        if (ex.message.indexOf(&#x27;ECONNREFUSED&#x27;) === -1) {
-          throw(ex);
-        }
-
-        if (tries &lt; 10) {
-          DEBUG &amp;&amp; console.log(&#x27;[velocity] retrying mirror at &#x27;, url);
-          retry.retryLater(++tries, doGet);
-        } else {
-          callback(ex.message);
-        }
-      }
-    };
-
-    doGet();
-  } // end _retryHttpGet
-
-
   function _parseTestingFrameworkOptions (name, options) {
     options = options || {};
     _.defaults(options, {
@@ -1043,6 +1136,7 @@ Velocity = {};
 
       // if this is a fixture file, put it in the fixtures collection
       if (FIXTURE_REG_EXP.test(relativePath)) {
+        DEBUG &amp;&amp; console.log(&#x27;[velocity] Copying fixture file&#x27;, relativePath);
         VelocityFixtureFiles.insert({
           _id: filePath,
           absolutePath: filePath,
@@ -1195,7 +1289,14 @@ Velocity = {};
    * @param force performs an rsync even if no mirrors have been requested
    * @private
    */
+  var _syncing = false;
   function _syncMirror (force) {
+
+    // de-bounce the sync requests which is killing the mirror
+    if (_syncing) {
+      return;
+    }
+    _syncing = true;
 
     // don&#x27;t sync if no mirrors have been requested
     if (!force &amp;&amp; VelocityMirrors.find().count() === 0) {
@@ -1212,13 +1313,16 @@ Velocity = {};
       .exclude(&#x27;/.meteor/local&#x27;)
       .exclude(&#x27;/tests/.*&#x27;)
       .exclude(&#x27;/packages&#x27;)
+      // This file is created by velocity:core.
+      // It must be excluded to prevent rsync from deleting it.
+      .exclude(&#x27;/settings.json&#x27;)
       .source(Velocity.getAppPath() + path.sep)
       .destination(Velocity.getMirrorPath());
     var then = Date.now();
     cmd.execute(Meteor.bindEnvironment(function (error) {
 
       if (error) {
-        DEBUG &amp;&amp; console.error(&#x27;[velocity] Error syncing mirror&#x27;, error);
+        console.error(&#x27;[velocity] Error syncing mirror&#x27;, error);
       } else {
         DEBUG &amp;&amp; console.log(&#x27;[velocity] rsync took&#x27;, Date.now() - then);
       }
@@ -1229,13 +1333,20 @@ Velocity = {};
         preProcessor();
       });
 
-      VelocityFixtureFiles.find({}).forEach(function (fixture) {
-        var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
-        DEBUG &amp;&amp; console.log(&#x27;[velocity] copying fixture&#x27;, fixture.absolutePath, &#x27;to&#x27;, fixtureLocationInMirror);
-        copyFile(fixture.absolutePath, fixtureLocationInMirror);
-      });
+      _copyFixtureFilesIntoMirror();
+
+      _syncing = false;
 
     }));
+  }
+
+  // DOC IT UP
+  function _copyFixtureFilesIntoMirror () {
+    VelocityFixtureFiles.find({}).forEach(function (fixture) {
+      var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
+      DEBUG &amp;&amp; console.log(&#x27;[velocity] adding fixture to watch list&#x27;, fixture.absolutePath, &#x27;to mirror&#x27;);
+      copyFile(fixture.absolutePath, fixtureLocationInMirror);
+    });
   }
 
   /**
