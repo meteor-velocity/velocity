@@ -474,7 +474,7 @@ Velocity = {};
       };
 
       DEBUG && console.log('[velocity] Checking if requested mirror is already started.');
-      if (!_isMirrorRunning(options.port)) {
+      if (!_isProcessRunningForRegisteredMirrorPid(options.port)) {
         DEBUG && console.log('[velocity] Requested mirror not started. Starting...');
         _velocityStartMirror(options, function () {
           connectToMirrorViaDDP();
@@ -568,7 +568,6 @@ Velocity = {};
       next();
     });
 
-
   } // end velocityStartMirror
 
   /**
@@ -646,8 +645,14 @@ Velocity = {};
     meteorProc.stdout.on('data', processMeteorStartup);
   }
 
-  // TODO DOC IT UP
-  function _isMirrorRunning (port) {
+  /**
+   * Returns true if a mirror with the specified port was started by Velocity and if the pid stored
+   * at the time is currently running. This method DOES NOT check the actual connection
+   * @param port this is used to look up the PID for the mirror if it was started by Velocity
+   * @returns {string} true if the registered mirror process is running
+   * @private
+   */
+  function _isProcessRunningForRegisteredMirrorPid (port) {
     var mirrorPid = MIRROR_PID_VAR_TEMPLATE.replace('@PORT', port);
     var pid = VelocityVars.findOne(mirrorPid);
     if (!pid) {
@@ -664,7 +669,6 @@ Velocity = {};
     }
   }
 
-  // TODO DOC IT UP
   function _getTestFrameworkNames () {
     return _.pluck(_config, 'name');
   }
@@ -912,7 +916,7 @@ Velocity = {};
   var _syncing = false;
   function _syncMirror (force) {
 
-    // debounce the sync requests which is killing the mirror
+    // de-bounce the sync requests which is killing the mirror
     if (_syncing) {
       return;
     }
@@ -960,7 +964,7 @@ Velocity = {};
     }));
   }
 
-  // TODO DOC IT UP
+  // DOC IT UP
   function _copyFixtureFilesIntoMirror () {
     VelocityFixtureFiles.find({}).forEach(function (fixture) {
       var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
