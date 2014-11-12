@@ -560,7 +560,7 @@ Velocity = {};
     var settingsPath = path.join(Velocity.getMirrorPath(), 'settings.json');
     outputFile(settingsPath, JSON.stringify(Meteor.settings));
 
-    DEBUG && console.log('[velocity] Mirror starting at', mirrorLocation);
+    console.log('[velocity] Starting mirror at', mirrorLocation);
 
     _startMeteor(port, settingsPath, opts, function () {
       // do another forced sync in case the user changes any files whilst the mirror is starting up
