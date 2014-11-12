@@ -32,7 +32,7 @@ Velocity = {};
   if (process.env.NODE_ENV !== 'development' ||
       process.env.VELOCITY === '0' ||
       process.env.IS_MIRROR) {
-    DEBUG && console.log('Not adding velocity code');
+    DEBUG && console.log('[velocity] ' + (process.env.IS_MIRROR ? 'Mirror detected -' : '') + 'Not adding velocity core');
     return;
   }
 
@@ -55,7 +55,6 @@ Velocity = {};
       url = Npm.require('url'),
       Rsync = Npm.require('rsync'),
       child_process = Npm.require('child_process'),
-      spawn = child_process.spawn,
       chokidar = Npm.require('chokidar'),
       mkdirp = Npm.require('mkdirp'),
       _config = {},
@@ -63,7 +62,8 @@ Velocity = {};
       _postProcessors = [],
       _watcher,
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$'),
-      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js');
+      DEFAULT_FIXTURE_PATH = getAssetPath('velocity:core', 'default-fixture.js'),
+      MIRROR_PID_VAR_TEMPLATE = 'mirror.@PORT.pid';
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
@@ -170,7 +170,7 @@ Velocity = {};
         _config[name] = _parseTestingFrameworkOptions(name, options);
 
         // make sure the appropriate aggregate records are added
-        _reset(_config)
+        _reset(_config);
       }
     });
   }
@@ -456,40 +456,34 @@ Velocity = {};
       options.port = options.port || 5000;
       options.requestId = options.requestId || Random.id();
 
-      var rootUrlPath = (options.rootUrlPath || '').replace(/\//, '')
+      var rootUrlPath = (options.rootUrlPath || '').replace(/\//, '');
       options.rootUrl = _getMirrorUrl(options.port) + rootUrlPath;
 
       DEBUG && console.log('[velocity] Mirror requested', options,
                            'requestId:', options.requestId);
 
-      _retryHttpGet(options.rootUrl, function (error, result) {
 
-        // if this mirror already been started, reuse it
-        if (!error && result.statusCode === 200) {
-          DEBUG && console.log('[velocity] Requested mirror already exists. ' +
-                               'Reusing...');
-          _reuseExistingMirror(options);
-        }
+      var connectToMirrorViaDDP = function () {
+        DEBUG && console.log('[velocity] Connecting to mirror via DDP...');
+        var ddpConnection = DDP.connect(options.rootUrl);
+        ddpConnection.onReconnect = function () {
+          DEBUG && console.log('[velocity] Connected, updating mirror metadata');
+          _updateMirrorMetadata(options);
+          this.disconnect();
+        };
+      };
 
-        // if the mirror not been started at all, start a new one
-        if (error && (error.indexOf('ECONNREFUSED') !== -1 || result.statusCode === 502)) {
-          DEBUG && console.log('[velocity] Requested mirror not started. ');
-          _velocityStartMirror(options);
-        }
+      DEBUG && console.log('[velocity] Checking if requested mirror is already started.');
+      if (!_isMirrorRunning(options.port)) {
+        DEBUG && console.log('[velocity] Requested mirror not started. Starting...');
+        _velocityStartMirror(options, function () {
+          connectToMirrorViaDDP();
+        });
+      } else {
+        DEBUG && console.log('[velocity] Requested mirror pid already running. Reusing...');
+        connectToMirrorViaDDP();
+      }
 
-        // if a mirror exists but is failing for some other reason, let the
-        // user know why in the console
-        if (error && error.indexOf('ECONNREFUSED') === -1) {
-          DEBUG && console.log('[velocity] Mirror could not start', error);
-        } else if (!error && result.statusCode !== 200) {
-          DEBUG && console.log('[velocity] Mirror started but returned ' +
-                               'non-200 response', result);
-        }
-
-      });
-
-      // frameworks know a mirror is ready by observing VelocityMirrors for
-      // this requestId
       return options.requestId;
     },
 
@@ -535,10 +529,11 @@ Velocity = {};
    *                 Optional parameters:
    *                   fixtureFiles - Array of files with absolute paths
    *                   port - String use a specific port instead of finding the next available one
+   *                   next - function to call after the mirror has started
    *
    * @private
    */
-  function _velocityStartMirror (options) {
+  function _velocityStartMirror (options, next) {
 
     // perform a forced rsync as we are about to start a mirror
     _syncMirror(true);
@@ -546,8 +541,6 @@ Velocity = {};
     var port = options.port;
     var mongoLocation = _getMongoUrl(options.framework);
     var mirrorLocation = _getMirrorUrl(port);
-
-    console.log('[velocity] Starting mirror on', options.mirrorLocation, 'with mongo', mongoLocation);
 
     if (options.fixtureFiles) {
       _addFixtures(options.fixtureFiles);
@@ -564,100 +557,114 @@ Velocity = {};
       })
     };
 
-
     var settingsPath = path.join(Velocity.getMirrorPath(), 'settings.json');
     outputFile(settingsPath, JSON.stringify(Meteor.settings));
 
-    var spawnAttempts = 10;
-    var spawnMeteor = function () {
-      var closeHandler = function (code, signal) {
-        console.log('[velocity] Mirror: exited with code ' + code + ' signal ' + signal);
-        setTimeout(function () {
-          DEBUG && console.log('[velocity] Mirror: trying to restart');
-          spawnAttempts--;
-          if (spawnAttempts) {
-            spawnMeteor();
-          } else {
-            console.error('[velocity] Mirror: could not be started on port ' + port + '.\n' +
-            'Please make sure that nothing else is using the port and then restart your app to try again.');
-          }
-        }, 1000);
-      };
-      var meteor = spawn(
-        'meteor',
-        ['--port', port, '--settings', settingsPath],
-        opts
-      );
-      meteor.on('close', closeHandler);
+    DEBUG && console.log('[velocity] Mirror starting at', mirrorLocation);
 
-      // FIXME there's a better way to do this with streams
-      var outputHandler = function (data) {
-        var lines = data.toString().split(/\r?\n/).slice(0, -1);
-        _.map(lines, function (line) {
-          console.log('[velocity mirror] ' + line);
-        });
-      };
-      meteor.stdout.on('data', outputHandler);
-      meteor.stderr.on('data', outputHandler);
-    };
-    spawnMeteor();
-
-    var storeMirrorMetadata = function () {
-      VelocityMirrors.upsert(
-        {
-          framework: options.framework,
-          port: port
-        }, {
-          framework: options.framework,
-          port: port,
-          rootUrl: options.rootUrl,
-          mongoUrl: mongoLocation,
-          requestId: options.requestId
-        });
-    };
-
-    _retryHttpGet(mirrorLocation, function (error, result) {
-      if (!error && result.statusCode === 200) {
-        DEBUG && console.log('[velocity] Mirror started at', mirrorLocation, 'with result:', result);
-        storeMirrorMetadata();
-        // do a final rsync in case the user changes any files whilst the mirror is starting up
-        _syncMirror();
-      } else {
-        console.error('Mirror did not start correctly.', error || result);
-      }
+    _startMeteor(port, settingsPath, opts, function () {
+      // do another forced sync in case the user changes any files whilst the mirror is starting up
+      _syncMirror(true);
+      next();
     });
+
 
   } // end velocityStartMirror
 
   /**
-   * Reuses a mirror is it has already been started and updated the VelocityMirrors collection
+   * Updated the VelocityMirrors collection with metadata about a newly started or reused mirror
    *
-   * @method _reuseExistingMirror
+   * @method _updateMirrorMetadata
    * @param {Object} options Required fields:
    *                   framework - String ex. 'mocha-web-1'
-   *                   port - String use a specific port
+   *                   port - String the port the mirror that just started / was reused is using
    *                   requestId - the request id to put in the mirror metadata
    *
    * @private
    */
-  function _reuseExistingMirror (options) {
+  function _updateMirrorMetadata (options) {
     // if this is a request we've seen before
-    var existingMirror = VelocityMirrors.findOne({framework: options.framework, port: options.port});
+    var existingMirror = VelocityMirrors.findOne({
+      framework: options.framework,
+      port: options.port
+    });
     if (existingMirror) {
       // if we already have this mirror metadata, update it
       VelocityMirrors.update(existingMirror._id, {$set: {requestId: options.requestId}});
     } else {
       // if this is a request we haven't seen before, create a new metadata entry
-      VelocityMirrors.insert({
-        framework: options.framework,
-        port: options.port,
-        rootUrl: options.rootUrl,
-        mongoUrl: _getMongoUrl(options.framework),
-        requestId: options.requestId
-      });
+      VelocityMirrors.upsert(
+        {
+          framework: options.framework,
+          port: options.port
+        }, {
+          framework: options.framework,
+          port: options.port,
+          rootUrl: options.rootUrl,
+          mongoUrl: _getMongoUrl(options.framework),
+          requestId: options.requestId
+        });
     }
   }
 
+  // TODO DOC IT UP
+  function _startMeteor (port, settingsPath, procOpts, next) {
+
+    var meteorArgs = [];
+    meteorArgs.push('--port', port);
+    meteorArgs.push('--settings', settingsPath);
+
+    var meteorProc = child_process.execFile('meteor', meteorArgs, procOpts);
+    meteorProc.stdout.pipe(process.stdout);
+    meteorProc.stderr.pipe(process.stderr);
+    var stopMeteorProc = function () {
+      DEBUG && console.log('[velocity] killing mirror');
+      meteorProc.kill();
+    };
+    process.on('SIGINT', stopMeteorProc);
+
+    meteorProc.on('exit', function (code, signal) {
+      DEBUG && console.log('[velocity] Mirror exited with code:', code, ' signal:', signal);
+      process.removeListener('SIGINT', stopMeteorProc);
+      // should we respawn here based on code/signal?
+    });
+
+    meteorProc.stdout.setEncoding('utf8');
+    var processMeteorStartup = Meteor.bindEnvironment(function (data) {
+      if (data.match(/Started Proxy/i)) {
+        console.log('[velocity] Mirror started.');
+        var mirrorPidId = MIRROR_PID_VAR_TEMPLATE.replace('@PORT', port);
+        VelocityVars.upsert({_id: mirrorPidId}, {_id: mirrorPidId, value: meteorProc.pid});
+        meteorProc.stdout.removeListener('data', processMeteorStartup);
+        next(null, meteorProc);
+      }
+      else if (data.match(/Perhaps another Meteor is running/i)) {
+        next(new Error(data));
+      }
+      // TODO there are more scenarios where meteor exists and we need to have those covered
+    });
+    meteorProc.stdout.on('data', processMeteorStartup);
+  }
+
+  // TODO DOC IT UP
+  function _isMirrorRunning (port) {
+    var mirrorPid = MIRROR_PID_VAR_TEMPLATE.replace('@PORT', port);
+    var pid = VelocityVars.findOne(mirrorPid);
+    if (!pid) {
+      return false;
+    }
+    DEBUG && console.log('[velocity] Checking if mirror is running with pid', pid);
+    try {
+      process.kill(pid.value, 0);
+      DEBUG && console.log('[velocity] process with pid', pid, 'is running');
+      return true;
+    } catch (e) {
+      DEBUG && console.log('[velocity] process with ', pid, 'is not running');
+      return false;
+    }
+  }
+
+  // TODO DOC IT UP
   function _getTestFrameworkNames () {
     return _.pluck(_config, 'name');
   }
@@ -710,51 +717,6 @@ Velocity = {};
     });
   }
 
-  /**
-   * Performs a http get and retries the specified number of times with the specified timeouts.
-   * Uses a future to respond and the future return object can be provided.
-   *
-   * @method _retryHttpGet
-   *
-   * @param {String} url The target location
-   * @param {Function} callback Called with (error, result) where error is the exception and result is the status code
-   *
-   * @return {Future} A future that can be used in meteor methods (or for other async needs)
-   * @private
-   */
-  function _retryHttpGet (url, callback) {
-    var retry = new Retry({
-      baseTimeout: 100,
-      maxTimeout: 2000
-    });
-
-    DEBUG && console.log('[velocity] _retryHttpGet', url);
-
-    var tries = 0;
-    var doGet = function () {
-      try {
-        var res = HTTP.get(url);
-
-        callback(null, {statusCode: res.statusCode});
-      } catch (ex) {
-        if (ex.message.indexOf('ECONNREFUSED') === -1 && ex.response.statusCode !== 502) {
-          throw ex;
-        }
-
-        if (tries < 10) {
-          DEBUG && console.log('[velocity] retrying mirror at ', url);
-          retry.retryLater(++tries, doGet);
-        } else {
-          ex.response = ex.response || {};
-          callback(ex.message, {statusCode: ex.response.statusCode});
-        }
-      }
-    };
-
-    doGet();
-  } // end _retryHttpGet
-
-
   function _parseTestingFrameworkOptions (name, options) {
     options = options || {};
     _.defaults(options, {
@@ -794,6 +756,7 @@ Velocity = {};
 
       // if this is a fixture file, put it in the fixtures collection
       if (FIXTURE_REG_EXP.test(relativePath)) {
+        DEBUG && console.log('[velocity] Copying fixture file', relativePath);
         VelocityFixtureFiles.insert({
           _id: filePath,
           absolutePath: filePath,
@@ -946,7 +909,14 @@ Velocity = {};
    * @param force performs an rsync even if no mirrors have been requested
    * @private
    */
+  var _syncing = false;
   function _syncMirror (force) {
+
+    // debounce the sync requests which is killing the mirror
+    if (_syncing) {
+      return;
+    }
+    _syncing = true;
 
     // don't sync if no mirrors have been requested
     if (!force && VelocityMirrors.find().count() === 0) {
@@ -972,7 +942,7 @@ Velocity = {};
     cmd.execute(Meteor.bindEnvironment(function (error) {
 
       if (error) {
-        DEBUG && console.error('[velocity] Error syncing mirror', error);
+        console.error('[velocity] Error syncing mirror', error);
       } else {
         DEBUG && console.log('[velocity] rsync took', Date.now() - then);
       }
@@ -983,13 +953,20 @@ Velocity = {};
         preProcessor();
       });
 
-      VelocityFixtureFiles.find({}).forEach(function (fixture) {
-        var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
-        DEBUG && console.log('[velocity] copying fixture', fixture.absolutePath, 'to', fixtureLocationInMirror);
-        copyFile(fixture.absolutePath, fixtureLocationInMirror);
-      });
+      _copyFixtureFilesIntoMirror();
+
+      _syncing = false;
 
     }));
+  }
+
+  // TODO DOC IT UP
+  function _copyFixtureFilesIntoMirror () {
+    VelocityFixtureFiles.find({}).forEach(function (fixture) {
+      var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
+      DEBUG && console.log('[velocity] adding fixture to watch list', fixture.absolutePath, 'to mirror');
+      copyFile(fixture.absolutePath, fixtureLocationInMirror);
+    });
   }
 
   /**
