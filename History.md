@@ -1,3 +1,10 @@
+## v1.0.0.rc.4
+
+* Fixed bug in de-bouncing rsync
+* Added NPM shrink
+* Bumped npm dependency versions for chokadir, glob and freeport
+* Increased mirror logging
+
 ## v1.0.0.rc.3
 
 * Mirror output is now visible by default

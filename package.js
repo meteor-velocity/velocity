@@ -4,19 +4,19 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '1.0.0-rc.3',
+  version: '1.0.0-rc.4',
   git: 'https://github.com/xolvio/velocity.git',
   debugOnly: true
 });
 
 Npm.depends({
-  'chokidar': '0.8.2',
+  'chokidar': '0.10.1',
   'lodash': '2.4.1',
-  'glob': '3.2.9',
+  'glob': '4.0.6',
   'mkdirp': '0.5.0',
   'rsync': '0.3.0',
   'fs-extra': '0.12.0',
-  'freeport': '1.0.2'
+  'freeport': '1.0.3'
 });
 
 Package.on_use(function (api) {

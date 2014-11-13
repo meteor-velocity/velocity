@@ -30,9 +30,9 @@ Velocity = {};
 //
 
   if (process.env.NODE_ENV !== 'development' ||
-      process.env.VELOCITY === '0' ||
-      process.env.IS_MIRROR) {
-    DEBUG && console.log('[velocity] ' + (process.env.IS_MIRROR ? 'Mirror detected -' : '') + 'Not adding velocity core');
+    process.env.VELOCITY === '0' ||
+    process.env.IS_MIRROR) {
+    DEBUG && console.log('[velocity] ' + (process.env.IS_MIRROR ? 'Mirror detected - ' : '') + 'Not adding velocity core');
     return;
   }
 
@@ -66,6 +66,7 @@ Velocity = {};
       MIRROR_PID_VAR_TEMPLATE = 'mirror.@PORT.pid';
 
   Meteor.startup(function initializeVelocity () {
+    DEBUG && console.log('[velocity] Server startup');
     DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
     DEBUG && console.log('velocity config =', JSON.stringify(_config, null, 2));
 
@@ -505,6 +506,7 @@ Velocity = {};
      * @method velocity/syncMirror
      */
     'velocity/syncMirror': function () {
+      DEBUG && console.log('[velocity] client restart requested velocity/syncMirror');
       _syncMirror();
     }
 
@@ -535,9 +537,6 @@ Velocity = {};
    */
   function _velocityStartMirror (options, next) {
 
-    // perform a forced rsync as we are about to start a mirror
-    _syncMirror(true);
-
     var port = options.port;
     var mongoLocation = _getMongoUrl(options.framework);
     var mirrorLocation = _getMirrorUrl(port);
@@ -562,10 +561,13 @@ Velocity = {};
 
     console.log('[velocity] Starting mirror at', mirrorLocation);
 
-    _startMeteor(port, settingsPath, opts, function () {
-      // do another forced sync in case the user changes any files whilst the mirror is starting up
-      _syncMirror(true);
-      next();
+
+    // perform a forced rsync as we are about to start a mirror
+    _syncMirror(true, function () {
+      _startMeteor(port, settingsPath, opts, function () {
+        // do another forced sync in case the user changes any files whilst the mirror is starting up
+        next();
+      });
     });
 
   } // end velocityStartMirror
@@ -744,6 +746,8 @@ Velocity = {};
 
     _watcher = chokidar.watch(Velocity.getTestsPath(), {ignored: /[\/\\]\./});
 
+    console.log('[velocity] chokadir watching ' + Velocity.getTestsPath());
+
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
       var relativePath,
           targetFramework,
@@ -760,12 +764,14 @@ Velocity = {};
 
       // if this is a fixture file, put it in the fixtures collection
       if (FIXTURE_REG_EXP.test(relativePath)) {
-        DEBUG && console.log('[velocity] Copying fixture file', relativePath);
+        DEBUG && console.log('[velocity] Found fixture file', relativePath);
         VelocityFixtureFiles.insert({
           _id: filePath,
           absolutePath: filePath,
           lastModified: Date.now()
         });
+        // update the mirror right away
+        _syncMirror(true);
         return;
       }
 
@@ -821,6 +827,9 @@ Velocity = {};
    * @private
    */
   function _reset (config) {
+
+    DEBUG && console.log('[velocity] resetting the world');
+
     if (_watcher) {
       _watcher.close();
     }
@@ -851,9 +860,6 @@ Velocity = {};
       });
     });
     VelocityMirrors.remove({});
-
-    // Meteor just reloaded us which means we should rsync the app files to the mirror
-    _syncMirror();
 
     _initWatcher(config);
   }
@@ -914,26 +920,32 @@ Velocity = {};
    * @private
    */
   var _syncing = false;
-  function _syncMirror (force) {
 
-    // de-bounce the sync requests which is killing the mirror
+  function _syncMirror (force, next) {
+
+    // de-bounce sync requests
     if (_syncing) {
+      DEBUG && console.log('[velocity] de-bouncing sync mirror');
+      next && next();
       return;
     }
-    _syncing = true;
 
-    // don't sync if no mirrors have been requested
+    // don't sync if no mirrors have been requested, unless force is set
     if (!force && VelocityMirrors.find().count() === 0) {
+      DEBUG && console.log('[velocity] not syncing as no mirror metadata was found.');
+      next && next();
       return;
     }
+
+    _syncing = true;
+    DEBUG && console.log('[velocity] syncing mirror');
+
 
     var cmd = new Rsync()
       .shell('ssh')
       .flags('av')
       .set('delete')
-      .set('q')
       .set('delay-updates')
-      .set('force')
       .exclude('/.meteor/local')
       .exclude('/tests/.*')
       .exclude('/packages')
@@ -951,21 +963,23 @@ Velocity = {};
         DEBUG && console.log('[velocity] rsync took', Date.now() - then);
       }
 
+      _copyFixtureFilesIntoMirror();
       _symlinkPackagesDirIfPresent();
 
       _.each(_preProcessors, function (preProcessor) {
         preProcessor();
       });
 
-      _copyFixtureFilesIntoMirror();
-
       _syncing = false;
+      
+      next && next();
 
     }));
   }
 
   // DOC IT UP
   function _copyFixtureFilesIntoMirror () {
+    DEBUG && console.log('[velocity] copying fixture files');
     VelocityFixtureFiles.find({}).forEach(function (fixture) {
       var fixtureLocationInMirror = Velocity.getMirrorPath() + path.sep + path.basename(fixture.absolutePath) + path.extname(fixture.absolutePath);
       DEBUG && console.log('[velocity] adding fixture to watch list', fixture.absolutePath, 'to mirror');
@@ -986,6 +1000,7 @@ Velocity = {};
         mirrorPackagesDir = path.join(Velocity.getMirrorPath(), 'packages');
 
     if (fs.existsSync(packagesDir) && !fs.existsSync(mirrorPackagesDir)) {
+      DEBUG && console.log('[velocity] symlinking packages into mirror');
       fs.symlinkSync(packagesDir, mirrorPackagesDir);
     }
 
