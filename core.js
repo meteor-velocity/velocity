@@ -457,8 +457,9 @@ Velocity = {};
       options.port = options.port || 5000;
       options.requestId = options.requestId || Random.id();
 
+      var mirrorUrl = _getMirrorUrl(options.port);
       var rootUrlPath = (options.rootUrlPath || '').replace(/\//, '');
-      options.rootUrl = _getMirrorUrl(options.port) + rootUrlPath;
+      options.rootUrl = mirrorUrl + rootUrlPath;
 
       DEBUG && console.log('[velocity] Mirror requested', options,
                            'requestId:', options.requestId);
@@ -466,7 +467,7 @@ Velocity = {};
 
       var connectToMirrorViaDDP = function () {
         DEBUG && console.log('[velocity] Connecting to mirror via DDP...');
-        var ddpConnection = DDP.connect(options.rootUrl);
+        var ddpConnection = DDP.connect(mirrorUrl);
         ddpConnection.onReconnect = function () {
           DEBUG && console.log('[velocity] Connected, updating mirror metadata');
           _updateMirrorMetadata(options);
@@ -971,7 +972,7 @@ Velocity = {};
       });
 
       _syncing = false;
-      
+
       next && next();
 
     }));
