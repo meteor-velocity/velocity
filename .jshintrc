@@ -24,13 +24,17 @@
     "Deps": false,
     "DDP": false,
     "check": false,
+    "Match": false,
     "Npm": false,
+    "Random": false,
     "Package": false,
     "DEBUG": false,
     "Velocity": false,
     "VelocityTestFiles": false,
     "VelocityTestReports": false,
+    "VelocityFixtureFiles": false,
     "VelocityAggregateReports": false,
+    "VelocityMirrors": false,
     "VelocityLogs": false,
     "VelocityVars": false
   }

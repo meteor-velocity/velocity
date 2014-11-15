@@ -3,27 +3,20 @@
  VelocityTestFiles: true,
  VelocityTestReports: true,
  VelocityAggregateReports: true,
- VelocityLogs: true,
- VelocityMirrors: true,
- VelocityVars: true
+ VelocityLogs: true
  */
 
 VelocityTestFiles = new Meteor.Collection('velocityTestFiles');
-VelocityFixtureFiles = new Meteor.Collection('velocityFixtureFiles');
 VelocityTestReports = new Meteor.Collection('velocityTestReports');
 VelocityAggregateReports = new Meteor.Collection('velocityAggregateReports');
 VelocityLogs = new Meteor.Collection('velocityLogs');
 VelocityMirrors = new Meteor.Collection('velocityMirrors');
-VelocityVars = new Meteor.Collection('velocityVars');
 (function () {
   'use strict';
 
   if (Meteor.isServer) {
     Meteor.publish('VelocityTestFiles', function () {
       return VelocityTestFiles.find({});
-    });
-    Meteor.publish('VelocityFixtureFiles', function () {
-      return VelocityFixtureFiles.find({});
     });
     Meteor.publish('VelocityTestReports', function () {
       return VelocityTestReports.find({});
@@ -37,18 +30,14 @@ VelocityVars = new Meteor.Collection('velocityVars');
     Meteor.publish('VelocityMirrors', function () {
       return VelocityMirrors.find({});
     });
-    Meteor.publish('VelocityVars', function () {
-      return VelocityVars.find({});
-    });
   }
 
   if (Meteor.isClient) {
     Meteor.subscribe('VelocityTestFiles');
-    Meteor.subscribe('VelocityFixtureFiles');
     Meteor.subscribe('VelocityTestReports');
     Meteor.subscribe('VelocityAggregateReports');
     Meteor.subscribe('VelocityLogs');
     Meteor.subscribe('VelocityMirrors');
-    Meteor.subscribe('VelocityVars');
   }
 })();
+
