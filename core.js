@@ -59,6 +59,14 @@ Velocity = {};
     return path.join(serverAssetsPath, 'packages', packageName, fileName);
   };
 
+  var escapeShellArgument = function (argument) {
+    if (!/(["'`\\ ])/.test(argument)) {
+      return argument;
+    } else {
+      return '"' + argument.replace(/(["'`\\])/g, '\\$1') + '"';
+    }
+  }
+
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
       fse = Npm.require('fs-extra'),
@@ -956,8 +964,11 @@ Velocity = {};
       // This file is created by velocity:core.
       // It must be excluded to prevent rsync from deleting it.
       .exclude('/settings.json')
-      .source(Velocity.getAppPath() + path.sep)
-      .destination(Velocity.getMirrorPath());
+      // We must use escapeShellArgument until
+      // https://github.com/mattijs/node-rsync/pull/23
+      // has been pulled.
+      .source(escapeShellArgument(Velocity.getAppPath()) + path.sep)
+      .destination(escapeShellArgument(Velocity.getMirrorPath()));
     var then = Date.now();
     cmd.execute(Meteor.bindEnvironment(function (error) {
 
