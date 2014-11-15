@@ -1008,12 +1008,13 @@ Velocity = {};
    * @private
    */
   function _symlinkPackagesDirIfPresent () {
-    var packagesDir = path.join(process.env.PWD, 'packages'),
-        mirrorPackagesDir = path.join(Velocity.getMirrorPath(), 'packages');
+    var mirrorDir = Velocity.getMirrorPath(),
+        packagesDir = path.join(Velocity.getAppPath(), 'packages'),
+        mirrorPackagesDir = path.join(mirrorDir, 'packages');
 
     if (fs.existsSync(packagesDir) && !fs.existsSync(mirrorPackagesDir)) {
       DEBUG && console.log('[velocity] symlinking packages into mirror');
-      fs.symlinkSync(packagesDir, mirrorPackagesDir);
+      fs.symlinkSync(path.relative(mirrorDir, packagesDir), mirrorPackagesDir);
     }
 
   }
