@@ -1,3 +1,10 @@
+## v1.0.0.rc.6
+
+* Decoupled mirrors from the core so now mirrors can be authored as packages
+
+## v1.0.0.rc.5
+??
+
 ## v1.0.0.rc.4
 
 * Fixed bug in de-bouncing rsync
