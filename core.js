@@ -29,19 +29,6 @@ Velocity = {};
 // Init
 //
 
-  // This methods must be also available in the mirror
-  Meteor.methods({
-    /**
-     * Exposes the IS_MIRROR flag to clients
-     *
-     * @method velocity/isMirror
-     * @return {Boolean} true if currently running in mirror
-     */
-    'velocity/isMirror': function () {
-      return !!process.env.IS_MIRROR;
-    }
-  })
-
   if (process.env.NODE_ENV !== 'development' ||
     process.env.VELOCITY === '0' ||
     process.env.IS_MIRROR) {
@@ -510,6 +497,16 @@ Velocity = {};
       return options.requestId;
     },
 
+
+    /**
+     * Exposes the IS_MIRROR flag to clients
+     *
+     * @method velocity/isMirror
+     * @return {Boolean} true if currently running in mirror
+     */
+    'velocity/isMirror': function () {
+      return !!process.env.IS_MIRROR;
+    },
 
     /**
      * Syncs the mirror filesystem on an adhoc basis.
