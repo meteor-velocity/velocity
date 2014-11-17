@@ -49,9 +49,6 @@
         }
       }
     },
-    "freeport": {
-      "version": "1.0.3"
-    },
     "fs-extra": {
       "version": "0.12.0",
       "dependencies": {
@@ -106,9 +103,6 @@
           "version": "0.0.8"
         }
       }
-    },
-    "rsync": {
-      "version": "0.3.0"
     }
   }
 }

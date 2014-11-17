@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '1.0.0-rc.5',
+  version: '1.0.0-rc.6',
   git: 'https://github.com/xolvio/velocity.git',
   debugOnly: true
 });
@@ -14,9 +14,7 @@ Npm.depends({
   'lodash': '2.4.1',
   'glob': '4.0.6',
   'mkdirp': '0.5.0',
-  'rsync': '0.3.0',
-  'fs-extra': '0.12.0',
-  'freeport': '1.0.3'
+  'fs-extra': '0.12.0'
 });
 
 Package.on_use(function (api) {
@@ -28,14 +26,11 @@ Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
   api.use('mongo');
   api.use('check');
-  api.use('http');
-  api.use('retry');
 
   api.add_files('collections.js', BOTH);
 
   api.export('Velocity', BOTH);
   api.export('VelocityTestFiles', BOTH);
-  api.export('VelocityFixtureFiles', BOTH);
   api.export('VelocityTestReports', BOTH);
   api.export('VelocityAggregateReports', BOTH);
   api.export('VelocityLogs', BOTH);
@@ -43,11 +38,8 @@ Package.on_use(function (api) {
 
   api.add_files('lib/meteor/files.js', SERVER);
   api.add_files('core.js', SERVER);
-  api.add_files(['lib/FileCopier.js'], SERVER);
-  api.add_files('clientFileSync.js', CLIENT);
 
-  // Assets
-  api.add_files([
-    'default-fixture.js'
-  ], SERVER, {isAsset: true});
+  api.add_files('mirrors/Mirror.js', SERVER);
+  api.add_files('mirrors/mirrorRegistrar.js', SERVER);
+
 });
