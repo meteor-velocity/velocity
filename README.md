@@ -3,9 +3,6 @@ Velocity
 
 Test runner (and community) for Meteor apps.  Under heavy development.
 
-> __Important:__ Currently Meteor has an issue with one of velocity:core's release names.
-> To fix this issue you need to add `velocity:core@1.0.0-rc.6` to your `.meteor/packages` and `.meteor/versions` file.
-
 ##Why Velocity?
 
 The Meteor-provided testing framework, TinyTest, works great for testing packages but doesn't work for apps.  Many members of the community created their own solutions but recently we wondered what would happen if we got everybody together and tried to unify our efforts.
