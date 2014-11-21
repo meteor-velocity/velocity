@@ -3,6 +3,8 @@ Velocity
 
 Test runner (and community) for Meteor apps.  Under heavy development.
 
+> __Important:__ Currently Meteor has an issue with one of velocity:core's release names.
+> To fix this issue you need to add velocity:core with a fixed version: `meteor add velocity:core@1.0.0-rc.6`
 
 ##Why Velocity?
 
