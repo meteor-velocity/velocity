@@ -41,7 +41,7 @@ The `velocity` package coordinates between test frameworks and provides a common
 
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) - Write client and server unit and integration tests with Jasmine.
 * [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
-* [clinical:nightwatch](https://github.com/awatson1978/selenium-nightwatch/) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
+* [clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
 
 
 ## Current Reporters
