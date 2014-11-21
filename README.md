@@ -56,7 +56,7 @@ test your app. Integrated nicely with [meteor-webdriver](https://github.com/xolv
 These frameworks are very usable, and they are placed under this section as they currently don't 
 have an example app and do not offer a sample-test button in the reporter. 
 
-* [clinical:nightwatch](https://github.com/awatson1978/selenium-nightwatch/) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
+* [clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
 * [nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration 
 
 ### Reporters

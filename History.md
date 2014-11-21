@@ -1,3 +1,8 @@
+## v0.3.0
+
+
+* temporarily move off of rc track while issue https://github.com/meteor/meteor/issues/3147 is resolved
+
 ## v1.0.0.rc.6
 
 * Decoupled mirrors from the core so now mirrors can be authored as packages
