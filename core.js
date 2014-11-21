@@ -46,7 +46,8 @@ Velocity = {};
       chokidar = Npm.require('chokidar'),
       mkdirp = Npm.require('mkdirp'),
       _config = {},
-      _watcher;
+      _watcher,
+      FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$');
 
 
   Meteor.startup(function initializeVelocity () {
@@ -420,28 +421,44 @@ Velocity = {};
    *
    * @method _initWatcher
    * @param {Object} config  See `registerTestingFramework`.
+   * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
   function _initWatcher (config, callback) {
 
     VelocityTestFiles.remove({});
+    VelocityFixtureFiles.remove({});
 
     _watcher = chokidar.watch(Velocity.getTestsPath(), {ignored: /[\/\\]\./, persistent: true});
 
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
+
       var relativePath,
           targetFramework,
           data;
 
       filePath = path.normalize(filePath);
-
       relativePath = _getRelativePath(filePath);
+
+      // if this is a fixture file, put it in the fixtures collection
+      if (FIXTURE_REG_EXP.test(relativePath)) {
+        DEBUG && console.log('[velocity] Found fixture file', relativePath);
+        VelocityFixtureFiles.insert({
+          _id: filePath,
+          absolutePath: filePath,
+          relativePath: relativePath,
+          lastModified: Date.now()
+        });
+        // bail early
+        return;
+      }
 
       // test against each test framework's regexp matcher, use first
       // one that matches
       targetFramework = _.find(config, function (framework) {
         return framework._regexp.test(relativePath);
       });
+
 
       if (targetFramework) {
         DEBUG && console.log('[velocity] Target framework for', relativePath, 'is', targetFramework.name);
@@ -563,7 +580,7 @@ Velocity = {};
     }
   }
 
-  function _getRelativePath(filePath) {
+  function _getRelativePath (filePath) {
     var relativePath = filePath.substring(Velocity.getAppPath().length);
     if (relativePath[0] === path.sep) {
       relativePath = relativePath.substring(1);

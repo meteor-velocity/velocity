@@ -30,6 +30,7 @@ Package.on_use(function (api) {
 
   api.export('Velocity', BOTH);
   api.export('VelocityTestFiles', BOTH);
+  api.export('VelocityFixtureFiles', BOTH);
   api.export('VelocityTestReports', BOTH);
   api.export('VelocityAggregateReports', BOTH);
   api.export('VelocityLogs', BOTH);
