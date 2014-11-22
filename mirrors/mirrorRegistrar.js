@@ -14,6 +14,19 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return;
   }
 
+  Meteor.methods({
+
+    /**
+     * Meteor method: velocity/isMirror
+     * Exposes the IS_MIRROR flag to mirror clients
+     *
+     * @method velocity/isMirror
+     */
+    'velocity/isMirror': function () {
+      return !!process.env.IS_MIRROR;
+    }
+  });
+
   /**
    * This code will run inside a mirror and connects the mirror to velocity via ddp once the mirror
    * starts. Velocity will then inform frameworks this mirror is ready.
