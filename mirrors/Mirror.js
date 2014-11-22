@@ -96,6 +96,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *                            startOrReuseMirror call in this class
      *                port      : the port this mirror is running on
      *                mongoUrl  : the mongo url this mirror is using
+     *                host      : the root url of this mirror without any additional paths. Used for
+     *                            making DDP connections
      *                rootUrl   : the root url of this mirror, which also includes the path and params
      *                type      : eg 'node-soft-mirror' or 'meteor-soft-mirror'
      * @param extra {Object}    Any additional metadata the implementing mirror would like to store
@@ -107,6 +109,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         mirrorId: String,
         port: Number,
         mongoUrl: String,
+        host: String,
         rootUrl: String,
         type: String
       });
@@ -183,7 +186,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     options.port = options.port || process.env.DEFAULT_MIRROR_PORT || 5000;
     var rootUrlPath = (options.rootUrlPath || '').replace(/\//, '');
-    options.rootUrl = _getMirrorUrl(options.port) + rootUrlPath;
+    options.host = _getMirrorUrl(options.port);
+    options.rootUrl = options.host + rootUrlPath;
 
     DEBUG && console.log('[velocity] Mirror requested', options);
 
@@ -249,7 +253,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return {
       NODE_ENV: process.env.NODE_ENV,
       DEBUG: DEBUG,
+      VELOCITY_DEBUG: process.env.VELOCITY_DEBUG,
       PORT: options.port,
+      HOST: options.host,
       ROOT_URL: options.rootUrl,
       MONGO_URL: _getMongoUrl(options.framework),
       PARENT_URL: process.env.ROOT_URL,
