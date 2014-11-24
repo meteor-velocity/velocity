@@ -1,5 +1,3 @@
-LOG = console.log;
-
 /*jshint -W117, -W030, -W016 */
 /* global
  Velocity:true,
@@ -22,7 +20,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
  *
  * @class Velocity
  */
-Velocity = {};
+Velocity = Velocity || {};
 
 (function () {
   'use strict';
@@ -140,6 +138,7 @@ Velocity = {};
         result: 'pending'
       });
     }
+
   });
 
 

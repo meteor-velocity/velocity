@@ -38,6 +38,7 @@ Package.on_use(function (api) {
 
   api.add_files('lib/meteor/files.js', SERVER);
   api.add_files('core.js', SERVER);
+  api.add_files('core-shared.js', BOTH);
 
   api.add_files('mirrors/Mirror.js', SERVER);
   api.add_files('mirrors/mirrorRegistrar.js', SERVER);
