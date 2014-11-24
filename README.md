@@ -162,7 +162,7 @@ We have two naming schemas:
 1. When the method does something with a resource type: `velocity/<RESOURCE_NAME>/<ACTION>`
 2. When the method isn't specific to a resource type: `velocity/<ACTION>`
 
-All parts a camelCase and start with a lowercase letter.
+All parts are camelCase and start with a lowercase letter.
 
 ##Contributors
 

@@ -156,6 +156,40 @@ Velocity = {};
   Meteor.methods({
 
     /**
+    * Registers a testing framework plugin via a Meteor method.
+    *
+    * @method registerTestingFramework
+    * @param {String} name                       The name of the testing framework.
+    * @param {Object} [options]                  Options for the testing framework.
+    * @param {String} options.disableAutoReset   Velocity's reset cycle will skip reports and logs for this framework
+    *                                            It will be the responsibility of the framework to clean up its ****!
+    * @param {String} options.regex              The regular expression for test files that should be assigned
+    *                                            to the testing framework.
+    *                                            The path relative to the tests
+    *                                            folder is matched against it.
+    *                                            The default is "name/.+\.js$"
+    *                                            (name is the testing framework name).
+    * @param options.sampleTestGenerator {Function} sampleTestGenerator
+    *    returns an array of fileObjects with the following fields:
+    * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
+    * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
+    */
+    'velocity/register/framework': function (name, options) {
+      options = options || {};
+      check(name, Match.Optional(String));
+      check(options, {
+        disableAutoReset: Match.Optional(Boolean),
+        regex: Match.Optional(RegExp)
+      });
+
+      _config[name] = _parseTestingFrameworkOptions(name, options);
+
+      // make sure the appropriate aggregate records are added
+      _reset(_config);
+    },
+
+
+    /**
      * Re-init file watcher and clear all test results.
      *
      * @method velocity/reset
@@ -291,7 +325,7 @@ Velocity = {};
         timestamp: Match.Optional(Match.OneOf(Date, String)),
         duration: Match.Optional(Number),
         browser: Match.Optional(String),
-        failureType: Match.Optional(String),
+        failureType: Match.Optional(Match.Any),
         failureMessage: Match.Optional(String),
         failureStackTrace: Match.Optional(Match.Any)
       }));
