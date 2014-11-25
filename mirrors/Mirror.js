@@ -142,7 +142,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         port: parseInt(options.port)
       }, {
         $set: {
-          state: 'ready'
+          state: 'ready',
+          lastModified: Date.now()
         }
       });
     },
