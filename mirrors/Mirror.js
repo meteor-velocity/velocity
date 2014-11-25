@@ -144,8 +144,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         mirrorConnection.onReconnect = function () {
           DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
           VelocityMirrors.update({
-            framework: options.framework,
-            port: parseInt(options.port)
+            mirrorId: options.mirrorId
           }, {
             $set: {
               state: 'ready',

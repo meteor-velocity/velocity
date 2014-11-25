@@ -41,7 +41,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       velocityConnection.call('velocity/mirrors/register', {
         framework: process.env.FRAMEWORK,
         port: process.env.PORT,
-        host: process.env.HOST
+        host: process.env.HOST,
+        mirrorId: process.env.MIRROR_ID
       });
     };
 
