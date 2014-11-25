@@ -30,7 +30,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     // TODO This can be extended to support multiple mirror types, but just one for now until we
     // get the API right
-    start: function() {
+    start: function () {
       throw new Error('Mirror requested but a mirror has not been implemented');
     }
 
@@ -114,7 +114,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         type: String
       });
 
-      if(extra) {
+      if (extra) {
         _.extend(options, extra);
       }
 
@@ -135,16 +135,27 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      */
     'velocity/mirrors/register': function (options) {
 
-      DEBUG && console.log('[velocity] Mirror registered with', options);
+      DEBUG && console.log('[velocity] Connecting to mirror');
 
-      VelocityMirrors.update({
-        framework: options.framework,
-        port: parseInt(options.port)
-      }, {
-        $set: {
-          state: 'ready'
-        }
-      });
+      // Ugliness! It seems the DDP connect has a exponential back-off, which means the tests take
+      // around 5 seconds to rerun. This setTimeout helps.
+      Meteor.setTimeout(function() {
+        var mirrorConnection = DDP.connect(options.host);
+        mirrorConnection.onReconnect = function () {
+          DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
+          VelocityMirrors.update({
+            framework: options.framework,
+            port: parseInt(options.port)
+          }, {
+            $set: {
+              state: 'ready'
+            }
+          });
+        };
+      }, 300);
+
+
+
     },
 
     /**

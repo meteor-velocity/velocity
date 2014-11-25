@@ -40,7 +40,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       DEBUG && console.log('[velocity] Mirror connected to parent. Registering mirror...');
       velocityConnection.call('velocity/mirrors/register', {
         framework: process.env.FRAMEWORK,
-        port: process.env.PORT
+        port: process.env.PORT,
+        host: process.env.HOST
       });
     };
 
