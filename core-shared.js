@@ -11,9 +11,7 @@ Velocity = Velocity || {};
 //////////////////////////////////////////////////////////////////////
 // Public Methods
 //
-
-  _.extend(Velocity, {
-
+  
     /**
      * Mirrors can share the same codebase as the main process. This method will run provided code
      * inside a mirror only.
@@ -24,13 +22,12 @@ Velocity = Velocity || {};
      * @param {Function} code
      *
      */
-    onTest: function (code) {
+    Velocity.onTest = function (code) {
       Meteor.call('velocity/isMirror', function (err, res) {
         if (res) {
           code();
         }
       });
-    }
-  });
+    };
 
 })();
