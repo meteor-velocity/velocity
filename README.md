@@ -3,106 +3,118 @@ Velocity
 
 Test runner (and community) for Meteor apps.  Under heavy development.
 
-##Why Velocity?
+### What is Velocity?
+Head over to the [official homepage](http://velocity.meteor.com) 
 
-The Meteor-provided testing framework, TinyTest, works great for testing packages but doesn't work for apps.  Many members of the community created their own solutions but recently we wondered what would happen if we got everybody together and tried to unify our efforts.
+Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=40m51s) talk that
+ Robert, Sam, and Mike did at the June 2014 Meteor Devshop!
 
-Velocity is the result - the unified testing framework for Meteor.
+Read more in the [free chapter on Velocity in The Meteor Testing Manual](www.meteortesting.com/chapter/velocity)
 
-Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=40m51s) talk that Robert, Sam, and Mike did at the June 2014 Meteor Devshop!
+### Getting Started
 
+The Velocity package itself is not something that you include, rather you use Velocity-compatible
+framework. 
 
-##Benefits
+To see frameworks in action, have a look at the [velocity-examples](https://github.com/meteor-velocity/velocity-examples) repository.
+ 
+### Troubleshooting
 
-- officially sanctioned by the Meteor Development Group
-- install with one line
-- test your whole app, not just packages
-- tests run in containers completely isolated from your app
-- one report shows all framework results reactively
-- easy CI integration
-- tests are not published to production
-- only executes in dev mode (`process.env.NODE_ENV === "development"`)
+Sometimes things break and its useful to get more debugging info.  Most of the test frameworks 
+support some kind of debugging environment variable flag.  You can usually see a lot more details
+about what's happening if you run your app with this command:
 
+```bash
+$ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 VELOCITY_DEBUG_MIRROR=1 meteor
+```
 
-## Roadmap
+### Reporting bugs
 
-https://trello.com/b/VCmaj73b/velocity-project
+Please report bugs directly on the issues of the framework(s) you are using. Framework authors 
+will then post issues to the core if they are core issues.
 
+##Velocity Compatible Packages
 
-## Usage
+### Frameworks
 
-The Velocity package itself is not something that you would normally include.  Rather you would include the test framework that you would like to use ([see below](https://github.com/meteor-velocity/velocity/#current-frameworks)) and it will automatically be added for you.
+Below is a list of the currently available frameworks.
 
+####Fully Integrated
 
-## Current Frameworks
-
-The `velocity` package coordinates between test frameworks and provides a common structure for getting test results.  Velocity by itself does not perform any tests.  To actually test your app, use one or more of the velocity-compatible test frameworks listed below:
+These frameworks have an example in the [velocity-examples](https://github
+.com/meteor-velocity/velocity-examples) repository. They also include a set of sample tests that 
+the framework can add directly to the reporter when you first install the framework. 
 
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) - Write client and server unit and integration tests with Jasmine.
 * [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
+* [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) - Use Gherkin-syntax cucumber to 
+test your app. Integrated nicely with [meteor-webdriver](https://github.com/xolvio/meteor-webdriver)  
+
+
+####Partially Integrated
+
+These frameworks are very usable, and they are placed under this section as they currently don't 
+have an example app and do not offer a sample-test button in the reporter. 
+
 * [clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
+* [nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration 
 
-
-## Current Reporters
+### Reporters
 
 Reporters display test results.
 
 * [velocity:html-reporter](https://github.com/meteor-velocity/html-reporter/) - Adds an overlay to your app indicating test success/failure (green/red dot in top right).  Click dot for test details.  `meteor add velocity:html-reporter`
 
+### Mirrors
 
-## Test framework authors
+Mirrors are used by test frameworks to run tests within. Tests are typically destructive and as such
+require a different database. Mirrors run a parallel version of your app with a different 
+database as not to intrude on the main development workflow.
+
+* [node-soft-mirror](https://github.com/meteor-velocity/node-soft-mirror) - This mirror offers an 
+extremely fast startup time. It creates a mirror using a node form from within the running meteor 
+process.
+
+### Other
+
+* [xolvio:webdriver](https://github.com/xolvio/meteor-webdriver) - Adds webdriver.io to any test 
+framework for UI testing. Uses PhantomJS in GhostDriver mode for ultra-fast UI testing
+
+## Test Framework Authors
 
 We would love to add your framework to the list!  Take a look at how some of these interface with velocity and let us know about your framework on the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
 
-Please see the [velocity-wiki](https://github.com/xolvio/velocity/wiki/Making-your-test-framework-work-with-meteor-test-runner) for basic instructions on making your test framework work with Velocity.
+Please see the [velocity-wiki](https://github.com/meteor-velocity/velocity/wiki/How-to-integrate-a-test-framework-with-Velocity) for basic instructions on making your test framework work with Velocity.
 
 Also, be sure to check out the documentation for the public API.  You can view them in the browser by cloning this repo and then running: `open docs/classes/Velocity.html`
-
  
 A few notes on being velocity-compatible:
 
-#### Sample Tests
+### Register testing framework to Velocity
 
-Please put some sample tests in a directory named `sample-tests` at the root of your package.  These will be used by the velocity-quick-start package and also allows users to click a button in the html-reporter to have them added to their apps.
+Use `Velocity.registerTestingFramework(frameworkName, options)` to register your package as testing framework. You can find a description of the expected arguments in the docs.
 
-#### Debug output
 
-Please include a way to get more detailed info about your test runs.  
+### Sample Tests
+
+Please put some sample tests in a directory named `sample-tests` at the root of your package. 
+These will be used by the velocity-quick-start package and also allows users to click a button 
+in the html-reporter to have them added to their apps.
+
+### Debug output
+
+Please include a way to get more detailed info about your frameworks' test runs.  
 
 One way that we've done it is by having an environment flag that the user can set.  Feel free to use `VELOCITY_DEBUG` if you'd like.  
 
 For example, you could write your logging like this:
 
     var DEBUG = process.env.VELOCITY_DEBUG;
-    DEBUG && console.log('[my-framework] helpful debugging info', someVar);
-    
+    DEBUG && console.log('[my-framework] helpful debugging info', someVar)
 
-#### Register testing framework to Velocity
+### Writing a new Mirror Package
 
-Use `Velocity.registerTestingFramework(frameworkName, options)` to register your package as testing framework. You can find a description of the expected arguments in the docs.
-
-## Disable mirror
-
-Sometimes you just don't what that mirror to start up, maybe the frameworks you have don't need it or you're developing a framework of your own. This is how:
-
-```bash
-$ NO_MIRROR=1 meteor
-```
-
-## Debug output
-
-Sometimes things break and its useful to get more debugging info.  Most of the test frameworks support some kind of debugging environment variable flag.  You can usually see a lot more details about what's happening if you run your app with this command:
-
-```bash
-$ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 VELOCITY_DEBUG_MIRROR=1 meteor
-```
-
-
-## Troubleshooting
-
-* `Error: There was a problem checking out branch: master`
-
-Used to be encountered when you referenced the velocity repo directly in `smart.json`. Was because we tried using a submodule for the example app but meteorite doesn't play well with submodules.  If you are still running into this one,  see [Issue #37](https://github.com/xolvio/velocity/issues/37) for a fix.
+See [instructions here](https://github.com/meteor-velocity/velocity/wiki/How-to-Write-a-Mirror-Package)
 
 ## For velocity:core maintainers
 
@@ -166,3 +178,8 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 * [Jonas Aschenbrenner](https://github.com/sanjo), velocity contributor, [Jasmine](https://github.com/Sanjo/meteor-jasmine) package
 
 Please join our discussions at the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
+
+## Roadmap
+
+https://trello.com/b/VCmaj73b/velocity-project
+

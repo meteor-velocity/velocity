@@ -1,3 +1,10 @@
+## v0.4.1
+
+* decoupled mirrors
+* added Velocity.startup
+* Decoupled mirrors from the core so now mirrors can be authored as packages
+* Updated chokidar and now file watching only synced once
+
 ## v0.3.2
 
 * Makes FileCopier more robust
@@ -5,6 +12,14 @@
 ## v0.3.0
 
 * temporarily move off of rc track while issue https://github.com/meteor/meteor/issues/3147 is resolved
+
+## v1.0.0.rc.6
+
+* Decoupled mirrors from the core so now mirrors can be authored as packages
+* Updated chokidar and now file watching only synced once
+
+## v1.0.0.rc.5
+??
 
 ## v1.0.0.rc.4
 
