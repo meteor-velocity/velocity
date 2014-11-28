@@ -1,4 +1,4 @@
-/*jshint -W117, -W030, -W016 */
+/*jshint -W117, -W030, -W016, -W084 */
 /* global
  Velocity:true,
  DEBUG:true
@@ -45,6 +45,8 @@ Velocity = Velocity || {};
       mkdirp = Npm.require('mkdirp'),
       _config = {},
       _watcher,
+      _velocityStarted = false,
+      _velocityStartupFunctions = [],
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$');
 
 
@@ -56,7 +58,7 @@ Velocity = Velocity || {};
     //kick-off everything
     _reset(_config);
 
-    _initWatcher(_config);
+    _initWatcher(_config, _triggerVelocityStartupFunctions);
 
   });
 
@@ -65,6 +67,23 @@ Velocity = Velocity || {};
 //
 
   _.extend(Velocity, {
+
+    /**
+     * Run code when Velocity is started. Velocity is considered started when the file watcher has
+     * completed the scan of the  file system
+     *
+     * @method startup
+     * @return {function} A function to run on startup
+     */
+    startup: function (func) {
+      if (_velocityStarted) {
+        DEBUG && console.log('[velocity] Velocity already started. Immediately calling func');
+        func();
+      } else {
+        DEBUG && console.log('[velocity] Velocity not started. Queueing func');
+        _velocityStartupFunctions.push(func);
+      }
+    },
 
     /**
      * Get application directory path.
@@ -435,7 +454,14 @@ Velocity = Velocity || {};
 // Private functions
 //
 
-
+  function _triggerVelocityStartupFunctions () {
+    _velocityStarted = true;
+    DEBUG && console.log('[velocity] Triggering queued startup functions');
+    var func;
+    while (func = _velocityStartupFunctions.pop()) {
+      func();
+    }
+  }
 
   function _parseTestingFrameworkOptions (name, options) {
     options = options || {};
