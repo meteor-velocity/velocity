@@ -113,6 +113,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         rootUrl: String,
         type: String
       });
+      check(extra, Match.Optional(Object));
 
       if (extra) {
         _.extend(options, extra);
@@ -130,10 +131,16 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @param options
      *            Required fields
-     *                mirrorId  : the ID this mirror was given by
-     *                port      : the port this mirror is running on
+     *                mirrorId  : the ID the mirror was given by
+     *                host      : the host the mirror is running on
+     *                port      : the port the mirror is running on
      */
     'velocity/mirrors/register': function (options) {
+      check(options, Match.ObjectIncluding({
+        mirrorId: String,
+        host: String,
+        port: Match.OneOf(Number, String)
+      }));
 
       DEBUG && console.log('[velocity] Connecting to mirror');
 
