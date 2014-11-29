@@ -1,3 +1,7 @@
+## v0.4.2
+
+* Adds missing checks to pass audit-argument-checks
+
 ## v0.4.1
 
 * decoupled mirrors

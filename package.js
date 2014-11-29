@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.4.1',
+  version: '0.4.2',
   git: 'https://github.com/xolvio/velocity.git',
   debugOnly: true
 });
