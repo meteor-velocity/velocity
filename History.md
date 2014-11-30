@@ -1,3 +1,7 @@
+## v0.4.3
+
+* Fixes connection errors with old mirrors (#195)
+
 ## v0.4.2
 
 * Adds missing checks to pass audit-argument-checks
