@@ -150,6 +150,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         var mirrorConnection = DDP.connect(options.host);
         mirrorConnection.onReconnect = function () {
           DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
+          // Disconnect because we no longer need the connection
+          mirrorConnection.disconnect();
           VelocityMirrors.update({
             mirrorId: options.mirrorId
           }, {

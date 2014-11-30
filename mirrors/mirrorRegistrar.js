@@ -43,6 +43,17 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         port: process.env.PORT,
         host: process.env.HOST,
         mirrorId: process.env.MIRROR_ID
+      }, function (error) {
+        if (error) {
+          console.error(
+            '[velocity] Could not connect to parent via DDP. ' +
+            'Please restart your app and try again. ' +
+            'If this happens often please report it as issue to velocity:core.',
+            error
+          );
+        }
+        // Disconnect because we no longer need the connection
+        velocityConnection.disconnect();
       });
     };
 
