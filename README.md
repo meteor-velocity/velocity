@@ -9,7 +9,7 @@ Head over to the [official homepage](http://velocity.meteor.com)
 Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=40m51s) talk that
  Robert, Sam, and Mike did at the June 2014 Meteor Devshop!
 
-Read more in the [free chapter on Velocity in The Meteor Testing Manual](www.meteortesting.com/chapter/velocity)
+Read more in the [free chapter on Velocity in The Meteor Testing Manual](http://www.meteortesting.com/chapter/velocity)
 
 ### Getting Started
 
