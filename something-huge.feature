@@ -7,4 +7,4 @@ Feature: New feature
     Given 
     And it happens again
     When 
-    Then ...
+    Then th
