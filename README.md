@@ -41,8 +41,7 @@ Below is a list of the currently available frameworks.
 
 ####Fully Integrated
 
-These frameworks have an example in the [velocity-examples](https://github
-.com/meteor-velocity/velocity-examples) repository. They also include a set of sample tests that 
+These frameworks have an example in the [velocity-examples](https://github.com/meteor-velocity/velocity-examples) repository. They also include a set of sample tests that 
 the framework can add directly to the reporter when you first install the framework. 
 
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) - Write client and server unit and integration tests with Jasmine.
