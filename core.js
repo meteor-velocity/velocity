@@ -548,12 +548,7 @@ Velocity = Velocity || {};
 
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
       DEBUG && console.log('[velocity] File removed:', _getRelativePath(filePath));
-      // If we only remove the file, we also need to remove the test results for
-      // just that file. This required changing the postResult API and we could
-      // do it, but the brute force method of reset() will do the trick until we
-      // want to optimize VelocityTestFiles.remove(filePath);
-      VelocityTestFiles.remove({});
-      _reset(config);
+      VelocityTestFiles.remove(filePath);
     }));
 
     _watcher.on('ready', Meteor.bindEnvironment(function () {
