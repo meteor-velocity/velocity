@@ -8,12 +8,12 @@
  VelocityMirrors: true
  */
 
-VelocityTestFiles = new Meteor.Collection('velocityTestFiles');
-VelocityFixtureFiles = new Meteor.Collection('velocityFixtureFiles');
-VelocityTestReports = new Meteor.Collection('velocityTestReports');
-VelocityAggregateReports = new Meteor.Collection('velocityAggregateReports');
-VelocityLogs = new Meteor.Collection('velocityLogs');
-VelocityMirrors = new Meteor.Collection('velocityMirrors');
+VelocityTestFiles = new Mongo.Collection('velocityTestFiles');
+VelocityFixtureFiles = new Mongo.Collection('velocityFixtureFiles');
+VelocityTestReports = new Mongo.Collection('velocityTestReports');
+VelocityAggregateReports = new Mongo.Collection('velocityAggregateReports');
+VelocityLogs = new Mongo.Collection('velocityLogs');
+VelocityMirrors = new Mongo.Collection('velocityMirrors');
 (function () {
   'use strict';
 
