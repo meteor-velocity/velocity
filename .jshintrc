@@ -28,7 +28,7 @@
     "Npm": false,
     "Random": false,
     "Package": false,
-    "Mongo": false
+    "Mongo": false,
     "DEBUG": false,
     "Velocity": false,
     "VelocityTestFiles": false,
