@@ -1,3 +1,9 @@
+## v0.4.4
+
+* Fixed mirror killing mechanism in node-soft-mirror by removing idomptency logic into mirror 
+implementation
+* Increased logging around mirror start/ready
+
 ## v0.4.3
 
 * Fixes connection errors with old mirrors (#195)
