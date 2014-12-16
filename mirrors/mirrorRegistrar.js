@@ -14,6 +14,10 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return;
   }
 
+  // between this line and the velocity/parentHandshake, is the time the mirror starts initializing
+  // and is ready
+  console.log('[velocity-mirror] Mirror is initializing...');
+
   Meteor.methods({
 
     /**
@@ -24,6 +28,17 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      */
     'velocity/isMirror': function () {
       return !!process.env.IS_MIRROR;
+    },
+
+    /**
+     * Meteor method: velocity/parentHandshake
+     * This is the best indicator of the mirror's ready status, so it's used to inform the user
+     * when there may be delays
+     *
+     * @method velocity/isMirror
+     */
+    'velocity/parentHandshake': function () {
+      console.log('[velocity-mirror] Mirror is ready.');
     }
   });
 
@@ -33,7 +48,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    */
   Meteor.startup(function () {
 
-    DEBUG && console.log('[velocity] Mirror started. Connecting via DDP to parent');
+    DEBUG && console.log('[velocity-mirror] Mirror started. Connecting via DDP to parent');
 
     var velocityConnection = DDP.connect(process.env.PARENT_URL);
     velocityConnection.onReconnect = function () {
