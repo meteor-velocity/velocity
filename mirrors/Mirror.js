@@ -81,7 +81,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
       options.mirrorId = options.mirrorId || Random.id();
 
-      _startOrReuseMirror(options);
+      _startMirror(options);
 
       return options.mirrorId;
     },
@@ -108,9 +108,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       check(options, {
         mirrorId: String,
         port: Number,
+        framework: String,
         mongoUrl: String,
         host: String,
         rootUrl: String,
+        rootUrlPath: String,
         type: String
       });
       check(extra, Match.Optional(Object));
@@ -119,11 +121,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         _.extend(options, extra);
       }
 
-      VelocityMirrors.insert(_.extend(options, {
-        _id: options.mirrorId,
-        reused: false,
-        state: 'starting'
-      }));
+      VelocityMirrors.upsert({mirrorId: options.mirrorId},
+        _.extend(options, {
+          _id: options.mirrorId,
+          reused: false,
+          state: 'starting'
+        }));
     },
 
     /**
@@ -142,15 +145,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         port: Match.OneOf(Number, String)
       }));
 
-      DEBUG && console.log('[velocity] Connecting to mirror');
+      DEBUG && console.log('[velocity] Mirror registered. Handshaking with mirror...');
 
       // Ugliness! It seems the DDP connect has a exponential back-off, which means the tests take
       // around 5 seconds to rerun. This setTimeout helps.
-      Meteor.setTimeout(function() {
+      Meteor.setTimeout(function () {
         var mirrorConnection = DDP.connect(options.host);
         mirrorConnection.onReconnect = function () {
           DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
-          // Disconnect because we no longer need the connection
+          mirrorConnection.call('velocity/parentHandshake');
           mirrorConnection.disconnect();
           VelocityMirrors.update({
             mirrorId: options.mirrorId
@@ -187,42 +190,30 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
 
   /**
-   * Starts a new mirror if one is not found. The criteria to reuse a mirror is that the requested
-   * mirror and an existing mirror share the same port. If the same port is found, a new entry in
-   * the mirrors collection is added with the new metadata but the same port. If a mirror is reused,
-   * the metadata in the VelocityMirrors will have the property 'reused' set to true.
+   * Starts a new mirror.
    *
-   * @method startOrReuseMirror
+   * @method _startMirror
    * @param {Object} options
    *                Required fields:
    *                   framework - String ex. 'mocha-web-1'
    *                   rootUrlPath - String ex. '/x=y'
    *                   port - a specific port to start the mirror on
-   *                   mirrorId - the ID this miror was given in the requestMirror call
+   *                   mirrorId - the ID this mirror was given in the requestMirror call
    *
    * @private
    */
-  function _startOrReuseMirror (options) {
+  function _startMirror (options) {
 
     options.port = options.port || process.env.DEFAULT_MIRROR_PORT || 5000;
     var rootUrlPath = (options.rootUrlPath || '').replace(/\//, '');
+    options.rootUrlPath = rootUrlPath;
     options.host = _getMirrorUrl(options.port);
     options.rootUrl = options.host + rootUrlPath;
 
-    DEBUG && console.log('[velocity] Mirror requested', options);
+    options.mirrorId = options.mirrorId || options.framework;
 
-    var mirrorWithSamePort = VelocityMirrors.findOne({port: parseInt(options.port)});
-    if (mirrorWithSamePort && mirrorWithSamePort.framework !== options.framework) {
-      // the ports only match, which means this is a new framework reusing an existing mirror
-      delete mirrorWithSamePort._id;
-      mirrorWithSamePort.framework = options.framework;
-      mirrorWithSamePort.rootUrlPath = options.rootUrlPath;
-      mirrorWithSamePort.reused = true;
-      VelocityMirrors.insert(mirrorWithSamePort);
-    } else if (!mirrorWithSamePort) {
-      // delegate the mirror start to the framework-chose mirror choice
-      Velocity.Mirror.start(options, _getEnvironmentVariables(options));
-    }
+    DEBUG && console.log('[velocity] Mirror requested', options);
+    Velocity.Mirror.start(null, _getEnvironmentVariables(options));
   }
 
   /**
@@ -269,20 +260,18 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * @private
    */
   function _getEnvironmentVariables (options) {
-    // perhaps we can copy the meteor environment directly here?
-    return {
-      NODE_ENV: process.env.NODE_ENV,
-      DEBUG: DEBUG,
-      VELOCITY_DEBUG: process.env.VELOCITY_DEBUG,
+    return _.defaults({
       PORT: options.port,
       HOST: options.host,
+      ROOT_URL_PATH: options.rootUrlPath,
       ROOT_URL: options.rootUrl,
+      FRAMEWORK: options.framework,
       MONGO_URL: _getMongoUrl(options.framework),
       PARENT_URL: process.env.ROOT_URL,
       MIRROR_ID: options.mirrorId,
       IS_MIRROR: true,
       METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings))
-    };
+    }, process.env);
   }
 
 
