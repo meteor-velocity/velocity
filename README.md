@@ -173,6 +173,8 @@ meteor publish-for-arch velocity:core@<VERSION>
 exit
 ```
 
+The build for your own architecture can also be done on the own machine. But the publish-for-arch command for your architecture is still required.
+
 ### Meteor Method Naming Convention
 
 We have two naming schemas:
