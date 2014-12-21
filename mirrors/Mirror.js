@@ -61,29 +61,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * @param {String} [options.port]           String use a specific port
      * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the
      *                                          VelocityMirrors collection. eg. `/?jasmine=true`
-     *                 [options.mirrorId]       An id for this mirror that will be stored in the
-     *                                          VelocityMirrors collection and also available as
-     *                                          MIRROR_ID environment var from the mirror.
-     *                                          If not provided, this will be set to a random
-     *                                          mongo-style id.
-     *
-     * @return {String}   The mirrorId. Frameworks can wait for this mirrorId to be ready should
-     *                    they need to.
      *
      */
     'velocity/mirrors/request': function (options) {
       check(options, {
         framework: String,
         port: Match.Optional(Number),
-        rootUrlPath: Match.Optional(String),
-        mirrorId: Match.Optional(String)
+        rootUrlPath: Match.Optional(String)
       });
-
-      options.mirrorId = options.mirrorId || Random.id();
-
       _startMirror(options);
-
-      return options.mirrorId;
     },
 
     /**
@@ -92,8 +78,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @param options {Object}
      *            Required fields
-     *                mirrorId  : the ID of this mirror. This is provided to mirrors in the
-     *                            startOrReuseMirror call in this class
      *                port      : the port this mirror is running on
      *                mongoUrl  : the mongo url this mirror is using
      *                host      : the root url of this mirror without any additional paths. Used for
@@ -106,7 +90,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      */
     'velocity/mirrors/init': function (options, extra) {
       check(options, {
-        mirrorId: String,
         port: Number,
         framework: String,
         mongoUrl: String,
@@ -121,10 +104,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         _.extend(options, extra);
       }
 
-      VelocityMirrors.upsert({mirrorId: options.mirrorId},
+      VelocityMirrors.upsert({framework: options.framework},
         _.extend(options, {
-          _id: options.mirrorId,
-          reused: false,
           state: 'starting'
         }));
     },
@@ -134,13 +115,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @param options
      *            Required fields
-     *                mirrorId  : the ID the mirror was given by
+     *                framework  : the framework the mirror was requested by
      *                host      : the host the mirror is running on
      *                port      : the port the mirror is running on
      */
     'velocity/mirrors/register': function (options) {
       check(options, Match.ObjectIncluding({
-        mirrorId: String,
+        framework: String,
         host: String,
         port: Match.OneOf(Number, String)
       }));
@@ -156,7 +137,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
           mirrorConnection.call('velocity/parentHandshake');
           mirrorConnection.disconnect();
           VelocityMirrors.update({
-            mirrorId: options.mirrorId
+            framework: options.framework
           }, {
             $set: {
               state: 'ready',
@@ -198,7 +179,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    *                   framework - String ex. 'mocha-web-1'
    *                   rootUrlPath - String ex. '/x=y'
    *                   port - a specific port to start the mirror on
-   *                   mirrorId - the ID this mirror was given in the requestMirror call
    *
    * @private
    */
@@ -209,8 +189,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     options.rootUrlPath = rootUrlPath;
     options.host = _getMirrorUrl(options.port);
     options.rootUrl = options.host + rootUrlPath;
-
-    options.mirrorId = options.mirrorId || options.framework;
 
     DEBUG && console.log('[velocity] Mirror requested', options);
     Velocity.Mirror.start(null, _getEnvironmentVariables(options));
@@ -268,7 +246,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       FRAMEWORK: options.framework,
       MONGO_URL: _getMongoUrl(options.framework),
       PARENT_URL: process.env.ROOT_URL,
-      MIRROR_ID: options.mirrorId,
       IS_MIRROR: true,
       METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings))
     }, process.env);
