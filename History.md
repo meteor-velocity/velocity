@@ -1,3 +1,8 @@
+## v0.4.5
+
+* Removed mirrorId and replaced with framework name. If frameworks wish to use multiple mirrors, 
+they can manage this themselves
+
 ## v0.4.3
 
 * Fixes connection errors with old mirrors (#195)
