@@ -1,3 +1,8 @@
+## v0.4.5
+
+* Removed mirrorId and replaced with framework name. If frameworks wish to use multiple mirrors, 
+they can manage this themselves
+
 ## v0.4.4
 
 * Fixed mirror killing mechanism in node-soft-mirror by removing idomptency logic into mirror 
