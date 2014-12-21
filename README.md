@@ -150,9 +150,30 @@ See [instructions here](https://github.com/meteor-velocity/velocity/wiki/How-to-
 9. Push to github. Also push the new tag! (`git push --tags`)
 
 
-We have to publish velocity:core for the different architectures (Mac OS, 64-bit Linux and 32-bit Linux).
+We have to publish velocity:core for the different architectures (Mac OS, 64-bit Linux and 32-bit Linux). This is how it is done:
 
-First publish velocity:core on your development machine with `meteor publish`. Then you will need machines with the other two architectures. Use `meteor publish-for-arch velocity:core@VERSION --release 0.9.4` on a computer with the right architecture. Also see [Meteor docs](http://docs.meteor.com/#meteorpublishforarch).
+```bash
+# Publish new version
+meteor publish
+
+# Open Mac build machine
+meteor admine get-machine os.osx.x86_64
+# Build on the machine
+meteor publish-for-arch velocity:core@<VERSION>
+# Login
+# Exit
+exit
+
+# Open Linux build machine
+meteor admine get-machine os.linux.x86_64
+# Build on the machine (this will build a version for 64-bit and 32-bit Linux)
+meteor publish-for-arch velocity:core@<VERSION>
+# Login
+# Exit
+exit
+```
+
+The build for your own architecture can also be done on the own machine. But the publish-for-arch command for your architecture is still required.
 
 ### Meteor Method Naming Convention
 
