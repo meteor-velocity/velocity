@@ -16,7 +16,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   // between this line and the velocity/parentHandshake, is the time the mirror starts initializing
   // and is ready
-  console.log('[velocity-mirror] Mirror is initializing...');
+  console.log('Mirror requested by ' + process.env.FRAMEWORK + '.', 'Initializing...');
 
   Meteor.methods({
 
@@ -38,7 +38,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * @method velocity/isMirror
      */
     'velocity/parentHandshake': function () {
-      console.log('[velocity-mirror] Mirror is ready.');
+      console.log('Mirror requested by ' + process.env.FRAMEWORK + ' is ready.');
     }
   });
 
