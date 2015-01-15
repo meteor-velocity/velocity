@@ -172,9 +172,6 @@ Velocity = Velocity || {};
      * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
      */
     registerTestingFramework: function (name, options) {
-      if (options.regex[0] == '^') {
-        options.regex = options.regex.slice(1);
-      }
       DEBUG && console.log('[velocity] Register framework ' + name + ' with regex ' + options.regex);
       _config[name] = _parseTestingFrameworkOptions(name, options);
       // make sure the appropriate aggregate records are added
@@ -517,7 +514,7 @@ Velocity = Velocity || {};
     var paths = [Velocity.getTestsPath()];
 
     _.each(fs.readdirSync(Velocity.getPackagesPath()), function(dir) {
-      if (fs.lstatSync(Velocity.getPackagePath(dir)).isDirectory() && fs.existsSync(Velocity.getTestsPath(dir))) {
+      if (dir != 'tests-proxy' && fs.lstatSync(Velocity.getPackagePath(dir)).isDirectory() && fs.existsSync(Velocity.getTestsPath(dir))) {
         paths.push(Velocity.getTestsPath(dir));
       }
     });
@@ -549,12 +546,11 @@ Velocity = Velocity || {};
 
       DEBUG && console.log('[velocity] Search framework for path', relativePath);
 
-      // test against each test framework's regexp matcher, use first
-      // one that matches
+      var packageRelativePath = (relativePath.indexOf('packages') == 0) ? relativePath.split('/').slice(2).join('/') : relativePath;
+      // test against each test framework's regexp matcher, use first one that matches
       targetFramework = _.find(config, function (framework) {
-        return framework._regexp.test(relativePath);
+        return framework._regexp.test(packageRelativePath);
       });
-
 
       if (targetFramework) {
         DEBUG && console.log('[velocity] Target framework for', relativePath, 'is', targetFramework.name);
