@@ -92,7 +92,7 @@ Velocity = Velocity || {};
      * @return {String} app directory path
      */
     getAppPath: function () {
-      return findAppDir();
+      return VelocityMeteorInternals.files.findAppDir();
     },
 
 
