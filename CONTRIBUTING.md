@@ -1,3 +1,34 @@
+##Reporting a bug?
+
+
+Checklist for reporting a bug
+
+* [ ] Reproducible bug with a repro 
+
+If you can't do the reporoducible repo, then please be sure to do the following:
+
+* [ ] Attached output of `VELOCITY_DEBUG=1 meteor`
+* [ ] Attached content of `.meteor/versions` 
+* [ ] Attached content of `.meteor/packages` file attached
+
+
+###Reproducible bug with a repro
+Please be sure you can reproduce the bug. We LOVE a reproducible repository that we can download and see the error happening. Often you'll find that creating a new repo and just narrowing down the error will highlight if the bug is with your code or in Velocity / frameworks.
+
+Also, please be sure to run:
+
+`VELOCITY_DEBUG=1 meteor`
+
+And post the log with your report. This gives us a good starting point.
+
+Antother thing that helps is the `.meteor/versions` file, please post that in the bug report.
+
+
+
+
+
+
+## About
 Velocity is a volunteer effort. We encourage you to pitch in.
 
 If you want to submit a patch, please fork the repo and follow the [Git Flow workflow](http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/)
