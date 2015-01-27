@@ -25,7 +25,7 @@ Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
   api.use('mongo');
   api.use('check');
-  api.use('velocity:meteor-internals@1.0.2');
+  api.use('velocity:meteor-internals@1.0.2_2');
 
   api.add_files('collections.js', BOTH);
 
