@@ -42,7 +42,7 @@ Velocity = Velocity || {};
         check(value, Match.Any);
 
         VelocityOptions.upsert(
-          {_id: name},
+          {name: name},
           {$set: {name: name, value: value}}
         );
       },
