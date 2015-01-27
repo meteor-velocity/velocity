@@ -30,10 +30,34 @@ Velocity = Velocity || {};
       });
     };
 
+    if (Meteor.isServer) {
+      /**
+       * @method
+       * @see velocity/setOption
+       */
+      Velocity.setOption = function (name, value) {
+        Meteor.call('velocity/setOption', name, value);
+      };
+
+      /**
+       * @see velocity/setOptions
+       */
+      Velocity.setOptions = function (options) {
+        Meteor.call('velocity/setOptions', options);
+      };
+
+      /**
+       * @see velocity/getOption
+       */
+      Velocity.getOption = function (name) {
+        Meteor.call('velocity/getOption', name);
+      };
+    }
 
     Meteor.methods({
       /**
        * Set a option.
+       * @method velocity/setOption
        * @param name The name of the option.
        * @param value The value of the option.
        */
@@ -48,7 +72,23 @@ Velocity = Velocity || {};
       },
 
       /**
+       * Set multiple options.
+       * @method velocity/setOptions
+       * @param options Hash with options (name: value).
+       */
+      'velocity/setOptions': function (options) {
+        check(options, Object);
+
+        for (var name in options) {
+          if (options.hasOwnProperty(name)) {
+            Meteor.call('velocity/setOption', name, options[name]);
+          }
+        }
+      },
+
+      /**
        * Get a option
+       * @method velocity/getOption
        * @param name The name of the option.
        * @returns {*} The value of the option or null.
        */
