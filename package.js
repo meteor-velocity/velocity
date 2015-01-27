@@ -36,6 +36,7 @@ Package.on_use(function (api) {
   api.export('VelocityAggregateReports', BOTH);
   api.export('VelocityLogs', BOTH);
   api.export('VelocityMirrors', BOTH);
+  api.export('VelocityOptions', BOTH);
 
   api.add_files('core.js', SERVER);
   api.add_files('core-shared.js', BOTH);
