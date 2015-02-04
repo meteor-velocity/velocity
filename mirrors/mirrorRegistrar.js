@@ -16,7 +16,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   // between this line and the velocity/parentHandshake, is the time the mirror starts initializing
   // and is ready
-  console.log('Mirror requested by ' + process.env.FRAMEWORK + '.', 'Initializing...');
+  console.log('[velocity-mirror] Starting mirror on port', process.env.PORT);
 
   Meteor.methods({
 
@@ -47,6 +47,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * starts. Velocity will then inform frameworks this mirror is ready.
    */
   Meteor.startup(function () {
+
+    if (!process.env.HANDSHAKE) {
+      DEBUG && console.log('[velocity-mirror] Mirror', process.env.PORT , 'configured not to handshake');
+      return;
+    }
 
     DEBUG && console.log('[velocity-mirror] Mirror started. Connecting via DDP to parent');
 
