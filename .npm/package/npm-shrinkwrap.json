@@ -52,6 +52,9 @@
         }
       }
     },
+    "freeport": {
+      "version": "1.0.4"
+    },
     "fs-extra": {
       "version": "0.12.0",
       "dependencies": {
