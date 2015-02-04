@@ -20,7 +20,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   }
 
   var _ = Npm.require('lodash'),
-      url = Npm.require('url');
+      url = Npm.require('url'),
+      freeport = Npm.require('freeport');
 
 //////////////////////////////////////////////////////////////////////
 // Public Methods
@@ -61,15 +62,23 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * @param {String} [options.port]           String use a specific port
      * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the
      *                                          VelocityMirrors collection. eg. `/?jasmine=true`
+     * @param {String} [options.nodes]          The number of mirrors required. This is used by
+     *                                          distributable frameworks. Default is 1
+     * @param {String} [options.handshake]      Specifies whether or not this mirror should perform
+     *                                          a DDP handshake with the parent. Distributable
+     *                                          frameworks can use this to get mirrors to behave
+     *                                          like workers. The default is true
      *
      */
     'velocity/mirrors/request': function (options) {
       check(options, {
         framework: String,
         port: Match.Optional(Number),
-        rootUrlPath: Match.Optional(String)
+        rootUrlPath: Match.Optional(String),
+        nodes: Match.Optional(Number),
+        handshake: Match.Optional(Boolean)
       });
-      _startMirror(options);
+      _startMirrors(options);
     },
 
     /**
@@ -171,6 +180,35 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
 
   /**
+   * Starts a set of mirrors.
+   *
+   * @method _startMirrors
+   * @param {Object} options
+   *                Required fields:
+   *                   framework - String ex. 'mocha-web-1'
+   *                   rootUrlPath - String ex. '/x=y'
+   *                   port - a specific port to start the mirror on
+   *
+   * @private
+   */
+  function _startMirrors (options) {
+    DEBUG && console.log('[velocity]', options.nodes, 'mirror(s) requested');
+
+    // only respect a provided port if a single mirror is requested
+    if (options.port && (!options.nodes || options.nodes === 1)) {
+      _startMirror(options);
+      return;
+    }
+
+    for (var i = 0; i < options.nodes; i++) {
+      freeport(Meteor.bindEnvironment(function (err, port) {
+        options.port = port;
+        _startMirror(options);
+      }));
+    }
+  }
+
+  /**
    * Starts a new mirror.
    *
    * @method _startMirror
@@ -183,15 +221,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * @private
    */
   function _startMirror (options) {
-
-    options.port = options.port || process.env.DEFAULT_MIRROR_PORT || 5000;
+    options.handshake = options.handshake == undefined ? true : options.handshake;
     var rootUrlPath = (options.rootUrlPath || '').replace(/\//, '');
     options.rootUrlPath = rootUrlPath;
     options.host = _getMirrorUrl(options.port);
     options.rootUrl = options.host + rootUrlPath;
-
-    DEBUG && console.log('[velocity] Mirror requested', options);
-    Velocity.Mirror.start(null, _getEnvironmentVariables(options));
+    Velocity.Mirror.start(options, _getEnvironmentVariables(options));
   }
 
   /**
@@ -247,6 +282,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       MONGO_URL: _getMongoUrl(options.framework),
       PARENT_URL: process.env.ROOT_URL,
       IS_MIRROR: true,
+      HANDSHAKE: options.handshake,
       METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings))
     }, process.env);
   }

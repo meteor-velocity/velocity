@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.4.6',
+  version: '0.5.0',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
@@ -13,7 +13,8 @@ Npm.depends({
   'chokidar': '0.11.1',
   'lodash': '2.4.1',
   'mkdirp': '0.5.0',
-  'fs-extra': '0.12.0'
+  'fs-extra': '0.12.0',
+  'freeport':'1.0.4'
 });
 
 Package.on_use(function (api) {
