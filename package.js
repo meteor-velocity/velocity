@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.4.5',
+  version: '0.5.0',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
@@ -13,7 +13,8 @@ Npm.depends({
   'chokidar': '0.11.1',
   'lodash': '2.4.1',
   'mkdirp': '0.5.0',
-  'fs-extra': '0.12.0'
+  'fs-extra': '0.12.0',
+  'freeport':'1.0.4'
 });
 
 Package.on_use(function (api) {
@@ -25,6 +26,7 @@ Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
   api.use('mongo');
   api.use('check');
+  api.use('velocity:meteor-internals@1.0.2_2');
 
   api.add_files('collections.js', BOTH);
 
@@ -35,8 +37,8 @@ Package.on_use(function (api) {
   api.export('VelocityAggregateReports', BOTH);
   api.export('VelocityLogs', BOTH);
   api.export('VelocityMirrors', BOTH);
+  api.export('VelocityOptions', BOTH);
 
-  api.add_files('lib/meteor/files.js', SERVER);
   api.add_files('core.js', SERVER);
   api.add_files('core-shared.js', BOTH);
 

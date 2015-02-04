@@ -1,3 +1,14 @@
+## v0.5.0
+
+* First cut of distributable support
+* Removed default port of 5000 for mirrors and replaced with freeport.
+
+
+## v0.4.6
+
+* Mirror initializing and being ready are now part of the explicit logs so that users are aware
+of the existence of mirrors.  
+
 ## v0.4.5
 
 * Removed mirrorId and replaced with framework name. If frameworks wish to use multiple mirrors, 

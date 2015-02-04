@@ -92,18 +92,40 @@ Velocity = Velocity || {};
      * @return {String} app directory path
      */
     getAppPath: function () {
-      return findAppDir();
+      return VelocityMeteorInternals.files.findAppDir();
     },
 
 
     /**
-     * Get path to application's 'tests' directory
+     * Get path to application's or application package's 'tests' directory
      *
      * @method getTestsPath
+     * @param {String} packageName optional package name
      * @return {String} application's tests directory
      */
-    getTestsPath: function () {
-      return path.join(Velocity.getAppPath(), 'tests');
+    getTestsPath: function (packageName) {
+      return path.join(packageName ? Velocity.getPackagePath(packageName) : Velocity.getAppPath(), 'tests');
+    },
+
+    /**
+     * Get path to application's 'packages' directory
+     *
+     * @method getPackagesPath
+     * @return {String} application's packages directory
+     */
+    getPackagesPath: function () {
+      return path.join(Velocity.getAppPath(), 'packages');
+    },
+
+    /**
+     * Get path to application's package directory
+     *
+     * @method getPackagesPath
+     * @param {String} packageName package name
+     * @return {String} application's packages directory
+     */
+    getPackagePath: function (packageName) {
+      return path.join(Velocity.getPackagesPath(), packageName);
     },
 
     /**
@@ -150,6 +172,7 @@ Velocity = Velocity || {};
      * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
      */
     registerTestingFramework: function (name, options) {
+      DEBUG && console.log('[velocity] Register framework ' + name + ' with regex ' + options.regex);
       _config[name] = _parseTestingFrameworkOptions(name, options);
       // make sure the appropriate aggregate records are added
       VelocityAggregateReports.insert({
@@ -488,8 +511,17 @@ Velocity = Velocity || {};
     VelocityTestFiles.remove({});
     VelocityFixtureFiles.remove({});
 
-    _watcher = chokidar.watch(Velocity.getTestsPath(), {ignored: /[\/\\]\./, persistent: true});
+    var paths = [Velocity.getTestsPath()];
 
+    _.each(fs.readdirSync(Velocity.getPackagesPath()), function(dir) {
+      if (dir !== 'tests-proxy' && fs.lstatSync(Velocity.getPackagePath(dir)).isDirectory() && fs.existsSync(Velocity.getTestsPath(dir))) {
+        paths.push(Velocity.getTestsPath(dir));
+      }
+    });
+
+    DEBUG && console.log('[velocity] Add paths to watcher', paths);
+
+    _watcher = chokidar.watch(paths, {ignored: /[\/\\]\./, persistent: true});
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
 
       var relativePath,
@@ -512,12 +544,13 @@ Velocity = Velocity || {};
         return;
       }
 
-      // test against each test framework's regexp matcher, use first
-      // one that matches
-      targetFramework = _.find(config, function (framework) {
-        return framework._regexp.test(relativePath);
-      });
+      DEBUG && console.log('[velocity] Search framework for path', relativePath);
 
+      var packageRelativePath = (relativePath.indexOf('packages') === 0) ? relativePath.split('/').slice(2).join('/') : relativePath;
+      // test against each test framework's regexp matcher, use first one that matches
+      targetFramework = _.find(config, function (framework) {
+        return framework._regexp.test(packageRelativePath);
+      });
 
       if (targetFramework) {
         DEBUG && console.log('[velocity] Target framework for', relativePath, 'is', targetFramework.name);

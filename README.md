@@ -157,7 +157,7 @@ We have to publish velocity:core for the different architectures (Mac OS, 64-bit
 meteor publish
 
 # Open Mac build machine
-meteor admine get-machine os.osx.x86_64
+meteor admin get-machine os.osx.x86_64
 # Build on the machine
 meteor publish-for-arch velocity:core@<VERSION>
 # Login
@@ -165,7 +165,7 @@ meteor publish-for-arch velocity:core@<VERSION>
 exit
 
 # Open Linux build machine
-meteor admine get-machine os.linux.x86_64
+meteor admin get-machine os.linux.x86_64
 # Build on the machine (this will build a version for 64-bit and 32-bit Linux)
 meteor publish-for-arch velocity:core@<VERSION>
 # Login
