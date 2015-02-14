@@ -63,6 +63,7 @@ have an example app and do not offer a sample-test button in the reporter.
 Reporters display test results.
 
 * [velocity:html-reporter](https://github.com/meteor-velocity/html-reporter/) - Adds an overlay to your app indicating test success/failure (green/red dot in top right).  Click dot for test details.  `meteor add velocity:html-reporter`
+* [velocity:console-reporter](https://github.com/meteor-velocity/console-reporter/) - Reports test run results to the console.  `meteor add velocity:console-reporter`
 
 ### Mirrors
 
