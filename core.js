@@ -312,7 +312,7 @@ Velocity = Velocity || {};
       });
 
       VelocityLogs.insert({
-        timestamp: options.timestamp || new Date(),
+        timestamp: options.timestamp ? new Date(options.timestamp) : new Date(),
         level: options.level || 'info',
         message: options.message,
         framework: options.framework
@@ -371,7 +371,7 @@ Velocity = Velocity || {};
         failureStackTrace: Match.Optional(Match.Any)
       }));
 
-      data.timestamp = data.timestamp || new Date();
+      data.timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
       data.id = data.id || Random.id();
 
       VelocityTestReports.upsert(data.id, {$set: data});
