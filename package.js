@@ -13,7 +13,8 @@ Npm.depends({
   'chokidar': '0.11.1',
   'lodash': '2.4.1',
   'mkdirp': '0.5.0',
-  'fs-extra': '0.12.0'
+  'fs-extra': '0.12.0',
+  'mongodb-uri': '0.9.7'
 });
 
 Package.on_use(function (api) {

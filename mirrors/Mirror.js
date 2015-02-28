@@ -20,7 +20,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   }
 
   var _ = Npm.require('lodash'),
-      url = Npm.require('url');
+      url = Npm.require('url'),
+      mongodbUri = Npm.require('mongodb-uri');
 
 //////////////////////////////////////////////////////////////////////
 // Public Methods
@@ -201,14 +202,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * @private
    */
   function _getMongoUrl (database) {
-    var mongoLocationParts = url.parse(process.env.MONGO_URL);
-    return url.format({
-      protocol: mongoLocationParts.protocol,
-      slashes: mongoLocationParts.slashes,
-      hostname: mongoLocationParts.hostname,
-      port: mongoLocationParts.port,
-      pathname: '/' + database
-    });
+    var parts = mongodbUri.parse(process.env.MONGO_URL);
+    parts.database = database;
+    return mongodbUri.format(parts);
   }
 
   /**
