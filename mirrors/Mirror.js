@@ -223,10 +223,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    */
   function _startMirror (options) {
     options.handshake = options.handshake == undefined ? true : options.handshake;
-    var rootUrlPath = (options.rootUrlPath || '').replace(/\//, '');
-    options.rootUrlPath = rootUrlPath;
+    options.rootUrlPath = (options.rootUrlPath || '');
     options.host = _getMirrorUrl(options.port);
-    options.rootUrl = options.host + rootUrlPath;
+    options.rootUrl = options.host;
     Velocity.Mirror.start(options, _getEnvironmentVariables(options));
   }
 
