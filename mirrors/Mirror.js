@@ -141,7 +141,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       // Ugliness! It seems the DDP connect has a exponential back-off, which means the tests take
       // around 5 seconds to rerun. This setTimeout helps.
       Meteor.setTimeout(function () {
-        var mirrorConnection = DDP.connect(options.host);
+        var mirrorConnection = DDP.connect(options.host, {
+          // Don't show the user connection errors when not in debug mode.
+          // We will normally eventually connect to the mirror after
+          // a connection error has been shown.
+          _dontPrintErrors: !DEBUG
+        });
         mirrorConnection.onReconnect = function () {
           DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
           mirrorConnection.call('velocity/parentHandshake');
