@@ -193,19 +193,23 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * @private
    */
   function _startMirrors (options) {
+    options = _.extend({
+      nodes: 1
+    }, options);
     DEBUG && console.log('[velocity]', options.nodes, 'mirror(s) requested');
 
     // only respect a provided port if a single mirror is requested
-    if (options.port && (!options.nodes || options.nodes === 1)) {
+    if (options.port && options.nodes === 1) {
       _startMirror(options);
-      return;
-    }
-
-    for (var i = 0; i < options.nodes; i++) {
-      freeport(Meteor.bindEnvironment(function (err, port) {
+    } else {
+      var startWithFreePort = Meteor.bindEnvironment(function (err, port) {
         options.port = port;
         _startMirror(options);
-      }));
+      });
+
+      for (var i = 0; i < options.nodes; i++) {
+        freeport(startWithFreePort);
+      }
     }
   }
 
