@@ -79,6 +79,9 @@
           "version": "0.0.8"
         }
       }
+    },
+    "mongodb-uri": {
+      "version": "0.9.7"
     }
   }
 }
