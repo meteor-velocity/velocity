@@ -3,7 +3,7 @@
 
 Checklist for reporting a bug
 
-* [ ] Search if the bug is already reported. Open a new issue, when you aren't sure if an existing issue is about        the same bug.
+* [ ] Search if the issue is already reported. Open a new issue, when you aren't sure if an existing issue is about        the same thing.
 * [ ] Reproducible bug with a repro 
 
 If you can't do the reporoducible repo, then please be sure to do the following:
