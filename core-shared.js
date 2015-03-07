@@ -97,6 +97,19 @@ Velocity = Velocity || {};
 
         var option = VelocityOptions.findOne({name: name});
         return option ? option.value : null;
+      },
+
+      /**
+       * Exposes the VELOCITY flag
+       *
+       * @method velocity/isEnabled
+       */
+      'velocity/isEnabled': function () {
+        if (process.env.VELOCITY === undefined) {
+          return true;
+        } else {
+          return !!parseInt(process.env.VELOCITY);
+        }
       }
     });
 })();
