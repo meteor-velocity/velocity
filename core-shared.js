@@ -105,10 +105,14 @@ Velocity = Velocity || {};
        * @method velocity/isEnabled
        */
       'velocity/isEnabled': function () {
-        if (process.env.VELOCITY === undefined) {
-          return true;
+        if (Meteor.isServer) {
+          if (process.env.VELOCITY === undefined) {
+            return true;
+          } else {
+            return !!parseInt(process.env.VELOCITY);
+          }
         } else {
-          return !!parseInt(process.env.VELOCITY);
+          return false;
         }
       }
     });
