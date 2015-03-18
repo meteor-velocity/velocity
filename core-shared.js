@@ -52,6 +52,21 @@ Velocity = Velocity || {};
       Velocity.getOption = function (name) {
         Meteor.call('velocity/getOption', name);
       };
+
+      Meteor.methods({
+        /**
+         * Exposes the VELOCITY flag
+         *
+         * @method velocity/isEnabled
+         */
+        'velocity/isEnabled': function () {
+          if (process.env.VELOCITY === undefined) {
+            return true;
+          } else {
+            return !!parseInt(process.env.VELOCITY);
+          }
+        }
+      });
     }
 
     Meteor.methods({
@@ -98,22 +113,6 @@ Velocity = Velocity || {};
         var option = VelocityOptions.findOne({name: name});
         return option ? option.value : null;
       },
-
-      /**
-       * Exposes the VELOCITY flag
-       *
-       * @method velocity/isEnabled
-       */
-      'velocity/isEnabled': function () {
-        if (Meteor.isServer) {
-          if (process.env.VELOCITY === undefined) {
-            return true;
-          } else {
-            return !!parseInt(process.env.VELOCITY);
-          }
-        } else {
-          return false;
-        }
-      }
     });
+
 })();
