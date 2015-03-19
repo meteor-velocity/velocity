@@ -34,7 +34,7 @@ Velocity = Velocity || {};
     process.env.VELOCITY === '0' ||
     process.env.IS_MIRROR) {
     DEBUG && console.log('[velocity] ' + (process.env.IS_MIRROR ? 'Mirror detected - ' : '') + 'Not adding velocity core');
-    returnwe
+    return;
   }
   DEBUG && console.log('[velocity] adding velocity core');
   CONTINUOUS_INTEGRATION && console.log('[velocity] is in continuous integration mode');
