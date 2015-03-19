@@ -5,6 +5,7 @@
  */
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
+CONTINUOUS_INTEGRATION = process.env.CI;
 
 /**
  * @module Velocity
@@ -33,9 +34,10 @@ Velocity = Velocity || {};
     process.env.VELOCITY === '0' ||
     process.env.IS_MIRROR) {
     DEBUG && console.log('[velocity] ' + (process.env.IS_MIRROR ? 'Mirror detected - ' : '') + 'Not adding velocity core');
-    return;
+    returnwe
   }
   DEBUG && console.log('[velocity] adding velocity core');
+  CONTINUOUS_INTEGRATION && console.log('[velocity] is in continuous integration mode');
 
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
@@ -58,7 +60,9 @@ Velocity = Velocity || {};
     //kick-off everything
     _reset(_config);
 
-    _initWatcher(_config, _triggerVelocityStartupFunctions);
+    _initFileWatcher(_config, _triggerVelocityStartupFunctions);
+
+    _launchContinuousIntegration(_config);
 
   });
 
@@ -499,14 +503,41 @@ Velocity = Velocity || {};
   }
 
   /**
+   * Runs tests once in continous integration mode.
+   *
+   */
+  function _launchContinuousIntegration(_config){
+    if(CONTINUOUS_INTEGRATION){
+      //console.log('[velocity] _launchContinuousIntegration', _config);
+
+      if(_config.nightwatch){
+        Meteor.call('nightwatch/run');
+      }
+
+      // if(_config.jasmine){
+      //   // do jasmine stuff
+      // }
+      //
+      // if(_config.cucumber){
+      //   // do cucumber stuff
+      // }
+      //
+      // if(_config.mocha){
+      //   // do mocha stuff
+      // }
+
+    }
+  }
+
+  /**
    * Initialize the directory/file watcher.
    *
-   * @method _initWatcher
+   * @method _initFileWatcher
    * @param {Object} config  See `registerTestingFramework`.
    * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
-  function _initWatcher (config, callback) {
+  function _initFileWatcher (config, callback) {
 
     VelocityTestFiles.remove({});
     VelocityFixtureFiles.remove({});
@@ -591,7 +622,7 @@ Velocity = Velocity || {};
       }
     }));
 
-  }  // end _initWatcher
+  }  // end _initFileWatcher
 
   /**
    * Re-init file watcher and clear all test results.
