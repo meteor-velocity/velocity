@@ -511,7 +511,7 @@ Velocity = Velocity || {};
     if (CONTINUOUS_INTEGRATION){
       _.forEach(_getTestFrameworkNames(), function (testFramework) {
         Meteor.call("velocity/logs/reset", {framework: testFramework}, function(){
-          Meteor.call(testFramework + "/clear/xml");
+          Meteor.call(testFramework + "/reset");
           Meteor.call(testFramework + "/run");
         });
       });
