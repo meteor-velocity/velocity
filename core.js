@@ -224,7 +224,8 @@ Velocity = Velocity || {};
       check(name, Match.Optional(String));
       check(options, {
         disableAutoReset: Match.Optional(Boolean),
-        regex: Match.Optional(RegExp)
+        regex: Match.Optional(RegExp),
+        sampleTestGenerator: Match.Optional(Function)
       });
 
       _config[name] = _parseTestingFrameworkOptions(name, options);
