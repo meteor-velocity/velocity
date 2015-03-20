@@ -5,7 +5,7 @@
  */
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
-CONTINUOUS_INTEGRATION = process.env.CI;
+CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
 /**
  * @module Velocity
@@ -503,29 +503,18 @@ Velocity = Velocity || {};
   }
 
   /**
-   * Runs tests once in continous integration mode.
+   * Runs each test framework once when in continous integration mode.
    *
    */
   function _launchContinuousIntegration(_config){
-    if(CONTINUOUS_INTEGRATION){
-      //console.log('[velocity] _launchContinuousIntegration', _config);
 
-      if(_config.nightwatch){
-        Meteor.call('nightwatch/run');
-      }
-
-      // if(_config.jasmine){
-      //   // do jasmine stuff
-      // }
-      //
-      // if(_config.cucumber){
-      //   // do cucumber stuff
-      // }
-      //
-      // if(_config.mocha){
-      //   // do mocha stuff
-      // }
-
+    if (CONTINUOUS_INTEGRATION){
+      _.forEach(_getTestFrameworkNames(), function (testFramework) {
+        Meteor.call("velocity/logs/reset", {framework: testFramework}, function(){
+          Meteor.call(testFramework + "/clear/xml");
+          Meteor.call(testFramework + "/run");
+        });
+      });
     }
   }
 

@@ -38,7 +38,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * @method velocity/isMirror
      */
     'velocity/parentHandshake': function () {
-      console.log('Mirror requested by ' + process.env.FRAMEWORK + ' is ready.');
+      console.log('[velocity-mirror] Mirror requested by ' + process.env.FRAMEWORK + ' is ready.');
     }
   });
 
