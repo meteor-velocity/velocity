@@ -5,6 +5,7 @@
  */
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
+CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
 /**
  * @module Velocity
@@ -36,6 +37,7 @@ Velocity = Velocity || {};
     return;
   }
   DEBUG && console.log('[velocity] adding velocity core');
+  CONTINUOUS_INTEGRATION && console.log('[velocity] is in continuous integration mode');
 
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
@@ -58,7 +60,9 @@ Velocity = Velocity || {};
     //kick-off everything
     _reset(_config);
 
-    _initWatcher(_config, _triggerVelocityStartupFunctions);
+    _initFileWatcher(_config, _triggerVelocityStartupFunctions);
+
+    _launchContinuousIntegration(_config);
 
   });
 
@@ -220,7 +224,8 @@ Velocity = Velocity || {};
       check(name, Match.Optional(String));
       check(options, {
         disableAutoReset: Match.Optional(Boolean),
-        regex: Match.Optional(RegExp)
+        regex: Match.Optional(RegExp),
+        sampleTestGenerator: Match.Optional(Function)
       });
 
       _config[name] = _parseTestingFrameworkOptions(name, options);
@@ -454,7 +459,7 @@ Velocity = Velocity || {};
           child_process.exec(command, Meteor.bindEnvironment(
             function copySampleTestsExecHandler (err, stdout, stderr) {
               if (err) {
-                console.error('ERROR', err);
+                console.error('[velocity] ERROR', err);
               }
               console.log(stdout);
               console.error(stderr);
@@ -499,14 +504,39 @@ Velocity = Velocity || {};
   }
 
   /**
+   * Runs each test framework once when in continous integration mode.
+   *
+   */
+  function _launchContinuousIntegration(_config){
+
+    if (CONTINUOUS_INTEGRATION){
+      _.forEach(_getTestFrameworkNames(), function (testFramework) {
+        Meteor.call("velocity/logs/reset", {framework: testFramework}, function(){
+
+          Meteor.call(testFramework + "/reset", function(error, result){
+            if(error){
+                console.error('[velocity] ERROR; testFramework/rest not implemented', error);
+            }
+          });
+          Meteor.call(testFramework + "/run", function(error, result){
+            if(error){
+                console.error('[velocity] ERROR; testFramework/run not implemented', error);
+            }
+          });
+        });
+      });
+    }
+  }
+
+  /**
    * Initialize the directory/file watcher.
    *
-   * @method _initWatcher
+   * @method _initFileWatcher
    * @param {Object} config  See `registerTestingFramework`.
    * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
-  function _initWatcher (config, callback) {
+  function _initFileWatcher (config, callback) {
 
     VelocityTestFiles.remove({});
     VelocityFixtureFiles.remove({});
@@ -591,7 +621,7 @@ Velocity = Velocity || {};
       }
     }));
 
-  }  // end _initWatcher
+  }  // end _initFileWatcher
 
   /**
    * Re-init file watcher and clear all test results.
