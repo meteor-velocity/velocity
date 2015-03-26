@@ -5,7 +5,8 @@
  VelocityTestReports: true,
  VelocityAggregateReports: true,
  VelocityLogs: true,
- VelocityMirrors: true
+ VelocityMirrors: true,
+ VelocityOptions: true
  */
 
 VelocityTestFiles = new Mongo.Collection('velocityTestFiles');
@@ -14,6 +15,7 @@ VelocityTestReports = new Mongo.Collection('velocityTestReports');
 VelocityAggregateReports = new Mongo.Collection('velocityAggregateReports');
 VelocityLogs = new Mongo.Collection('velocityLogs');
 VelocityMirrors = new Mongo.Collection('velocityMirrors');
+VelocityOptions = new Mongo.Collection('velocityOptions');
 (function () {
   'use strict';
 
@@ -36,6 +38,9 @@ VelocityMirrors = new Mongo.Collection('velocityMirrors');
     Meteor.publish('VelocityMirrors', function () {
       return VelocityMirrors.find({});
     });
+    Meteor.publish('VelocityOptions', function () {
+      return VelocityOptions.find({});
+    });
   }
 
   if (Meteor.isClient) {
@@ -45,6 +50,7 @@ VelocityMirrors = new Mongo.Collection('velocityMirrors');
     Meteor.subscribe('VelocityAggregateReports');
     Meteor.subscribe('VelocityLogs');
     Meteor.subscribe('VelocityMirrors');
+    Meteor.subscribe('VelocityOptions');
   }
 })();
 

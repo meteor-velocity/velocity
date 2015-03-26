@@ -63,6 +63,7 @@ have an example app and do not offer a sample-test button in the reporter.
 Reporters display test results.
 
 * [velocity:html-reporter](https://github.com/meteor-velocity/html-reporter/) - Adds an overlay to your app indicating test success/failure (green/red dot in top right).  Click dot for test details.  `meteor add velocity:html-reporter`
+* [velocity:console-reporter](https://github.com/meteor-velocity/console-reporter/) - Reports test run results to the console.  `meteor add velocity:console-reporter`
 
 ### Mirrors
 
@@ -157,7 +158,7 @@ We have to publish velocity:core for the different architectures (Mac OS, 64-bit
 meteor publish
 
 # Open Mac build machine
-meteor admine get-machine os.osx.x86_64
+meteor admin get-machine os.osx.x86_64
 # Build on the machine
 meteor publish-for-arch velocity:core@<VERSION>
 # Login
@@ -165,7 +166,7 @@ meteor publish-for-arch velocity:core@<VERSION>
 exit
 
 # Open Linux build machine
-meteor admine get-machine os.linux.x86_64
+meteor admin get-machine os.linux.x86_64
 # Build on the machine (this will build a version for 64-bit and 32-bit Linux)
 meteor publish-for-arch velocity:core@<VERSION>
 # Login

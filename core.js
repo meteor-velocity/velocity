@@ -5,6 +5,7 @@
  */
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
+CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
 /**
  * @module Velocity
@@ -36,6 +37,7 @@ Velocity = Velocity || {};
     return;
   }
   DEBUG && console.log('[velocity] adding velocity core');
+  CONTINUOUS_INTEGRATION && console.log('[velocity] is in continuous integration mode');
 
   var _ = Npm.require('lodash'),
       fs = Npm.require('fs'),
@@ -58,7 +60,9 @@ Velocity = Velocity || {};
     //kick-off everything
     _reset(_config);
 
-    _initWatcher(_config, _triggerVelocityStartupFunctions);
+    _initFileWatcher(_config, _triggerVelocityStartupFunctions);
+
+    _launchContinuousIntegration(_config);
 
   });
 
@@ -92,18 +96,40 @@ Velocity = Velocity || {};
      * @return {String} app directory path
      */
     getAppPath: function () {
-      return findAppDir();
+      return VelocityMeteorInternals.files.findAppDir();
     },
 
 
     /**
-     * Get path to application's 'tests' directory
+     * Get path to application's or application package's 'tests' directory
      *
      * @method getTestsPath
+     * @param {String} packageName optional package name
      * @return {String} application's tests directory
      */
-    getTestsPath: function () {
-      return path.join(Velocity.getAppPath(), 'tests');
+    getTestsPath: function (packageName) {
+      return path.join(packageName ? Velocity.getPackagePath(packageName) : Velocity.getAppPath(), 'tests');
+    },
+
+    /**
+     * Get path to application's 'packages' directory
+     *
+     * @method getPackagesPath
+     * @return {String} application's packages directory
+     */
+    getPackagesPath: function () {
+      return path.join(Velocity.getAppPath(), 'packages');
+    },
+
+    /**
+     * Get path to application's package directory
+     *
+     * @method getPackagesPath
+     * @param {String} packageName package name
+     * @return {String} application's packages directory
+     */
+    getPackagePath: function (packageName) {
+      return path.join(Velocity.getPackagesPath(), packageName);
     },
 
     /**
@@ -150,6 +176,7 @@ Velocity = Velocity || {};
      * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
      */
     registerTestingFramework: function (name, options) {
+      DEBUG && console.log('[velocity] Register framework ' + name + ' with regex ' + options.regex);
       _config[name] = _parseTestingFrameworkOptions(name, options);
       // make sure the appropriate aggregate records are added
       VelocityAggregateReports.insert({
@@ -197,7 +224,8 @@ Velocity = Velocity || {};
       check(name, Match.Optional(String));
       check(options, {
         disableAutoReset: Match.Optional(Boolean),
-        regex: Match.Optional(RegExp)
+        regex: Match.Optional(RegExp),
+        sampleTestGenerator: Match.Optional(Function)
       });
 
       _config[name] = _parseTestingFrameworkOptions(name, options);
@@ -289,7 +317,7 @@ Velocity = Velocity || {};
       });
 
       VelocityLogs.insert({
-        timestamp: options.timestamp || new Date(),
+        timestamp: options.timestamp ? new Date(options.timestamp) : new Date(),
         level: options.level || 'info',
         message: options.message,
         framework: options.framework
@@ -348,7 +376,7 @@ Velocity = Velocity || {};
         failureStackTrace: Match.Optional(Match.Any)
       }));
 
-      data.timestamp = data.timestamp || new Date();
+      data.timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
       data.id = data.id || Random.id();
 
       VelocityTestReports.upsert(data.id, {$set: data});
@@ -431,7 +459,7 @@ Velocity = Velocity || {};
           child_process.exec(command, Meteor.bindEnvironment(
             function copySampleTestsExecHandler (err, stdout, stderr) {
               if (err) {
-                console.error('ERROR', err);
+                console.error('[velocity] ERROR', err);
               }
               console.log(stdout);
               console.error(stderr);
@@ -476,20 +504,54 @@ Velocity = Velocity || {};
   }
 
   /**
+   * Runs each test framework once when in continous integration mode.
+   *
+   */
+  function _launchContinuousIntegration(_config){
+
+    if (CONTINUOUS_INTEGRATION){
+      _.forEach(_getTestFrameworkNames(), function (testFramework) {
+        Meteor.call("velocity/logs/reset", {framework: testFramework}, function(){
+
+          Meteor.call(testFramework + "/reset", function(error, result){
+            if(error){
+                console.error('[velocity] ERROR; testFramework/rest not implemented', error);
+            }
+          });
+          Meteor.call(testFramework + "/run", function(error, result){
+            if(error){
+                console.error('[velocity] ERROR; testFramework/run not implemented', error);
+            }
+          });
+        });
+      });
+    }
+  }
+
+  /**
    * Initialize the directory/file watcher.
    *
-   * @method _initWatcher
+   * @method _initFileWatcher
    * @param {Object} config  See `registerTestingFramework`.
    * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
-  function _initWatcher (config, callback) {
+  function _initFileWatcher (config, callback) {
 
     VelocityTestFiles.remove({});
     VelocityFixtureFiles.remove({});
 
-    _watcher = chokidar.watch(Velocity.getTestsPath(), {ignored: /[\/\\]\./, persistent: true});
+    var paths = [Velocity.getTestsPath()];
 
+    _.each(fs.readdirSync(Velocity.getPackagesPath()), function(dir) {
+      if (dir !== 'tests-proxy' && fs.lstatSync(Velocity.getPackagePath(dir)).isDirectory() && fs.existsSync(Velocity.getTestsPath(dir))) {
+        paths.push(Velocity.getTestsPath(dir));
+      }
+    });
+
+    DEBUG && console.log('[velocity] Add paths to watcher', paths);
+
+    _watcher = chokidar.watch(paths, {ignored: /[\/\\]\./, persistent: true});
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
 
       var relativePath,
@@ -512,12 +574,13 @@ Velocity = Velocity || {};
         return;
       }
 
-      // test against each test framework's regexp matcher, use first
-      // one that matches
-      targetFramework = _.find(config, function (framework) {
-        return framework._regexp.test(relativePath);
-      });
+      DEBUG && console.log('[velocity] Search framework for path', relativePath);
 
+      var packageRelativePath = (relativePath.indexOf('packages') === 0) ? relativePath.split('/').slice(2).join('/') : relativePath;
+      // test against each test framework's regexp matcher, use first one that matches
+      targetFramework = _.find(config, function (framework) {
+        return framework._regexp.test(packageRelativePath);
+      });
 
       if (targetFramework) {
         DEBUG && console.log('[velocity] Target framework for', relativePath, 'is', targetFramework.name);
@@ -558,7 +621,7 @@ Velocity = Velocity || {};
       }
     }));
 
-  }  // end _initWatcher
+  }  // end _initFileWatcher
 
   /**
    * Re-init file watcher and clear all test results.
