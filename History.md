@@ -1,3 +1,7 @@
+## v0.5.1
+
+* Prototype of testing lifecycle (run, reset, etc.)
+
 ## v0.5.0
 
 * First cut of distributable support
