@@ -459,7 +459,7 @@ Velocity = Velocity || {};
           child_process.exec(command, Meteor.bindEnvironment(
             function copySampleTestsExecHandler (err, stdout, stderr) {
               if (err) {
-                console.error('ERROR', err);
+                console.error('[velocity] ERROR', err);
               }
               console.log(stdout);
               console.error(stderr);
@@ -512,8 +512,17 @@ Velocity = Velocity || {};
     if (CONTINUOUS_INTEGRATION){
       _.forEach(_getTestFrameworkNames(), function (testFramework) {
         Meteor.call("velocity/logs/reset", {framework: testFramework}, function(){
-          Meteor.call(testFramework + "/reset");
-          Meteor.call(testFramework + "/run");
+
+          Meteor.call(testFramework + "/reset", function(error, result){
+            if(error){
+                console.error('[velocity] ERROR; testFramework/rest not implemented', error);
+            }
+          });
+          Meteor.call(testFramework + "/run", function(error, result){
+            if(error){
+                console.error('[velocity] ERROR; testFramework/run not implemented', error);
+            }
+          });
         });
       });
     }
