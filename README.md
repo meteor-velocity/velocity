@@ -192,7 +192,9 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 * [Jonas Aschenbrenner](https://github.com/sanjo), velocity contributor, [Jasmine](https://github.com/Sanjo/meteor-jasmine) package
 * [Richard Smith](https://github.com/rjsmith) from [RSBA Technology Ltd](http://www.rsbatechnology.co.uk), author of [Meteor-RobotFramework](https://github.com/rjsmith/meteor-robotframework)
 
-Please join our discussions at the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
+For general questions about testing, check out [Testing](https://forums.meteor.com/c/testing) on the Meteor forums.
+
+For specific questions about velocity core, please post in [Velocity Core](https://forums.meteor.com/c/testing/velocity-core).
 
 ## Roadmap
 
