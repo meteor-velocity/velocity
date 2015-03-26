@@ -39,24 +39,17 @@ will then post issues to the core if they are core issues.
 
 Below is a list of the currently available frameworks.
 
-####Fully Integrated
-
-These frameworks have an example in the [velocity-examples](https://github.com/meteor-velocity/velocity-examples) repository. They also include a set of sample tests that 
-the framework can add directly to the reporter when you first install the framework. 
+Most of these frameworks have an example in the [velocity-examples](https://github.com/meteor-velocity/velocity-examples) repository, and have a set of sample tests that can be added to your project.
 
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) - Write client and server unit and integration tests with Jasmine.
 * [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
 * [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) - Use Gherkin-syntax cucumber to 
 test your app. Integrated nicely with [meteor-webdriver](https://github.com/xolvio/meteor-webdriver)  
-
-
-####Partially Integrated
-
-These frameworks are very usable, and they are placed under this section as they currently don't 
-have an example app and do not offer a sample-test button in the reporter. 
-
 * [clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
 * [nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration 
+* [rsbatech:robotframework](https://github.com/rjsmith/meteor-robotframework) - [Robot Framework](http://robotframework.org/) end to end test integration using Selenium and many other [test libraries](http://robotframework.org/#test-libraries)
+
+A lot more information on these frameworks can be found on the [Velocity website](http://velocity.meteor.com/) and in their respective repositories.
 
 ### Reporters
 
@@ -197,6 +190,7 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 * [Robert Dickert](https://github.com/rdickert) from [Meteor Boulder](http://www.meetup.com/Meteor-Boulder), contributor to [all things Meteor](https://github.com/rdickert?tab=repositories)
 * [Josh Owens](https://github.com/queso) from [Differential](http://differential.io/), author of [Testing with Meteor](http://testingmeteor.com/)
 * [Jonas Aschenbrenner](https://github.com/sanjo), velocity contributor, [Jasmine](https://github.com/Sanjo/meteor-jasmine) package
+* [Richard Smith](https://github.com/rjsmith) from [RSBA Technology Ltd](http://www.rsbatechnology.co.uk), author of [Meteor-RobotFramework](https://github.com/rjsmith/meteor-robotframework)
 
 Please join our discussions at the [velocity-core](https://groups.google.com/forum/#!forum/velocity-core) google group.
 
