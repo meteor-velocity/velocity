@@ -4,7 +4,7 @@
   "version": "0.2.13",
   "options": {
     "outdir": "./docs",
-    "exclude": ".meteor,.build,tests",
+    "exclude": ".meteor,.build,tests,test-app",
     "paths": ["."]
   }
 }
