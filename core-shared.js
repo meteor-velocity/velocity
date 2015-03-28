@@ -105,7 +105,7 @@ Velocity = Velocity || {};
        * Get a option
        * @method velocity/getOption
        * @param name The name of the option.
-       * @returns {*} The value of the option or null.
+       * @return {*} The value of the option or null.
        */
       'velocity/getOption': function (name) {
         check(name, String);

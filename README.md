@@ -137,7 +137,7 @@ See [instructions here](https://github.com/meteor-velocity/velocity/wiki/How-to-
 2. Commit changes
 3. Update History.md with summary of changes
 4. Bump version numbers in package.js, History.md and yuidoc.json
-5. Execute `yuidoc` command from velocity root path
+5. Delete .build* folders and execute `yuidoc` command from velocity root path.
 6. Commit changes
 7. `meteor publish`
 8. Tag last commit with the new version `X.X.X`

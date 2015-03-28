@@ -83,7 +83,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     },
 
     /**
-     * Stores metadata about the mirror. Before a mirror implementation starts, it needs to call
+     * Stores metadata about the mirror.
+     * Before a mirror implementation starts, it needs to call
      * this method to let Velocity know it is starting up.
      *
      * @param options {Object}
@@ -241,7 +242,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   /**
    * Returns the MongoDB URL for the given database.
    * @param database
-   * @returns {string} MongoDB Url
+   * @return {string} MongoDB Url
    * @private
    */
   function _getMongoUrl (database) {
@@ -253,7 +254,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   /**
    * Return URL for the mirror with the given port.
    * @param port Mirror port
-   * @returns {string} Mirror URL
+   * @return {string} Mirror URL
    * @private
    */
   function _getMirrorUrl (port) {
