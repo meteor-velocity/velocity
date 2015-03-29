@@ -576,7 +576,7 @@ Velocity = Velocity || {};
 
       DEBUG && console.log('[velocity] Search framework for path', relativePath);
 
-      var packageRelativePath = (relativePath.indexOf('packages') === 0) ? relativePath.split('/').slice(2).join('/') : relativePath;
+      var packageRelativePath = (relativePath.indexOf('packages') === 0) ? relativePath.split(path.sep).slice(2).join('/') : relativePath.split(path.sep).join('/');
       // test against each test framework's regexp matcher, use first one that matches
       targetFramework = _.find(config, function (framework) {
         return framework._regexp.test(packageRelativePath);
