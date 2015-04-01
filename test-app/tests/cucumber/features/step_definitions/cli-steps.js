@@ -172,7 +172,6 @@
     this.Then(/^I should see "([^"]*)" in the Velocity reporter$/, function (elementText, callback) {
       helper.world.browser
         .getText('div.velocity-summary-text', function (err, text) {
-          console.log(err)
           assert(text.indexOf(elementText) !== -1, elementText + ': NOT FOUND');
           callback();
         });
