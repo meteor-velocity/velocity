@@ -150,7 +150,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         });
         mirrorConnection.onReconnect = function () {
           DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
-          mirrorConnection.call('velocity/parentHandshake');
+          mirrorConnection.call('velocity/parentHandshake', function(e, r) {
+            DEBUG && console.log('[velocity] Parent Handshake response', e, r);
+          });
           mirrorConnection.disconnect();
           VelocityMirrors.update({
             framework: options.framework
