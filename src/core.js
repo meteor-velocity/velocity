@@ -507,18 +507,18 @@ Velocity = Velocity || {};
    * Runs each test framework once when in continous integration mode.
    *
    */
-  function _launchContinuousIntegration(_config){
+  function _launchContinuousIntegration(){
 
     if (CONTINUOUS_INTEGRATION){
       _.forEach(_getTestFrameworkNames(), function (testFramework) {
-        Meteor.call("velocity/logs/reset", {framework: testFramework}, function(){
+        Meteor.call('velocity/logs/reset', {framework: testFramework}, function(){
 
-          Meteor.call(testFramework + "/reset", function(error, result){
+          Meteor.call(testFramework + '/reset', function(error){
             if(error){
                 console.error('[velocity] ERROR; testFramework/rest not implemented', error);
             }
           });
-          Meteor.call(testFramework + "/run", function(error, result){
+          Meteor.call(testFramework + '/run', function(error){
             if(error){
                 console.error('[velocity] ERROR; testFramework/run not implemented', error);
             }
