@@ -1,4 +1,8 @@
-if (Meteor.isServer) {
+(function () {
+
+  'use strict';
+
+  if (Meteor.isServer) {
   Meteor.startup(function () {
     Meteor.setTimeout(function() {
       Meteor.call('pretendTests', {
@@ -19,3 +23,6 @@ if (Meteor.isClient) {
     }, 1000);
   });
 }
+
+
+})();
