@@ -156,7 +156,7 @@
 
 
     this.Then(/^I should see the file "([^"]*)"$/, function (file, callback) {
-      console.log(path.resolve(helper.world.cwd, file))
+      console.log(path.resolve(helper.world.cwd, file));
       fs.exists(path.resolve(helper.world.cwd, file), function(exists){
         if (exists) {
           callback();
