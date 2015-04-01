@@ -39,6 +39,10 @@
     "VelocityLogs": false,
     "VelocityVars": false,
     "$": false,
+    "Jasmine": false,
+    "describe": false,
+    "it": false,
+    "expect": false,
     "_": false
   }
 }

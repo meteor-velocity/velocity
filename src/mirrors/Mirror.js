@@ -232,7 +232,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * @private
    */
   function _startMirror (options) {
-    options.handshake = options.handshake == undefined ? true : options.handshake;
+    options.handshake = options.handshake === undefined ? true : options.handshake;
     options.rootUrlPath = (options.rootUrlPath || '');
     options.host = _getMirrorUrl(options.port);
     options.rootUrl = options.host;

@@ -511,14 +511,14 @@ Velocity = Velocity || {};
 
     if (CONTINUOUS_INTEGRATION){
       _.forEach(_getTestFrameworkNames(), function (testFramework) {
-        Meteor.call("velocity/logs/reset", {framework: testFramework}, function(){
+        Meteor.call('velocity/logs/reset', {framework: testFramework}, function(){
 
-          Meteor.call(testFramework + "/reset", function(error, result){
+          Meteor.call(testFramework + '/reset', function(error, result){
             if(error){
                 console.error('[velocity] ERROR; testFramework/rest not implemented', error);
             }
           });
-          Meteor.call(testFramework + "/run", function(error, result){
+          Meteor.call(testFramework + '/run', function(error, result){
             if(error){
                 console.error('[velocity] ERROR; testFramework/run not implemented', error);
             }
