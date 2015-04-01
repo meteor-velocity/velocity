@@ -3,14 +3,15 @@
  DEBUG:true
  */
 
-// empty class for mirror implementations to extend
-Velocity.Mirror = {};
-
 DEBUG = !!process.env.VELOCITY_DEBUG;
 
 (function () {
 
   'use strict';
+
+  var fs = Npm.require('fs-extra');
+  var path = Npm.require('path');
+  var spawn = Npm.require('child_process').spawn;
 
   if (process.env.NODE_ENV !== 'development' ||
     process.env.IS_MIRROR) {
@@ -24,19 +25,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       mongodbUri = Npm.require('mongodb-uri'),
       freeport = Npm.require('freeport');
 
-//////////////////////////////////////////////////////////////////////
-// Public Methods
-//
-
-  _.extend(Velocity.Mirror, {
-
-    // TODO This can be extended to support multiple mirror types, but just one for now until we
-    // get the API right
-    start: function () {
-      throw new Error('Mirror requested but a mirror has not been implemented');
-    }
-
-  });
 
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
@@ -60,6 +48,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
+     * @param {String} options.testsPath        The path to tests for this framework.
+     *                                          For example "jasmine/server/unit".
+     *                                          Don't include a leading or trailing slash.
      * @param {String} [options.port]           String use a specific port
      * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the
      *                                          VelocityMirrors collection. eg. `/?jasmine=true`
@@ -74,6 +65,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     'velocity/mirrors/request': function (options) {
       check(options, {
         framework: String,
+        testsPath: String,
         port: Match.Optional(Number),
         rootUrlPath: Match.Optional(String),
         nodes: Match.Optional(Number),
@@ -142,6 +134,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       // Ugliness! It seems the DDP connect has a exponential back-off, which means the tests take
       // around 5 seconds to rerun. This setTimeout helps.
       Meteor.setTimeout(function () {
+        // TODO: Should the host really include the port?
         var mirrorConnection = DDP.connect(options.host, {
           // Don't show the user connection errors when not in debug mode.
           // We will normally eventually connect to the mirror after
@@ -187,19 +180,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 // Private functions
 //
 
-
-  /**
-   * Starts a set of mirrors.
-   *
-   * @method _startMirrors
-   * @param {Object} options
-   *                Required fields:
-   *                   framework - String ex. 'mocha-web-1'
-   *                   rootUrlPath - String ex. '/x=y'
-   *                   port - a specific port to start the mirror on
-   *
-   * @private
-   */
   function _startMirrors (options) {
     options = _.extend({
       nodes: 1
@@ -221,24 +201,60 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     }
   }
 
-  /**
-   * Starts a new mirror.
-   *
-   * @method _startMirror
-   * @param {Object} options
-   *                Required fields:
-   *                   framework - String ex. 'mocha-web-1'
-   *                   rootUrlPath - String ex. '/x=y'
-   *                   port - a specific port to start the mirror on
-   *
-   * @private
-   */
   function _startMirror (options) {
     options.handshake = options.handshake === undefined ? true : options.handshake;
     options.rootUrlPath = (options.rootUrlPath || '');
     options.host = _getMirrorUrl(options.port);
     options.rootUrl = options.host;
-    Velocity.Mirror.start(options, _getEnvironmentVariables(options));
+
+    var environment = _getEnvironmentVariables(options);
+    var logStream = _createLogStream(environment.FRAMEWORK);
+
+    var args = [
+      'run',
+      '--test-app',
+      '--port', environment.PORT,
+      '--include-tests', options.testsPath
+    ];
+
+    // Allow to use checked out meteor for spawning mirrors
+    // for development on our Meteor fork
+    if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
+      args.push('--release', 'velocity:METEOR@1.1.0_1');
+    }
+
+    var mirror = spawn(
+      'meteor',
+      args,
+      {
+        cwd: process.env.VELOCITY_APP_PATH,
+        env: environment,
+        stdio: ['ignore', logStream, logStream]
+      }
+    );
+
+    DEBUG && console.log('[velocity-node-mirror] Mirror process forked with pid', mirror.pid);
+
+    Meteor.call('velocity/mirrors/init', {
+      framework: environment.FRAMEWORK,
+      port: environment.PORT,
+      mongoUrl: environment.MONGO_URL,
+      host: environment.HOST,
+      rootUrl: environment.ROOT_URL,
+      rootUrlPath: environment.ROOT_URL_PATH,
+      type: 'meteor-mirror'
+    }, {
+      pid: mirror.pid
+    });
+  }
+
+  function _createLogStream(logName) {
+    var logFilePath = path.join(
+      Velocity.getAppPath(),
+      '.meteor/local/log/' + logName + '.log'
+    );
+    fs.ensureDirSync(path.dirname(logFilePath));
+    return fs.openSync(logFilePath, 'w');
   }
 
   /**
