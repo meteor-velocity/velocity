@@ -37,6 +37,8 @@
     "VelocityAggregateReports": false,
     "VelocityMirrors": false,
     "VelocityLogs": false,
-    "VelocityVars": false
+    "VelocityVars": false,
+    "$": false,
+    "_": false
   }
 }

@@ -5,7 +5,7 @@ Package.describe({
 	debugOnly: true
 });
 
-Package.on_use(function (api) {
+Package.onUse(function (api) {
 	api.use("coffeescript", ["client", "server"]);
 	api.add_files("tests/jasmine/server/integration/VelocitySpec.js",["server"]);
 });
