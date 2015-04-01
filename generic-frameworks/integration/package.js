@@ -16,8 +16,7 @@
 
     api.use([
       'underscore@1.0.2',
-      'velocity:core',
-      'velocity:node-soft-mirror@0.3.1'
+      'velocity:core'
     ], ['server', 'client']);
     api.use([
       'velocity:html-reporter@0.4.1'
