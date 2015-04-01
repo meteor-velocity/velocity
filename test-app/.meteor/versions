@@ -53,9 +53,7 @@ url@1.0.4
 velocity:core@0.5.1
 velocity:html-reporter@0.4.2
 velocity:meteor-internals@1.0.2_2
-velocity:node-soft-mirror@0.3.1
 velocity:shim@0.1.0
-velocity:test-proxy@0.0.4
 webapp@1.2.0
 webapp-hashing@1.0.3
 xolvio:cucumber@0.5.5

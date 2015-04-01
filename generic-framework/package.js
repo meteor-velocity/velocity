@@ -3,7 +3,7 @@
   'use strict';
 
   Package.describe({
-    name: 'velocity:generic-integration-framework',
+    name: 'velocity:generic-framework',
     summary: 'Generic integration testing framework for testing Velocity',
     version: '0.0.0',
     debugOnly: true

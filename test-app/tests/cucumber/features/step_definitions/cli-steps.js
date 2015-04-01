@@ -5,7 +5,6 @@
   module.exports = function () {
 
     var fs = Package['xolvio:cucumber'].cucumber.fs,
-        assert = require('assert'),
         path = require('path'),
         spawn = require('child_process').spawn;
 
@@ -60,8 +59,6 @@
       } else {
         callback.fail(message + ' was not seen in the console log');
       }
-
-
     });
 
 
@@ -99,6 +96,7 @@
         detached: true,
         env: currentEnv
       });
+      helper.world.meteor.port = 3030;
 
       var onMeteorData = Meteor.bindEnvironment(function (data) {
         var stdout = data.toString();
@@ -114,12 +112,51 @@
     });
 
 
-    this.Given(/^I symlinked the "([^"]*)" generic framework to this directory$/,
-      function (genericPackage, callback) {
-        var genericPackagePath = path.resolve(
-          process.env.PWD, '../generic-frameworks', genericPackage);
-        _runCliCommand('ln -s ' + genericPackagePath + ' .', callback);
+    this.Given(/^I create a fresh meteor project called "([^"]*)"$/, function (arg1, callback) {
+      _runCliCommand('rm -rf myApp', callback);
+      _runCliCommand('meteor create myApp', callback);
+    });
+
+
+    this.Given(/^I install the generic testing framework in "([^"]*)"$/, function (appName, callback) {
+
+      //And   I created a folder called "myApp/packages"
+      fs.mkdirsSync(_resolveToCurrentDir(path.join(appName + 'packages')));
+
+      //And   I changed directory to "myApp/packages"
+      helper.world.cwd = path.resolve(helper.world.cwd, path.join(appName + 'packages'));
+
+      //And   I symlinked the generic framework to this directory
+      var genericPackagePath = path.resolve(process.env.PWD, '../generic-framework');
+      _runCliCommand('ln -s ' + genericPackagePath + ' .', function () {
+        helper.world.cwd = path.resolve(helper.world.cwd, '..');
+
+        //And   I ran "meteor add velocity:generic-test-framework"
+        _runCliCommand('meteor add velocity:generic-framework;' + genericPackagePath + ' .', callback);
+
       });
+    });
+
+
+
+    this.When(/^I call ([^"]*)" via DDP$/, function (method, callback) {
+      var app = DDP.connect('http://localhost:3030');
+      app.call(method, {framework: 'generic-framework'}, function (e) {
+        if (e) {
+          callback.fail(e);
+        } else {
+          callback();
+        }
+      });
+    });
+
+
+    this.Then(/^I should see the folder "sample\-tests"([^"]*)"myApp"$/, function (arg1, arg2, callback) {
+      callback.pending();
+    });
+
+
+
 
     function _resolveToCurrentDir (location) {
       return path.join(helper.world.cwd, location);
@@ -154,63 +191,6 @@
 
       });
     }
-
-
-
-
-    this.Then(/^I should see a green dot in the the velocity html reporter$/, function (callback) {
-      // FIXME should be .passed when it's green
-      helper.world.browser
-        .call(callback);
-    });
-
-    this.Then(/^I click the green dot$/, function (callback) {
-      // Write code here that turns the phrase above into concrete actions
-      helper.world.browser.execute(function () { $('button.display-toggle').click(); }).call(callback);
-    });
-
-    this.Then(/^I should see "([^"]*)" in the Velocity reporter$/, function (elementText, callback) {
-      helper.world.browser
-        .getText('div.velocity-summary-text', function (err, text) {
-          assert(text.indexOf(elementText) !== -1, elementText + ': NOT FOUND');
-          callback();
-        });
-    });
-
-    this.When(/^I navigate to "([^"]*)"$/, function (path, callback) {
-      helper.world.browser.
-        url(path).
-        call(callback);
-    });
-
-    this.When(/^I click the Velocity reporter button$/, function (callback) {
-      helper.world.browser
-        .click('button.display-toggle')
-        .call(callback);
-    });
-
-    this.Then(/^I should see a button labelled "([^"]*)"$/, function (elementText, callback) {
-      helper.world.browser
-        .getText('button.', function (err, text) {
-          assert(text.indexOf(elementText) !== -1, elementText + ': NOT FOUND');
-          callback();
-        });
-    });
-
-
-
-
-    this.When(/^DEBUG pause (\d+)$/, function (milliseconds, callback) {
-      helper.world.browser.
-        pause(milliseconds).
-        call(callback);
-    });
-
-    this.When(/^DEBUG take screenshot$/, function (callback) {
-      helper.world.browser.
-        takeScreenshot().
-        call(callback);
-    });
 
 
 
