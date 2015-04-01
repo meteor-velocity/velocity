@@ -16,10 +16,12 @@
   if (Velocity && Velocity.registerTestingFramework) {
     Velocity.registerTestingFramework(FRAMEWORK_NAME, {
       regex: FRAMEWORK_REGEX,
-      sampleTestGenerator: [{
-        path: path.join(FRAMEWORK_NAME, 'sample.js'),
-        contents: Assets.getText(path.join('sample-tests', 'sample.js'))
-      }]
+      sampleTestGenerator: function () {
+        return [{
+          path: path.join(FRAMEWORK_NAME, 'sample.js'),
+          contents: Assets.getText(path.join('sample-tests', 'sample.js'))
+        }];
+      }
     });
   }
 

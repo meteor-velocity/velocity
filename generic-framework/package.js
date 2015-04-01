@@ -16,14 +16,15 @@
 
     api.use([
       'underscore@1.0.2',
-      'velocity:core'
+      'velocity:core',
+      'velocity:shim@0.1.0'
     ], ['server', 'client']);
     api.use([
       'velocity:html-reporter@0.4.1'
     ], 'client');
 
     api.add_files([
-      'sample-tests/sample.js',
+      'sample-tests/sample.js'
     ], 'server', {isAsset: true});
 
     api.addFiles(['server.js'], 'server');

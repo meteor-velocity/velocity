@@ -7,4 +7,4 @@ Feature: Velocity API
   Scenario: Calling the "velocity/copySampleTests" API writes files to the to the test directory
     Given I started meteor
     When  I call "velocity/copySampleTests" via DDP
-    Then  I should see the folder "sample-tests" in "myApp"
+    Then  I should see the file "tests/generic/sample.js"

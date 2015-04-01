@@ -100,7 +100,7 @@
 
       var onMeteorData = Meteor.bindEnvironment(function (data) {
         var stdout = data.toString();
-        //console.log('[meteor-output]', stdout);
+        console.log('[meteor-output]', stdout);
         if (stdout.match(/=> App running at/i)) {
           //console.log('[meteor-output] Meteor started');
           helper.world.meteor.stdout.removeListener('data', onMeteorData);
@@ -113,35 +113,39 @@
 
 
     this.Given(/^I create a fresh meteor project called "([^"]*)"$/, function (arg1, callback) {
-      _runCliCommand('rm -rf myApp', callback);
-      _runCliCommand('meteor create myApp', callback);
+      _runCliCommand('rm -rf myApp', function () {
+        _runCliCommand('meteor create myApp', callback);
+      });
     });
 
 
     this.Given(/^I install the generic testing framework in "([^"]*)"$/, function (appName, callback) {
 
       //And   I created a folder called "myApp/packages"
-      fs.mkdirsSync(_resolveToCurrentDir(path.join(appName + 'packages')));
+      console.log('***', _resolveToCurrentDir(path.join(appName, 'packages')));
+      fs.mkdirsSync(_resolveToCurrentDir(path.join(appName, 'packages')));
 
       //And   I changed directory to "myApp/packages"
-      helper.world.cwd = path.resolve(helper.world.cwd, path.join(appName + 'packages'));
+      helper.world.cwd = path.resolve(helper.world.cwd, path.join(appName, 'packages'));
 
       //And   I symlinked the generic framework to this directory
-      var genericPackagePath = path.resolve(process.env.PWD, '../generic-framework');
-      _runCliCommand('ln -s ' + genericPackagePath + ' .', function () {
-        helper.world.cwd = path.resolve(helper.world.cwd, '..');
+      var velocityPackagePath = path.resolve(process.env.PWD, '..', 'src');
+      var genericPackagePath = path.resolve(process.env.PWD, '..', 'generic-framework');
 
-        //And   I ran "meteor add velocity:generic-test-framework"
-        _runCliCommand('meteor add velocity:generic-framework;' + genericPackagePath + ' .', callback);
-
+      _runCliCommand('ln -s ' + velocityPackagePath + ' .', function () {
+        _runCliCommand('ln -s ' + genericPackagePath + ' .', function () {
+          helper.world.cwd = path.resolve(helper.world.cwd, '..');
+          //And   I ran "meteor add velocity:generic-test-framework"
+          _runCliCommand('meteor add velocity:generic-framework', callback);
+        });
       });
     });
 
 
 
-    this.When(/^I call ([^"]*)" via DDP$/, function (method, callback) {
+    this.When(/^I call "([^"]*)" via DDP$/, function (method, callback) {
       var app = DDP.connect('http://localhost:3030');
-      app.call(method, {framework: 'generic-framework'}, function (e) {
+      app.call(method, {framework: 'generic'}, function (e) {
         if (e) {
           callback.fail(e);
         } else {
@@ -151,10 +155,17 @@
     });
 
 
-    this.Then(/^I should see the folder "sample\-tests"([^"]*)"myApp"$/, function (arg1, arg2, callback) {
-      callback.pending();
-    });
+    this.Then(/^I should see the file "([^"]*)"$/, function (file, callback) {
+      console.log(path.resolve(helper.world.cwd, file))
+      fs.exists(path.resolve(helper.world.cwd, file), function(exists){
+        if (exists) {
+          callback();
+        } else {
+          callback.fail('Could not find the file ' + file);
+        }
+      });
 
+    });
 
 
 
