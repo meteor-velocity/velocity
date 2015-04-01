@@ -62,7 +62,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     'velocity/mirrors/request': function (options) {
       check(options, {
         framework: String,
-        testsPath: String,
+        testsPath: Match.Optional(String),
         port: Match.Optional(Number),
         rootUrlPath: Match.Optional(String),
         nodes: Match.Optional(Number),
@@ -208,14 +208,17 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     var args = [
       'run',
       '--test-app',
-      '--port', String(environment.PORT),
-      '--include-tests', options.testsPath
+      '--port', String(environment.PORT)
     ];
+
+    if (options.testsPath) {
+      args.push('--include-tests', options.testsPath);
+    }
 
     // Allow to use checked out meteor for spawning mirrors
     // for development on our Meteor fork
     if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
-      args.push('--release', 'velocity:METEOR@1.1.0_1');
+      args.push('--release', 'velocity:METEOR@1.1-rc.1');
     }
 
     var mirrorChild = _getMirrorChild(environment.FRAMEWORK);
