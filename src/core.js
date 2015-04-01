@@ -60,7 +60,9 @@ Velocity = Velocity || {};
     //kick-off everything
     _reset(_config);
 
-    _initFileWatcher(_config, _triggerVelocityStartupFunctions);
+    if (!process.env.IS_MIRROR) {
+      _initFileWatcher(_config, _triggerVelocityStartupFunctions);
+    }
 
     _launchContinuousIntegration(_config);
 

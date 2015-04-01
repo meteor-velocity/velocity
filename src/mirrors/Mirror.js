@@ -9,10 +9,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   'use strict';
 
-  var fs = Npm.require('fs-extra');
-  var path = Npm.require('path');
-  var spawn = Npm.require('child_process').spawn;
-
   if (process.env.NODE_ENV !== 'development' ||
     process.env.IS_MIRROR) {
     DEBUG && console.log('[velocity] Not adding mirror-registry because NODE_ENV is',
@@ -23,7 +19,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   var _ = Npm.require('lodash'),
       url = Npm.require('url'),
       mongodbUri = Npm.require('mongodb-uri'),
-      freeport = Npm.require('freeport');
+      freeport = Npm.require('freeport'),
+      _mirrorChildProcesses = {};
 
 
 //////////////////////////////////////////////////////////////////////
@@ -208,12 +205,10 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     options.rootUrl = options.host;
 
     var environment = _getEnvironmentVariables(options);
-    var logStream = _createLogStream(environment.FRAMEWORK);
-
     var args = [
       'run',
       '--test-app',
-      '--port', environment.PORT,
+      '--port', String(environment.PORT),
       '--include-tests', options.testsPath
     ];
 
@@ -223,17 +218,24 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       args.push('--release', 'velocity:METEOR@1.1.0_1');
     }
 
-    var mirror = spawn(
-      'meteor',
-      args,
-      {
-        cwd: process.env.VELOCITY_APP_PATH,
-        env: environment,
-        stdio: ['ignore', logStream, logStream]
-      }
-    );
+    var mirrorChild = _getMirrorChild(environment.FRAMEWORK);
+    if (mirrorChild.isRunning()) {
+      return;
+    }
 
-    DEBUG && console.log('[velocity-node-mirror] Mirror process forked with pid', mirror.pid);
+    mirrorChild.spawn({
+      command: 'meteor',
+      args: args,
+      options: {
+        cwd: process.env.VELOCITY_APP_PATH || process.env.PWD,
+        env: environment
+      }
+    });
+
+    DEBUG && console.log(
+      '[velocity-node-mirror] Mirror process forked with pid',
+      mirrorChild.getPid()
+    );
 
     Meteor.call('velocity/mirrors/init', {
       framework: environment.FRAMEWORK,
@@ -244,17 +246,17 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       rootUrlPath: environment.ROOT_URL_PATH,
       type: 'meteor-mirror'
     }, {
-      pid: mirror.pid
+      pid: mirrorChild.getPid()
     });
   }
 
-  function _createLogStream(logName) {
-    var logFilePath = path.join(
-      Velocity.getAppPath(),
-      '.meteor/local/log/' + logName + '.log'
-    );
-    fs.ensureDirSync(path.dirname(logFilePath));
-    return fs.openSync(logFilePath, 'w');
+  function _getMirrorChild (framework) {
+    var mirrorChild = _mirrorChildProcesses[framework];
+    if (!mirrorChild) {
+      mirrorChild = new sanjo.LongRunningChildProcess(framework);
+      _mirrorChildProcesses[framework] = mirrorChild;
+    }
+    return mirrorChild;
   }
 
   /**

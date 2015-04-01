@@ -43,6 +43,7 @@
     "describe": false,
     "it": false,
     "expect": false,
-    "_": false
+    "_": false,
+    "sanjo": false
   }
 }
