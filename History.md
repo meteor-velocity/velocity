@@ -2,7 +2,7 @@
 
 * First cut of distributable support
 * Removed default port of 5000 for mirrors and replaced with freeport.
-* Fixed client side error whith VELOCITY enabling 
+* Fixed client side error with VELOCITY enabling 
 
 
 ## v0.4.6
