@@ -5,7 +5,7 @@
   if (Meteor.isServer) {
   Meteor.startup(function () {
     Meteor.setTimeout(function() {
-      Meteor.call('pretendTests', {
+      Meteor.call('fakeTestRun', {
         result: 'passed',
         type: 'Server'
       });
@@ -16,7 +16,7 @@
 if (Meteor.isClient) {
   Meteor.startup(function () {
     Meteor.setTimeout(function() {
-      Meteor.call('pretendTests', {
+      Meteor.call('fakeTestRun', {
         result: 'passed',
         type: 'Client'
       });

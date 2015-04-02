@@ -10,29 +10,28 @@
   }
 
   var path = Npm.require('path'),
-      FRAMEWORK_NAME = 'generic-integration',
+      FRAMEWORK_NAME = 'generic',
       FRAMEWORK_REGEX = FRAMEWORK_NAME + '/.+\\.js$';
 
   if (Velocity && Velocity.registerTestingFramework) {
     Velocity.registerTestingFramework(FRAMEWORK_NAME, {
       regex: FRAMEWORK_REGEX,
-      sampleTestGenerator: _getSampleTestFiles
+      sampleTestGenerator: function () {
+        return [{
+          path: path.join(FRAMEWORK_NAME, 'sample.js'),
+          contents: Assets.getText(path.join('sample-tests', 'sample.js'))
+        }];
+      }
     });
   }
 
-  function _getSampleTestFiles () {
-    return [{
-      path: path.join(FRAMEWORK_NAME, 'sample.js'),
-      contents: Assets.getText(path.join('sample-tests', 'sample.js'))
-    }];
-  }
 
   Meteor.startup(function () {
 
     Meteor.call('velocity/reports/reset', {framework: FRAMEWORK_NAME}, function () {
 
       Meteor.call('velocity/mirrors/request', {
-        framework: 'generic-integration'
+        framework: FRAMEWORK_NAME
       });
 
       var init = function () {
@@ -44,7 +43,7 @@
       };
 
       var initOnce = _.once(Meteor.bindEnvironment(init));
-      VelocityMirrors.find({framework: 'generic-integration', state: 'ready'}).observe({
+      VelocityMirrors.find({framework: FRAMEWORK_NAME, state: 'ready'}).observe({
         added: initOnce,
         changed: initOnce
       });
@@ -53,7 +52,7 @@
   });
 
   Meteor.methods({
-    pretendTests: function (options) {
+    fakeTestRun: function (options) {
       Meteor.call('velocity/reports/submit', {
         id: 'GenericFramework' + options.type + 'Test',
         framework: FRAMEWORK_NAME,
