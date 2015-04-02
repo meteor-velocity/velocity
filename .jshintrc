@@ -31,6 +31,7 @@
     "Mongo": false,
     "DEBUG": false,
     "Velocity": false,
+    "VelocityInternals": false,
     "VelocityTestFiles": false,
     "VelocityTestReports": false,
     "VelocityFixtureFiles": false,

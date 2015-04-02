@@ -1,6 +1,5 @@
 /*jshint -W117, -W030, -W016, -W084 */
 /* global
- Velocity:true,
  DEBUG:true
  */
 
@@ -10,19 +9,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 /**
  * @module Velocity
  */
-/**
- * The `Velocity` object provides a common API for test frameworks to report
- * test results.  Frameworks can also request assets, such as a copy of the
- * user's application (the 'mirror') in which tests can be safely run without
- * impacting on-going development.
- *
- * Test results and log activity are reported via
- * {{#crossLink "Meteor.methods"}}Meteor methods{{/crossLink}}.
- *
- * @class Velocity
- */
-Velocity = Velocity || {};
-
 (function () {
   'use strict';
 
