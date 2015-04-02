@@ -96,13 +96,12 @@
         detached: true,
         env: currentEnv
       });
-      helper.world.meteor.port = 3030;
 
       var onMeteorData = Meteor.bindEnvironment(function (data) {
         var stdout = data.toString();
-        console.log('[meteor-output]', stdout);
+        //console.log('[meteor-output]', stdout);
         if (stdout.match(/=> App running at/i)) {
-          //console.log('[meteor-output] Meteor started');
+          console.log('[meteor-output] Meteor started', stdout);
           helper.world.meteor.stdout.removeListener('data', onMeteorData);
           callback();
         }
@@ -122,7 +121,6 @@
     this.Given(/^I install the generic testing framework in "([^"]*)"$/, function (appName, callback) {
 
       //And   I created a folder called "myApp/packages"
-      console.log('***', _resolveToCurrentDir(path.join(appName, 'packages')));
       fs.mkdirsSync(_resolveToCurrentDir(path.join(appName, 'packages')));
 
       //And   I changed directory to "myApp/packages"
@@ -156,7 +154,6 @@
 
 
     this.Then(/^I should see the file "([^"]*)"$/, function (file, callback) {
-      console.log(path.resolve(helper.world.cwd, file));
       fs.exists(path.resolve(helper.world.cwd, file), function(exists){
         if (exists) {
           callback();
@@ -186,11 +183,11 @@
       });
 
       //proc.stdout.on('data', function (data) {
-      //  console.log(data.toString());
+      //  console.log('[cli]', data.toString());
       //});
       //
       //proc.stderr.on('data', function (data) {
-      //  console.error(data.toString());
+      //  console.error('[cli]', data.toString());
       //});
 
       proc.on('exit', function (code) {

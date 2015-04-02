@@ -21,10 +21,14 @@ echo "Testing app"
 cd test-app
 rm -rf .meteor/local
 
+# Temporary until the latest cukes + velocity are released together
+rm -rf packages/meteor-cucumber
+git clone git@github.com:xolvio/meteor-cucumber.git packages/meteor-cucumber
+
 export JASMINE_CLIENT_UNIT=0
 export JASMINE_CLIENT_INTEGRATION=0
 export JASMINE_SERVER_UNIT=0
 export JASMINE_SERVER_INTEGRATION=1
-export VELOCITY_DEBUG=1
+#export VELOCITY_DEBUG=1
 
 meteor --test --once
