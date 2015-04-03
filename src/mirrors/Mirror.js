@@ -329,7 +329,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     _.defaults(env, process.env);
 
-    return options;
+    return env;
   }
 
 
