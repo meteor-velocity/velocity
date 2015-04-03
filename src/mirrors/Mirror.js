@@ -45,9 +45,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
-     * @param {String} options.testsPath        The path to tests for this framework.
+     * @param {String} [options.testsPath]      The path to tests for this framework.
      *                                          For example "jasmine/server/unit".
      *                                          Don't include a leading or trailing slash.
+     * @param {String} [options.args]           Additional arguments that the mirror is called with
+     *                                          It accepts all the options that are available for `meteor run`.
+     * @param {String} [options.env]            Additional environment variables that the mirror is called with.
      * @param {String} [options.port]           String use a specific port
      * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the
      *                                          VelocityMirrors collection. eg. `/?jasmine=true`
@@ -63,6 +66,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       check(options, {
         framework: String,
         testsPath: Match.Optional(String),
+        args: Match.Optional([Match.Any]),
+        env: Match.Optional(Object),
         port: Match.Optional(Number),
         rootUrlPath: Match.Optional(String),
         nodes: Match.Optional(Number),
@@ -215,6 +220,10 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       args.push('--include-tests', options.testsPath);
     }
 
+    if (options.args) {
+      args.push.apply(args, options.args);
+    }
+
     // Allow to use checked out meteor for spawning mirrors
     // for development on our Meteor fork
     if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
@@ -301,7 +310,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * @private
    */
   function _getEnvironmentVariables (options) {
-    return _.defaults({
+    var env = {
       PORT: options.port,
       HOST: options.host,
       ROOT_URL_PATH: options.rootUrlPath,
@@ -312,7 +321,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       IS_MIRROR: true,
       HANDSHAKE: options.handshake,
       METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings))
-    }, process.env);
+    };
+
+    if (options.env) {
+      _.defaults(env, options.env);
+    }
+
+    _.defaults(env, process.env);
+
+    return options;
   }
 
 
