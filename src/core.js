@@ -203,24 +203,24 @@ Velocity = Velocity || {};
   Meteor.methods({
 
     /**
-    * Registers a testing framework plugin via a Meteor method.
-    *
-    * @method registerTestingFramework
-    * @param {String} name                       The name of the testing framework.
-    * @param {Object} [options]                  Options for the testing framework.
-    * @param {String} options.disableAutoReset   Velocity's reset cycle will skip reports and logs for this framework
-    *                                            It will be the responsibility of the framework to clean up its ****!
-    * @param {String} options.regex              The regular expression for test files that should be assigned
-    *                                            to the testing framework.
-    *                                            The path relative to the tests
-    *                                            folder is matched against it.
-    *                                            The default is "name/.+\.js$"
-    *                                            (name is the testing framework name).
-    * @param options.sampleTestGenerator {Function} sampleTestGenerator
-    *    returns an array of fileObjects with the following fields:
-    * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
-    * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
-    */
+     * Registers a testing framework plugin via a Meteor method.
+     *
+     * @method registerTestingFramework
+     * @param {String} name                       The name of the testing framework.
+     * @param {Object} [options]                  Options for the testing framework.
+     * @param {String} options.disableAutoReset   Velocity's reset cycle will skip reports and logs for this framework
+     *                                            It will be the responsibility of the framework to clean up its ****!
+     * @param {String} options.regex              The regular expression for test files that should be assigned
+     *                                            to the testing framework.
+     *                                            The path relative to the tests
+     *                                            folder is matched against it.
+     *                                            The default is "name/.+\.js$"
+     *                                            (name is the testing framework name).
+     * @param options.sampleTestGenerator {Function} sampleTestGenerator
+     *    returns an array of fileObjects with the following fields:
+     * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
+     * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
+     */
     'velocity/register/framework': function (name, options) {
       options = options || {};
       check(name, Match.Optional(String));
@@ -272,6 +272,9 @@ Velocity = Velocity || {};
         query = _.assign(query, {_id: {$nin: options.notIn}});
       }
       VelocityTestReports.remove(query);
+
+      VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
+
       _updateAggregateReports();
     },
 
@@ -509,20 +512,20 @@ Velocity = Velocity || {};
    * Runs each test framework once when in continous integration mode.
    *
    */
-  function _launchContinuousIntegration(){
+  function _launchContinuousIntegration () {
 
-    if (CONTINUOUS_INTEGRATION){
+    if (CONTINUOUS_INTEGRATION) {
       _.forEach(_getTestFrameworkNames(), function (testFramework) {
-        Meteor.call('velocity/logs/reset', {framework: testFramework}, function(){
+        Meteor.call('velocity/logs/reset', {framework: testFramework}, function () {
 
-          Meteor.call(testFramework + '/reset', function(error){
-            if(error){
-                console.error('[velocity] ERROR; testFramework/rest not implemented', error);
+          Meteor.call(testFramework + '/reset', function (error) {
+            if (error) {
+              console.error('[velocity] ERROR; testFramework/rest not implemented', error);
             }
           });
-          Meteor.call(testFramework + '/run', function(error){
-            if(error){
-                console.error('[velocity] ERROR; testFramework/run not implemented', error);
+          Meteor.call(testFramework + '/run', function (error) {
+            if (error) {
+              console.error('[velocity] ERROR; testFramework/run not implemented', error);
             }
           });
         });
@@ -545,7 +548,7 @@ Velocity = Velocity || {};
 
     var paths = [Velocity.getTestsPath()];
 
-    _.each(fs.readdirSync(Velocity.getPackagesPath()), function(dir) {
+    _.each(fs.readdirSync(Velocity.getPackagesPath()), function (dir) {
       if (dir !== 'tests-proxy' && fs.lstatSync(Velocity.getPackagePath(dir)).isDirectory() && fs.existsSync(Velocity.getTestsPath(dir))) {
         paths.push(Velocity.getTestsPath(dir));
       }
@@ -641,14 +644,6 @@ Velocity = Velocity || {};
     VelocityTestReports.remove({framework: {$nin: frameworksWithDisableAutoReset}});
     VelocityLogs.remove({framework: {$nin: frameworksWithDisableAutoReset}});
     VelocityAggregateReports.remove({});
-    VelocityAggregateReports.insert({
-      name: 'aggregateResult',
-      result: 'pending'
-    });
-    VelocityAggregateReports.insert({
-      name: 'aggregateComplete',
-      result: 'pending'
-    });
     _.forEach(_getTestFrameworkNames(), function (testFramework) {
       VelocityAggregateReports.insert({
         name: testFramework,
@@ -666,19 +661,23 @@ Velocity = Velocity || {};
    */
   function _updateAggregateReports () {
 
-    var failedResult,
-        frameworkResult;
+    VelocityAggregateReports.upsert({name: 'aggregateResult'}, {$set: {result: 'pending'}});
+    VelocityAggregateReports.upsert({name: 'aggregateComplete'}, {$set: {result: 'pending'}});
 
     // if all of our test reports have valid results
     if (!VelocityTestReports.findOne({result: ''})) {
-      // look through them and see if we find any tests that failed
-      failedResult = VelocityTestReports.findOne({result: 'failed'});
 
-      // if any tests failed, set the framework as failed; otherwise set our framework to passed
-      frameworkResult = failedResult ? 'failed' : 'passed';
+      // pessimistically set passed state, ensuring all other states take precedence in order below
+      var aggregateResult =
+            VelocityTestReports.findOne({result: 'failed'}) ||
+            VelocityTestReports.findOne({result: 'undefined'}) ||
+            VelocityTestReports.findOne({result: 'skipped'}) ||
+            VelocityTestReports.findOne({result: 'pending'}) ||
+            VelocityTestReports.findOne({result: 'passed'}) ||
+            {result: 'pending'};
 
       // update the global status
-      VelocityAggregateReports.update({'name': 'aggregateResult'}, {$set: {result: frameworkResult}});
+      VelocityAggregateReports.update({'name': 'aggregateResult'}, {$set: {result: aggregateResult.result}});
     }
 
     // if all test frameworks have completed, upsert an aggregate completed record
@@ -694,7 +693,6 @@ Velocity = Velocity || {};
         _.each(Velocity.postProcessors, function (processor) {
           processor();
         });
-
       }
     }
   }
