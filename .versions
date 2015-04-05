@@ -20,5 +20,5 @@ retry@1.0.3
 sanjo:long-running-child-process@1.0.3
 tracker@1.0.7
 underscore@1.0.3
-velocity:core@0.6.0-rc.1
+velocity:core@0.6.0-rc.2
 velocity:meteor-internals@1.1.0_5
