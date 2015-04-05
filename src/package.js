@@ -27,7 +27,7 @@ Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
   api.use('mongo');
   api.use('check');
-  api.use('velocity:meteor-internals@1.1.0_3');
+  api.use('velocity:meteor-internals@1.1.0_4');
   api.use('sanjo:long-running-child-process@1.0.3', 'server');
 
   api.export('Velocity', BOTH);
