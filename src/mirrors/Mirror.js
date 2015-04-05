@@ -233,6 +233,21 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       args.push.apply(args, options.args);
     }
 
+    // Make it possible to debug a mirror
+    if (
+      process.env.VELOCITY_DEBUG_MIRROR &&
+      process.env.VELOCITY_DEBUG_MIRROR === environment.FRAMEWORK &&
+      !_.contains(options.args, '--debug-port')
+    ) {
+      var debugPort = '5858';
+      args.push('--debug-port', debugPort);
+      console.log('[velocity] Your mirror is now paused and ready for debugging!');
+      console.log();
+      console.log('[velocity] To debug the server process using a graphical debugging interface,');
+      console.log('[velocity] visit this URL in your web browser:');
+      console.log('[velocity] http://localhost:8080/debug?port=' + debugPort);
+    }
+
     // Allow to use checked out meteor for spawning mirrors
     // for development on our Meteor fork
     if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
