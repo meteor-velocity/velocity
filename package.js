@@ -10,7 +10,6 @@ Package.describe({
 });
 
 Npm.depends({
-  'chokidar': '0.12.6',
   'lodash': '2.4.1',
   'mkdirp': '0.5.0',
   'fs-extra': '0.12.0',
@@ -28,6 +27,7 @@ Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
   api.use('mongo');
   api.use('check');
+  api.use('velocity:chokidar@0.12.6_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_5');
   api.use('sanjo:long-running-child-process@1.0.3', 'server');
 

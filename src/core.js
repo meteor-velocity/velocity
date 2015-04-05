@@ -28,7 +28,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   var _ = Npm.require('lodash'),
       files = VelocityMeteorInternals.files,
       child_process = Npm.require('child_process'),
-      chokidar = Npm.require('chokidar'),
       mkdirp = Npm.require('mkdirp'),
       _config = {},
       _watcher,
