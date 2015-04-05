@@ -212,6 +212,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     options.rootUrl = options.host;
 
     var environment = _getEnvironmentVariables(options);
+
+    var mirrorChild = _getMirrorChild(environment.FRAMEWORK);
+    if (mirrorChild.isRunning()) {
+      return;
+    }
+
+    var command = VelocityInternals.isWindows() ? 'meteor.bat' : 'meteor';
     var args = [
       'run',
       '--test-app',
@@ -232,13 +239,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       args.push('--release', 'velocity:METEOR@1.1-rc.1');
     }
 
-    var mirrorChild = _getMirrorChild(environment.FRAMEWORK);
-    if (mirrorChild.isRunning()) {
-      return;
-    }
-
     mirrorChild.spawn({
-      command: 'meteor',
+      command: command,
       args: args,
       options: {
         cwd: process.env.VELOCITY_APP_PATH || process.env.PWD,

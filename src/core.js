@@ -1,6 +1,5 @@
 /*jshint -W117, -W030, -W016, -W084 */
 /* global
- Velocity:true,
  DEBUG:true
  */
 
@@ -10,19 +9,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 /**
  * @module Velocity
  */
-/**
- * The `Velocity` object provides a common API for test frameworks to report
- * test results.  Frameworks can also request assets, such as a copy of the
- * user's application (the 'mirror') in which tests can be safely run without
- * impacting on-going development.
- *
- * Test results and log activity are reported via
- * {{#crossLink "Meteor.methods"}}Meteor methods{{/crossLink}}.
- *
- * @class Velocity
- */
-Velocity = Velocity || {};
-
 (function () {
   'use strict';
 
@@ -40,8 +26,7 @@ Velocity = Velocity || {};
   CONTINUOUS_INTEGRATION && console.log('[velocity] is in continuous integration mode');
 
   var _ = Npm.require('lodash'),
-      fs = Npm.require('fs'),
-      path = Npm.require('path'),
+      files = VelocityMeteorInternals.files,
       child_process = Npm.require('child_process'),
       chokidar = Npm.require('chokidar'),
       mkdirp = Npm.require('mkdirp'),
@@ -98,7 +83,12 @@ Velocity = Velocity || {};
      * @return {String} app directory path
      */
     getAppPath: function () {
-      return VelocityMeteorInternals.files.findAppDir();
+      var appPath = files.findAppDir();
+      if (appPath) {
+        appPath = files.pathResolve(appPath);
+      }
+
+      return appPath;
     },
 
 
@@ -110,7 +100,7 @@ Velocity = Velocity || {};
      * @return {String} application's tests directory
      */
     getTestsPath: function (packageName) {
-      return path.join(packageName ? Velocity.getPackagePath(packageName) : Velocity.getAppPath(), 'tests');
+      return files.pathJoin(packageName ? Velocity.getPackagePath(packageName) : Velocity.getAppPath(), 'tests');
     },
 
     /**
@@ -120,7 +110,7 @@ Velocity = Velocity || {};
      * @return {String} application's packages directory
      */
     getPackagesPath: function () {
-      return path.join(Velocity.getAppPath(), 'packages');
+      return files.pathJoin(Velocity.getAppPath(), 'packages');
     },
 
     /**
@@ -131,7 +121,7 @@ Velocity = Velocity || {};
      * @return {String} application's packages directory
      */
     getPackagePath: function (packageName) {
-      return path.join(Velocity.getPackagesPath(), packageName);
+      return files.pathJoin(Velocity.getPackagesPath(), packageName);
     },
 
     /**
@@ -437,25 +427,25 @@ Velocity = Velocity || {};
           'sample test files for', options.framework);
 
         sampleTests.forEach(function (testFile) {
-          var fullTestPath = path.join(Velocity.getTestsPath(), testFile.path);
-          var testDir = path.dirname(fullTestPath);
+          var fullTestPath = files.pathJoin(Velocity.getTestsPath(), testFile.path);
+          var testDir = files.pathDirname(fullTestPath);
           mkdirp.sync(testDir);
-          fs.writeFileSync(fullTestPath, testFile.contents);
+          files.writeFile(fullTestPath, testFile.contents);
         });
 
       } else {
 
-        samplesPath = path.join(Velocity.getAppPath(), 'packages',
+        samplesPath = files.pathJoin(Velocity.getAppPath(), 'packages',
           options.framework, 'sample-tests');
         testsPath = Velocity.getTestsPath();
 
         DEBUG && console.log('[velocity] checking for sample tests in',
-          path.join(samplesPath, '*'));
+          files.pathJoin(samplesPath, '*'));
 
-        if (fs.existsSync(samplesPath)) {
+        if (files.exists(samplesPath)) {
           command = 'mkdir -p ' + testsPath + ' && ' +
-          'rsync -au ' + path.join(samplesPath, '*') +
-          ' ' + testsPath + path.sep;
+          'rsync -au ' + files.pathJoin(samplesPath, '*') +
+          ' ' + testsPath + '/';
 
           DEBUG && console.log('[velocity] copying sample tests (if any) ' +
             'for framework', options.framework, '-',
@@ -500,7 +490,7 @@ Velocity = Velocity || {};
     options = options || {};
     _.defaults(options, {
       name: name,
-      regex: name + '\\' + path.sep + '.+\\.js$'
+      regex: name + '/.+\\.js$'
     });
 
     options._regexp = new RegExp(options.regex);
@@ -548,11 +538,13 @@ Velocity = Velocity || {};
 
     var paths = [Velocity.getTestsPath()];
 
-    _.each(fs.readdirSync(Velocity.getPackagesPath()), function (dir) {
-      if (dir !== 'tests-proxy' && fs.lstatSync(Velocity.getPackagePath(dir)).isDirectory() && fs.existsSync(Velocity.getTestsPath(dir))) {
+    _.each(files.readdir(Velocity.getPackagesPath()), function (dir) {
+      if (dir !== 'tests-proxy' && files.lstat(Velocity.getPackagePath(dir)).isDirectory() && files.exists(Velocity.getTestsPath(dir))) {
         paths.push(Velocity.getTestsPath(dir));
       }
     });
+
+    paths = _.map(paths, files.convertToOSPath);
 
     DEBUG && console.log('[velocity] Add paths to watcher', paths);
 
@@ -563,7 +555,7 @@ Velocity = Velocity || {};
           targetFramework,
           data;
 
-      filePath = path.normalize(filePath);
+      filePath = files.convertToStandardPath(files.pathNormalize(filePath));
       relativePath = _getRelativePath(filePath);
 
       // if this is a fixture file, put it in the fixtures collection
@@ -581,7 +573,9 @@ Velocity = Velocity || {};
 
       DEBUG && console.log('[velocity] Search framework for path', relativePath);
 
-      var packageRelativePath = (relativePath.indexOf('packages') === 0) ? relativePath.split(path.sep).slice(2).join('/') : relativePath.split(path.sep).join('/');
+      var packageRelativePath = (relativePath.indexOf('packages') === 0) ?
+        relativePath.split('/').slice(2).join('/') :
+        relativePath;
       // test against each test framework's regexp matcher, use first one that matches
       targetFramework = _.find(config, function (framework) {
         return framework._regexp.test(packageRelativePath);
@@ -592,7 +586,7 @@ Velocity = Velocity || {};
 
         data = {
           _id: filePath,
-          name: path.basename(filePath),
+          name: files.pathBasename(filePath),
           absolutePath: filePath,
           relativePath: relativePath,
           targetFramework: targetFramework.name,
@@ -699,7 +693,7 @@ Velocity = Velocity || {};
 
   function _getRelativePath (filePath) {
     var relativePath = filePath.substring(Velocity.getAppPath().length);
-    if (relativePath[0] === path.sep) {
+    if (relativePath[0] === '/') {
       relativePath = relativePath.substring(1);
     }
     return relativePath;

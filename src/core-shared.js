@@ -1,9 +1,4 @@
 /*jshint -W117 */
-/* global
- Velocity:true
- */
-
-Velocity = Velocity || {};
 
 (function () {
   'use strict';

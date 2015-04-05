@@ -28,10 +28,8 @@ Package.on_use(function (api) {
   api.versionsFrom('METEOR@1.0');
   api.use('mongo');
   api.use('check');
-  api.use('velocity:meteor-internals@1.0.2_2');
-  api.use('sanjo:long-running-child-process@1.0.2', 'server');
-
-  api.add_files('collections.js', BOTH);
+  api.use('velocity:meteor-internals@1.1.0_4');
+  api.use('sanjo:long-running-child-process@1.0.3', 'server');
 
   api.export('Velocity', BOTH);
   api.export('VelocityTestFiles', BOTH);
@@ -42,6 +40,9 @@ Package.on_use(function (api) {
   api.export('VelocityMirrors', BOTH);
   api.export('VelocityOptions', BOTH);
 
+  api.add_files('globals.js', BOTH);
+  api.add_files('collections.js', BOTH);
+  api.add_files('helpers.js', SERVER);
   api.add_files('core.js', SERVER);
   api.add_files('core-shared.js', BOTH);
 
