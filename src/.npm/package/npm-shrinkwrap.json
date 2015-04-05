@@ -52,6 +52,9 @@
         }
       }
     },
+    "colors": {
+      "version": "1.0.3"
+    },
     "freeport": {
       "version": "1.0.4"
     },

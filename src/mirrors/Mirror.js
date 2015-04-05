@@ -20,7 +20,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       url = Npm.require('url'),
       mongodbUri = Npm.require('mongodb-uri'),
       freeport = Npm.require('freeport'),
+      path = Npm.require('path'),
       _mirrorChildProcesses = {};
+  Npm.require('colors');
 
 
 //////////////////////////////////////////////////////////////////////
@@ -248,6 +250,16 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       '[velocity-node-mirror] Mirror process forked with pid',
       mirrorChild.getPid()
     );
+
+
+    console.log(('[velocity-node-mirror] a mirror was started by ' +
+    environment.FRAMEWORK + ' at ' + options.rootUrl + ', you can see ' +
+    'the output of this mirror by tailing the log file:').yellow);
+
+    console.log(('[velocity-node-mirror] tail -f ' + path.join(process.env.PWD,
+      '.meteor', 'local', 'log', environment.FRAMEWORK + '.log')).yellow);
+
+
 
     Meteor.call('velocity/mirrors/init', {
       framework: environment.FRAMEWORK,
