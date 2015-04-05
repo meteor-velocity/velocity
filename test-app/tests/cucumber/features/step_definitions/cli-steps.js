@@ -1,10 +1,12 @@
 (function () {
 
+  // TODO: Replace process.env.PWD with getAppPath for Windows support
+
   'use strict';
 
   module.exports = function () {
 
-    var fs = Package['xolvio:cucumber'].cucumber.fs,
+    var fs = require('fs-extra'),
         path = require('path'),
         spawn = require('child_process').spawn;
 
@@ -29,6 +31,7 @@
 
     this.When(/^I run cuke-monkey inside "([^"]*)"$/, function (directory, callback) {
 
+      // TODO: Not sure if that process.env.PWD works here
       var proc = spawn(path.join(process.env.PWD, 'bin/cuke-monkey'), [], {
         cwd: _resolveToCurrentDir(directory),
         stdio: null
@@ -90,7 +93,8 @@
 
       var currentEnv = _.omit(process.env, toOmit);
 
-      helper.world.meteor = spawn('meteor', ['-p', '3030'], {
+      var command = isWindows() ? 'meteor.bat' : 'meteor';
+      helper.world.meteor = spawn(command, ['-p', '3030'], {
         cwd: helper.world.cwd,
         stdio: null,
         detached: true,
@@ -112,7 +116,7 @@
 
 
     this.Given(/^I create a fresh meteor project called "([^"]*)"$/, function (arg1, callback) {
-      _runCliCommand('rm -rf myApp', function () {
+      fs.remove('myApp', function () {
         _runCliCommand('meteor create myApp', callback);
       });
     });
@@ -126,17 +130,15 @@
       //And   I changed directory to "myApp/packages"
       helper.world.cwd = path.resolve(helper.world.cwd, path.join(appName, 'packages'));
 
-      //And   I symlinked the generic framework to this directory
+      //And   I copy the generic framework to this directory
       var velocityPackagePath = path.resolve(process.env.PWD, '..', 'src');
       var genericPackagePath = path.resolve(process.env.PWD, '..', 'generic-framework');
 
-      _runCliCommand('ln -s ' + velocityPackagePath + ' .', function () {
-        _runCliCommand('ln -s ' + genericPackagePath + ' .', function () {
-          helper.world.cwd = path.resolve(helper.world.cwd, '..');
-          //And   I ran "meteor add velocity:generic-test-framework"
-          _runCliCommand('meteor add velocity:generic-framework', callback);
-        });
-      });
+      fs.copySync(velocityPackagePath, process.env.PWD + '/velocity-core');
+      fs.copySync(genericPackagePath, process.env.PWD + '/generic-framework');
+      helper.world.cwd = path.resolve(helper.world.cwd, '..');
+      //And   I ran "meteor add velocity:generic-test-framework"
+      _runCliCommand('meteor add velocity:generic-framework', callback);
     });
 
 
@@ -165,6 +167,10 @@
     });
 
 
+
+    function isWindows() {
+      return process.platform === 'win32';
+    }
 
     function _resolveToCurrentDir (location) {
       return path.join(helper.world.cwd, location);
