@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.5.1',
+  version: '0.6.0-rc.1',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
@@ -40,13 +40,13 @@ Package.on_use(function (api) {
   api.export('VelocityMirrors', BOTH);
   api.export('VelocityOptions', BOTH);
 
-  api.add_files('globals.js', BOTH);
-  api.add_files('collections.js', BOTH);
-  api.add_files('helpers.js', SERVER);
-  api.add_files('core.js', SERVER);
-  api.add_files('core-shared.js', BOTH);
+  api.add_files('src/globals.js', BOTH);
+  api.add_files('src/collections.js', BOTH);
+  api.add_files('src/helpers.js', SERVER);
+  api.add_files('src/core.js', SERVER);
+  api.add_files('src/core-shared.js', BOTH);
 
-  api.add_files('mirrors/Mirror.js', SERVER);
-  api.add_files('mirrors/mirrorRegistrar.js', SERVER);
+  api.add_files('src/mirrors/Mirror.js', SERVER);
+  api.add_files('src/mirrors/mirrorRegistrar.js', SERVER);
 
 });
