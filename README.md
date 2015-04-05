@@ -64,10 +64,6 @@ Mirrors are used by test frameworks to run tests within. Tests are typically des
 require a different database. Mirrors run a parallel version of your app with a different 
 database as not to intrude on the main development workflow.
 
-* [node-soft-mirror](https://github.com/meteor-velocity/node-soft-mirror) - This mirror offers an 
-extremely fast startup time. It creates a mirror using a node form from within the running meteor 
-process.
-
 ### Other
 
 * [xolvio:webdriver](https://github.com/xolvio/meteor-webdriver) - Adds webdriver.io to any test 
