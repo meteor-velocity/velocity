@@ -16,7 +16,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   // between this line and the velocity/parentHandshake, is the time the mirror starts initializing
   // and is ready
-  console.log('[velocity-mirror] Starting mirror on port', process.env.PORT);
+  console.log('[velocity] Starting mirror on port', process.env.PORT);
 
   Meteor.methods({
 
@@ -38,7 +38,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * @method velocity/isMirror
      */
     'velocity/parentHandshake': function () {
-      console.log('[velocity-mirror] Mirror requested by ' + process.env.FRAMEWORK + ' is ready.');
+      console.log('[velocity] Mirror requested by ' + process.env.FRAMEWORK + ' is ready.');
     }
   });
 
@@ -49,11 +49,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   Meteor.startup(function () {
 
     if (!process.env.HANDSHAKE) {
-      DEBUG && console.log('[velocity-mirror] Mirror', process.env.PORT , 'configured not to handshake');
+      DEBUG && console.log('[velocity] Mirror', process.env.PORT , 'configured not to handshake');
       return;
     }
 
-    DEBUG && console.log('[velocity-mirror] Mirror started. Connecting via DDP to parent');
+    DEBUG && console.log('[velocity] Mirror started. Connecting via DDP to parent');
 
     var velocityConnection = DDP.connect(process.env.PARENT_URL);
     velocityConnection.onReconnect = function () {

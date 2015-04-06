@@ -264,16 +264,16 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     });
 
     DEBUG && console.log(
-      '[velocity-node-mirror] Mirror process forked with pid',
+      '[velocity] Mirror process forked with pid',
       mirrorChild.getPid()
     );
 
 
-    console.log(('[velocity-node-mirror] a mirror was started by ' +
+    console.log(('[velocity] a mirror was started by ' +
     environment.FRAMEWORK + ' at ' + options.rootUrl + ', you can see ' +
     'the output of this mirror by tailing the log file:').yellow);
 
-    console.log(('[velocity-node-mirror] tail -f ' + path.join(process.env.PWD,
+    console.log(('[velocity] tail -f ' + path.join(process.env.PWD,
       '.meteor', 'local', 'log', environment.FRAMEWORK + '.log')).yellow);
 
 
