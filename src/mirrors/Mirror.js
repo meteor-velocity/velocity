@@ -353,6 +353,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       PARENT_URL: process.env.ROOT_URL,
       IS_MIRROR: true,
       HANDSHAKE: options.handshake,
+      VELOCITY_MAIN_APP_PATH: Velocity.getAppPath(),
       METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings))
     };
 
