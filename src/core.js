@@ -537,11 +537,15 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     var paths = [Velocity.getTestsPath()];
 
-    _.each(files.readdir(Velocity.getPackagesPath()), function (dir) {
-      if (dir !== 'tests-proxy' && files.lstat(Velocity.getPackagePath(dir)).isDirectory() && files.exists(Velocity.getTestsPath(dir))) {
-        paths.push(Velocity.getTestsPath(dir));
-      }
-    });
+    var packagesPath = Velocity.getPackagesPath();
+    if (files.lstat(packagesPath).isDirectory()) {
+      var packageNames = files.readdir(packagesPath);
+      var packageTestsPaths = _.chain(packageNames)
+        .filter(_isPackageWithTests)
+        .map(Velocity.getTestsPath)
+        .value();
+      paths.push.apply(paths, packageTestsPaths);
+    }
 
     paths = _.map(paths, files.convertToOSPath);
 
@@ -620,6 +624,12 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     }));
 
   }  // end _initFileWatcher
+
+  function _isPackageWithTests(packageName) {
+    return packageName !== 'tests-proxy' &&
+      files.lstat(Velocity.getPackagePath(packageName)).isDirectory() &&
+      files.exists(Velocity.getTestsPath(packageName));
+  }
 
   /**
    * Re-init file watcher and clear all test results.
