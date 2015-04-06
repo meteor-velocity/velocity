@@ -151,6 +151,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
             DEBUG && console.log('[velocity] Parent Handshake response', e, r);
           });
           mirrorConnection.disconnect();
+          // TODO: This does not support starting multiple mirror for one framework
           VelocityMirrors.update({
             framework: options.framework
           }, {
@@ -341,6 +342,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   function _getEnvironmentVariables (options) {
     var env = {
       PORT: options.port,
+      // PORT gets overridden by Meteor so we save the mirror port in
+      // MIRROR_PORT too.
+      MIRROR_PORT: options.port,
       HOST: options.host,
       ROOT_URL_PATH: options.rootUrlPath,
       ROOT_URL: options.rootUrl,
