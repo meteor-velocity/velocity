@@ -35,10 +35,10 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * This is the best indicator of the mirror's ready status, so it's used to inform the user
      * when there may be delays
      *
-     * @method velocity/isMirror
+     * @method velocity/parentHandshake
      */
     'velocity/parentHandshake': function () {
-      console.log('[velocity] Mirror requested by ' + process.env.FRAMEWORK + ' is ready.');
+      console.log('[velocity] Established connection with Velocity.');
     }
   });
 
