@@ -87,7 +87,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         appPath = files.pathResolve(appPath);
       }
 
-      return appPath;
+      return files.convertToOSPath(appPath);
     },
 
 
@@ -99,7 +99,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @return {String} application's tests directory
      */
     getTestsPath: function (packageName) {
-      return files.pathJoin(packageName ? Velocity.getPackagePath(packageName) : Velocity.getAppPath(), 'tests');
+      return files.convertToOSPath(
+        files.pathJoin(packageName ? Velocity.getPackagePath(packageName) : Velocity.getAppPath(), 'tests')
+      );
     },
 
     /**
@@ -109,7 +111,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @return {String} application's packages directory
      */
     getPackagesPath: function () {
-      return files.pathJoin(Velocity.getAppPath(), 'packages');
+      return files.convertToOSPath(files.pathJoin(Velocity.getAppPath(), 'packages'));
     },
 
     /**
@@ -120,7 +122,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @return {String} application's packages directory
      */
     getPackagePath: function (packageName) {
-      return files.pathJoin(Velocity.getPackagesPath(), packageName);
+      return files.convertToOSPath(files.pathJoin(Velocity.getPackagesPath(), packageName));
     },
 
     /**
@@ -407,6 +409,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @param {Object} options
      * @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
      */
+    // TODO: Support Windows
     'velocity/copySampleTests': function (options) {
       var sampleTests,
           samplesPath,
@@ -439,11 +442,11 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         testsPath = Velocity.getTestsPath();
 
         DEBUG && console.log('[velocity] checking for sample tests in',
-          files.pathJoin(samplesPath, '*'));
+          files.convertToOSPath(files.pathJoin(samplesPath, '*')));
 
         if (files.exists(samplesPath)) {
           command = 'mkdir -p ' + testsPath + ' && ' +
-          'rsync -au ' + files.pathJoin(samplesPath, '*') +
+          'rsync -au ' + files.convertToOSPath(files.pathJoin(samplesPath, '*')) +
           ' ' + testsPath + '/';
 
           DEBUG && console.log('[velocity] copying sample tests (if any) ' +
