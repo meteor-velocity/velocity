@@ -258,13 +258,12 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       var query = {};
       if (options.framework) {
         query.framework = options.framework;
+        VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
       }
       if (options.notIn) {
         query = _.assign(query, {_id: {$nin: options.notIn}});
       }
       VelocityTestReports.remove(query);
-
-      VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
 
       _updateAggregateReports();
     },
