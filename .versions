@@ -21,5 +21,5 @@ sanjo:long-running-child-process@1.0.3
 tracker@1.0.7
 underscore@1.0.3
 velocity:chokidar@0.12.6_1
-velocity:core@0.6.0-rc.4
+velocity:core@0.6.0-rc.5
 velocity:meteor-internals@1.1.0_5
