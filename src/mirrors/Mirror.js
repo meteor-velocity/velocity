@@ -20,7 +20,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       url = Npm.require('url'),
       mongodbUri = Npm.require('mongodb-uri'),
       freeport = Npm.require('freeport'),
-      path = Npm.require('path'),
+      files = VelocityMeteorInternals.files,
       _mirrorChildProcesses = {};
   Npm.require('colors');
 
@@ -274,8 +274,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     environment.FRAMEWORK + ' at ' + options.rootUrl + ', you can see ' +
     'the output of this mirror by tailing the log file:').yellow);
 
-    console.log(('[velocity] tail -f ' + path.join(process.env.PWD,
-      '.meteor', 'local', 'log', environment.FRAMEWORK + '.log')).yellow);
+    console.log(('[velocity] tail -f ' + files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
+      '.meteor', 'local', 'log', environment.FRAMEWORK + '.log'))).yellow);
 
 
 
