@@ -11,8 +11,7 @@ Package.describe({
 
 Npm.depends({
   'lodash': '2.4.1',
-  'mkdirp': '0.5.0',
-  'fs-extra': '0.12.0',
+  'fs-extra': '0.18.0',
   'freeport':'1.0.4',
   'mongodb-uri': '0.9.7',
   'colors': '1.0.3'

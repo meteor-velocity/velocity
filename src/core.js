@@ -27,8 +27,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
   var _ = Npm.require('lodash'),
       files = VelocityMeteorInternals.files,
-      child_process = Npm.require('child_process'),
-      mkdirp = Npm.require('mkdirp'),
+      fs = Npm.require('fs-extra'),
+      mkdirp = Meteor.wrapAsync(fs.mkdirp, fs),
       _config = {},
       _watcher,
       _velocityStarted = false,
@@ -408,21 +408,15 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @param {Object} options
      * @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
      */
-    // TODO: Support Windows
     'velocity/copySampleTests': function (options) {
-      var sampleTests,
-          samplesPath,
-          testsPath,
-          command;
-
       options = options || {};
       check(options, {
         framework: String
       });
 
-      if (_config[options.framework].sampleTestGenerator) {
-
-        sampleTests = _config[options.framework].sampleTestGenerator(options);
+      var sampleTestGenerator = _config[options.framework].sampleTestGenerator;
+      if (sampleTestGenerator) {
+        var sampleTests = sampleTestGenerator(options);
 
         DEBUG && console.log('[velocity] found ', sampleTests.length,
           'sample test files for', options.framework);
@@ -430,40 +424,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         sampleTests.forEach(function (testFile) {
           var fullTestPath = files.pathJoin(Velocity.getTestsPath(), testFile.path);
           var testDir = files.pathDirname(fullTestPath);
-          mkdirp.sync(testDir);
+          mkdirp(files.convertToOSPath(testDir));
           files.writeFile(fullTestPath, testFile.contents);
         });
-
-      } else {
-
-        samplesPath = files.pathJoin(Velocity.getAppPath(), 'packages',
-          options.framework, 'sample-tests');
-        testsPath = Velocity.getTestsPath();
-
-        DEBUG && console.log('[velocity] checking for sample tests in',
-          files.convertToOSPath(files.pathJoin(samplesPath, '*')));
-
-        if (files.exists(samplesPath)) {
-          command = 'mkdir -p ' + testsPath + ' && ' +
-          'rsync -au ' + files.convertToOSPath(files.pathJoin(samplesPath, '*')) +
-          ' ' + testsPath + '/';
-
-          DEBUG && console.log('[velocity] copying sample tests (if any) ' +
-            'for framework', options.framework, '-',
-            command);
-
-          child_process.exec(command, Meteor.bindEnvironment(
-            function copySampleTestsExecHandler (err, stdout, stderr) {
-              if (err) {
-                console.error('[velocity] ERROR', err);
-              }
-              console.log(stdout);
-              console.error(stderr);
-            },
-            'copySampleTestsExecHandler'
-          ));
-        }
-
       }
     }  // end copySampleTests
 
