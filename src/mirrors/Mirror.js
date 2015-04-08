@@ -227,7 +227,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     ];
 
     if (options.testsPath) {
-      args.push('--include-tests', options.testsPath);
+      args.push('--include-tests', files.convertToStandardPath(options.testsPath));
     }
 
     if (options.args) {
