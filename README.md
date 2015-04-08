@@ -90,6 +90,27 @@ Please put some sample tests in a directory named `sample-tests` at the root of 
 These will be used by the velocity-quick-start package and also allows users to click a button 
 in the html-reporter to have them added to their apps.
 
+### Fixtures / Test Data
+A good pattern for creating fixtures is to do the following inside your app:
+
+```bash
+meteor create --package fixtures
+```
+
+Then modify the package.js file to set the `debugOnly` flag to true like this:
+```javascript
+Package.describe({
+  name: 'fixtures',
+  version: '0.0.1',
+  debugOnly: true,
+  // ...
+});
+```
+The `debugOnly` flag instruct Meteor not to bundle this package when building, which is how you 
+ensure this package does not make it to production. You can now define all your fixtures in this 
+package.
+
+
 ### Debug output
 
 Please include a way to get more detailed info about your frameworks' test runs.  
