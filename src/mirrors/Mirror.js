@@ -270,14 +270,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     );
 
 
-    console.log(('[velocity] a mirror was started by ' +
-    environment.FRAMEWORK + ' at ' + options.rootUrl + ', you can see ' +
-    'the output of this mirror by tailing the log file:').yellow);
+    console.log(('[velocity] ' +
+    environment.FRAMEWORK + ' is starting a mirror at ' + options.rootUrl + '. This can take a ' +
+    'few minutes for first-time users.').yellow);
 
-    console.log(('[velocity] tail -f ' + files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
+    console.log(('[velocity] You can see the mirror logs at: tail -f ' +
+    files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
       '.meteor', 'local', 'log', environment.FRAMEWORK + '.log'))).yellow);
-
-
 
     Meteor.call('velocity/mirrors/init', {
       framework: environment.FRAMEWORK,
