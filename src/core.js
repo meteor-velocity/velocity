@@ -540,7 +540,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     var paths = [Velocity.getTestsPath()];
 
     var packagesPath = Velocity.getPackagesPath();
-    if (files.lstat(packagesPath).isDirectory()) {
+    if (VelocityInternals.isDirectory(packagesPath)) {
       var packageNames = files.readdir(packagesPath);
       var packageTestsPaths = _.chain(packageNames)
         .filter(_isPackageWithTests)
@@ -629,8 +629,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
   function _isPackageWithTests(packageName) {
     return packageName !== 'tests-proxy' &&
-      files.lstat(Velocity.getPackagePath(packageName)).isDirectory() &&
-      files.exists(Velocity.getTestsPath(packageName));
+      VelocityInternals.isDirectory(Velocity.getTestsPath(packageName));
   }
 
   /**
