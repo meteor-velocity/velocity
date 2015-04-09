@@ -25,6 +25,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       _mirrorChildProcesses = {};
   Npm.require('colors');
 
+  // Specifies the Meteor release that we use for mirrors
+  Velocity.mirrorMeteorReleaseName = 'velocity:METEOR';
+  Velocity.mirrorMeteorVersion = '1.1.0.2';
+  Velocity.mirrorMeteorRelease =
+    Velocity.mirrorMeteorReleaseName + '@' + Velocity.mirrorMeteorVersion;
+  Velocity.mirrorMeteorToolReleaseName = 'velocity:meteor-tool';
+  Velocity.mirrorMeteorToolVersion = '1.1.3_1';
+  Velocity.mirrorMeteorToolRelease =
+    Velocity.mirrorMeteorToolReleaseName + '@' + Velocity.mirrorMeteorToolVersion;
 
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
@@ -277,8 +286,17 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
 
     console.log(('[velocity] ' +
-    environment.FRAMEWORK + ' is starting a mirror at ' + options.rootUrl + '. This can take a ' +
-    'few minutes for first-time users.').yellow);
+      environment.FRAMEWORK + ' is starting a mirror at ' +
+      options.rootUrl + '.'
+    ).yellow);
+
+    var isMeteorToolInstalled = MeteorFilesHelpers.isPackageInstalled(
+      Velocity.mirrorMeteorToolReleaseName,
+      Velocity.mirrorMeteorToolVersion
+    );
+    if (!isMeteorToolInstalled) {
+      console.log('This can take a few minutes for first-time users.'.yellow);
+    }
 
     console.log(('[velocity] You can see the mirror logs at: tail -f ' +
     files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),

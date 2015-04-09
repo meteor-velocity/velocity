@@ -46,6 +46,7 @@
     "expect": false,
     "_": false,
     "sanjo": false,
-    "VelocityMeteorInternals": false
+    "VelocityMeteorInternals": false,
+    "MeteorFilesHelpers": false
   }
 }

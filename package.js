@@ -31,6 +31,7 @@ Package.on_use(function (api) {
   api.use('velocity:chokidar@0.12.6_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_5');
   api.use('sanjo:long-running-child-process@1.0.3', 'server');
+  api.use('sanjo:meteor-files-helpers@1.1.0_4', 'server');
 
   api.export('Velocity', BOTH);
   api.export('VelocityTestFiles', BOTH);
