@@ -15,7 +15,8 @@ Npm.depends({
   'fs-extra': '0.12.0',
   'freeport':'1.0.4',
   'mongodb-uri': '0.9.7',
-  'colors': '1.0.3'
+  'colors': '1.0.3',
+  'tmp': '0.0.25'
 });
 
 Package.on_use(function (api) {

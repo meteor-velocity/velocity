@@ -20,6 +20,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       url = Npm.require('url'),
       mongodbUri = Npm.require('mongodb-uri'),
       freeport = Npm.require('freeport'),
+      tmp = Npm.require('tmp'),
       files = VelocityMeteorInternals.files,
       _mirrorChildProcesses = {};
   Npm.require('colors');
@@ -230,6 +231,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       args.push('--include-tests', files.convertToStandardPath(options.testsPath));
     }
 
+    if (Meteor.settings) {
+      var settingsPath = _generateSettingsFile();
+      args.push('--settings', settingsPath);
+    }
+
     if (options.args) {
       args.push.apply(args, options.args);
     }
@@ -364,6 +370,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     return env;
   }
+
+  var _generateSettingsFile = _.memoize(function () {
+    var tmpObject = tmp.fileSync();
+    files.writeFile(tmpObject.name, JSON.stringify(Meteor.settings));
+    return tmpObject.name;
+  });
 
 
 })();
