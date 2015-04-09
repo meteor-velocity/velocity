@@ -227,7 +227,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     ];
 
     if (options.testsPath) {
-      args.push('--include-tests', options.testsPath);
+      args.push('--include-tests', files.convertToStandardPath(options.testsPath));
     }
 
     if (options.args) {
@@ -252,7 +252,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     // Allow to use checked out meteor for spawning mirrors
     // for development on our Meteor fork
     if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
-      args.push('--release', 'velocity:METEOR@1.1-rc.1');
+      args.push('--release', 'velocity:METEOR@1.1.0.2');
     }
 
     mirrorChild.spawn({
