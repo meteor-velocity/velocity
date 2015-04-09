@@ -1,0 +1,921 @@
+{
+    "project": {
+        "name": "Velocity",
+        "description": "Test runner for Meteor apps",
+        "version": "0.5.1"
+    },
+    "files": {
+        "src/mirrors/Mirror.js": {
+            "name": "src/mirrors/Mirror.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/mirrors/mirrorRegistrar.js": {
+            "name": "src/mirrors/mirrorRegistrar.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/core-shared.js": {
+            "name": "src/core-shared.js",
+            "modules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/core.js": {
+            "name": "src/core.js",
+            "modules": {
+                "Velocity": 1
+            },
+            "classes": {
+                "Meteor.methods": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/globals.js": {
+            "name": "src/globals.js",
+            "modules": {},
+            "classes": {
+                "Velocity": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "Velocity": {
+            "name": "Velocity",
+            "submodules": {},
+            "classes": {
+                "Meteor.methods": 1,
+                "Velocity": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/globals.js",
+            "line": 6
+        }
+    },
+    "classes": {
+        "Meteor.methods": {
+            "name": "Meteor.methods",
+            "shortname": "Meteor.methods",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Velocity",
+            "file": "src/core.js",
+            "line": 187,
+            "description": "Most communication with Velocity core is done via the following\nMeteor methods."
+        },
+        "Velocity": {
+            "name": "Velocity",
+            "shortname": "Velocity",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "Velocity",
+            "namespace": "",
+            "file": "src/globals.js",
+            "line": 6,
+            "description": "The `Velocity` object provides a common API for test frameworks to report\ntest results.  Frameworks can also request assets, such as a copy of the\nuser's application (the 'mirror') in which tests can be safely run without\nimpacting on-going development.\n\nTest results and log activity are reported via\n{{#crossLink \"Meteor.methods\"}}Meteor methods{{/crossLink}}."
+        }
+    },
+    "classitems": [
+        {
+            "file": "src/mirrors/Mirror.js",
+            "line": 40,
+            "description": "Starts a new mirror if it has not already been started, and reuses an\nexisting one if it is already started.\n\nThis method will update the `VelocityMirrors` collection with once the mirror is ready.",
+            "itemtype": "method",
+            "name": "velocity/mirrors/request",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "Options for the mirror.",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "The name of the calling framework",
+                            "type": "String"
+                        },
+                        {
+                            "name": "testsPath",
+                            "description": "The path to tests for this framework.\n                                         For example \"jasmine/server/unit\".\n                                         Don't include a leading or trailing slash.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "args",
+                            "description": "Additional arguments that the mirror is called with\n                                         It accepts all the options that are available for `meteor run`.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "env",
+                            "description": "Additional environment variables that the mirror is called with.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "port",
+                            "description": "String use a specific port",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "rootUrlPath",
+                            "description": "Adds this string to the end of the root url in the\n                                         VelocityMirrors collection. eg. `/?jasmine=true`",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "nodes",
+                            "description": "The number of mirrors required. This is used by\n                                         distributable frameworks. Default is 1",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "handshake",
+                            "description": "Specifies whether or not this mirror should perform\n                                         a DDP handshake with the parent. Distributable\n                                         frameworks can use this to get mirrors to behave\n                                         like workers. The default is true",
+                            "type": "String",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/Mirror.js",
+            "line": 81,
+            "description": "Stores metadata about the mirror.\nBefore a mirror implementation starts, it needs to call\nthis method to let Velocity know it is starting up.",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "\n           Required fields\n               port      : the port this mirror is running on\n               mongoUrl  : the mongo url this mirror is using\n               host      : the root url of this mirror without any additional paths. Used for\n                           making DDP connections\n               rootUrl   : the root url of this mirror, which also includes the path and params\n               type      : eg 'node-soft-mirror' or 'meteor-soft-mirror'",
+                    "type": "Object"
+                },
+                {
+                    "name": "extra",
+                    "description": "Any additional metadata the implementing mirror would like to store\n                         in the Velocity mirrors collection. This is optional.",
+                    "type": "Object"
+                }
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/Mirror.js",
+            "line": 120,
+            "description": "Lets Velocity know the mirror has started successfully",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "Required fields\n               framework  : the framework the mirror was requested by\n               host      : the host the mirror is running on\n               port      : the port the mirror is running on"
+                }
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/Mirror.js",
+            "line": 169,
+            "description": "Exposes the IS_MIRROR flag to clients",
+            "itemtype": "method",
+            "name": "velocity/isMirror",
+            "return": {
+                "description": "true if currently running in mirror",
+                "type": "Boolean"
+            },
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/Mirror.js",
+            "line": 303,
+            "description": "Returns the MongoDB URL for the given database.",
+            "params": [
+                {
+                    "name": "database",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "MongoDB Url",
+                "type": "String"
+            },
+            "access": "private",
+            "tagname": "",
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/Mirror.js",
+            "line": 315,
+            "description": "Return URL for the mirror with the given port.",
+            "params": [
+                {
+                    "name": "port",
+                    "description": "Mirror port"
+                }
+            ],
+            "return": {
+                "description": "Mirror URL",
+                "type": "String"
+            },
+            "access": "private",
+            "tagname": "",
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/Mirror.js",
+            "line": 332,
+            "description": "Return the environment variables that a mirror should run with",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "Required fields:\n                  framework - String ex. 'mocha-web-1'\n                  rootUrl - String ex. 'http://localhost:5000/x=y'\n                  port - a specific port",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "Mirror URL",
+                "type": "String"
+            },
+            "access": "private",
+            "tagname": "",
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/mirrorRegistrar.js",
+            "line": 23,
+            "description": "Meteor method: velocity/isMirror\nExposes the IS_MIRROR flag to mirror clients",
+            "itemtype": "method",
+            "name": "velocity/isMirror",
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/mirrorRegistrar.js",
+            "line": 33,
+            "description": "Meteor method: velocity/parentHandshake\nThis is the best indicator of the mirror's ready status, so it's used to inform the user\nwhen there may be delays",
+            "itemtype": "method",
+            "name": "velocity/isMirror",
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/mirrors/mirrorRegistrar.js",
+            "line": 45,
+            "description": "This code will run inside a mirror and connects the mirror to velocity via ddp once the mirror\nstarts. Velocity will then inform frameworks this mirror is ready.",
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core-shared.js",
+            "line": 10,
+            "description": "Mirrors can share the same codebase as the main process. This method will run provided code\ninside a mirror only.\n\nwhere: client / server",
+            "itemtype": "method",
+            "name": "onTest",
+            "params": [
+                {
+                    "name": "code",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core-shared.js",
+            "line": 29,
+            "itemtype": "method",
+            "name": "",
+            "see": [
+                "velocity/setOption"
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core-shared.js",
+            "line": 37,
+            "see": [
+                "velocity/setOptions"
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core-shared.js",
+            "line": 44,
+            "see": [
+                "velocity/getOption"
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core-shared.js",
+            "line": 52,
+            "description": "Exposes the VELOCITY flag",
+            "itemtype": "method",
+            "name": "velocity/isEnabled",
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core-shared.js",
+            "line": 68,
+            "description": "Set a option.",
+            "itemtype": "method",
+            "name": "velocity/setOption",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the option."
+                },
+                {
+                    "name": "value",
+                    "description": "The value of the option."
+                }
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core-shared.js",
+            "line": 84,
+            "description": "Set multiple options.",
+            "itemtype": "method",
+            "name": "velocity/setOptions",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "Hash with options (name: value)."
+                }
+            ],
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core-shared.js",
+            "line": 99,
+            "description": "Get a option",
+            "itemtype": "method",
+            "name": "velocity/getOption",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the option."
+                }
+            ],
+            "return": {
+                "description": "The value of the option or null.",
+                "type": "*"
+            },
+            "class": "Meteor.methods"
+        },
+        {
+            "file": "src/core.js",
+            "line": 62,
+            "description": "Run code when Velocity is started. Velocity is considered started when the file watcher has\ncompleted the scan of the  file system",
+            "itemtype": "method",
+            "name": "startup",
+            "return": {
+                "description": "A function to run on startup",
+                "type": "Function"
+            },
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 79,
+            "description": "Get application directory path.",
+            "itemtype": "method",
+            "name": "getAppPath",
+            "return": {
+                "description": "app directory path",
+                "type": "String"
+            },
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 95,
+            "description": "Get path to application's or application package's 'tests' directory",
+            "itemtype": "method",
+            "name": "getTestsPath",
+            "params": [
+                {
+                    "name": "packageName",
+                    "description": "optional package name",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "application's tests directory",
+                "type": "String"
+            },
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 106,
+            "description": "Get path to application's 'packages' directory",
+            "itemtype": "method",
+            "name": "getPackagesPath",
+            "return": {
+                "description": "application's packages directory",
+                "type": "String"
+            },
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 116,
+            "description": "Get path to application's package directory",
+            "itemtype": "method",
+            "name": "getPackagesPath",
+            "params": [
+                {
+                    "name": "packageName",
+                    "description": "package name",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "application's packages directory",
+                "type": "String"
+            },
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 127,
+            "description": "Add a callback which will execute after all tests have completed\nand after the aggregate test results have been reported.",
+            "itemtype": "method",
+            "name": "addPostProcessor",
+            "params": [
+                {
+                    "name": "processor",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 139,
+            "description": "Get a message that displays where bugs in Velocity core itself should\nbe reported.",
+            "itemtype": "method",
+            "name": "getReportGithubIssueMessage",
+            "return": {
+                "description": "message with bug repo url",
+                "type": "String"
+            },
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 151,
+            "description": "Registers a testing framework plugin.",
+            "itemtype": "method",
+            "name": "registerTestingFramework",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the testing framework.",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "Options for the testing framework.",
+                    "type": "Object",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "disableAutoReset",
+                            "description": "Velocity's reset cycle will skip reports and logs for this framework\n                                           It will be the responsibility of the framework to clean up its ****!",
+                            "type": "String"
+                        },
+                        {
+                            "name": "regex",
+                            "description": "The regular expression for test files that should be assigned\n                                           to the testing framework.\n                                           The path relative to the tests\n                                           folder is matched against it.\n                                           The default is \"name/.+\\.js$\"\n                                           (name is the testing framework name).",
+                            "type": "String"
+                        },
+                        {
+                            "name": "sampleTestGenerator",
+                            "description": "sampleTestGenerator\n   returns an array of fileObjects with the following fields:",
+                            "type": "Function",
+                            "props": [
+                                {
+                                    "name": "path",
+                                    "description": "relative path to place test file (from PROJECT/tests)",
+                                    "type": "String"
+                                },
+                                {
+                                    "name": "contents",
+                                    "description": "contents of the test file the path that's returned",
+                                    "type": "String"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 195,
+            "description": "Registers a testing framework plugin via a Meteor method.",
+            "itemtype": "method",
+            "name": "registerTestingFramework",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "The name of the testing framework.",
+                    "type": "String"
+                },
+                {
+                    "name": "options",
+                    "description": "Options for the testing framework.",
+                    "type": "Object",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "disableAutoReset",
+                            "description": "Velocity's reset cycle will skip reports and logs for this framework\n                                           It will be the responsibility of the framework to clean up its ****!",
+                            "type": "String"
+                        },
+                        {
+                            "name": "regex",
+                            "description": "The regular expression for test files that should be assigned\n                                           to the testing framework.\n                                           The path relative to the tests\n                                           folder is matched against it.\n                                           The default is \"name/.+\\.js$\"\n                                           (name is the testing framework name).",
+                            "type": "String"
+                        },
+                        {
+                            "name": "sampleTestGenerator",
+                            "description": "sampleTestGenerator\n   returns an array of fileObjects with the following fields:",
+                            "type": "Function",
+                            "props": [
+                                {
+                                    "name": "path",
+                                    "description": "relative path to place test file (from PROJECT/tests)",
+                                    "type": "String"
+                                },
+                                {
+                                    "name": "contents",
+                                    "description": "contents of the test file the path that's returned",
+                                    "type": "String"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 230,
+            "description": "Re-init file watcher and clear all test results.",
+            "itemtype": "method",
+            "name": "velocity/reset",
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 239,
+            "description": "Clear all test results.",
+            "itemtype": "method",
+            "name": "velocity/reports/reset",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "The name of a specific framework\n                 to clear results for.  Ex. 'jasmine' or 'mocha'",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "notIn",
+                            "description": "A list of test Ids which should be kept\n                               (not cleared).  These Ids must match the\n                               ones passed to `velocity/reports/submit`.",
+                            "type": "Array",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 272,
+            "description": "Clear all log entries.",
+            "itemtype": "method",
+            "name": "velocity/logs/reset",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true,
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "The name of a specific framework\n                                    to clear logs for.",
+                            "type": "String",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 294,
+            "description": "Log a message to the Velocity log store.  This provides a central\nlocation for different reporters to query for test framework log\nentries.",
+            "itemtype": "method",
+            "name": "velocity/logs/submit",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "The name of the test framework",
+                            "type": "String"
+                        },
+                        {
+                            "name": "message",
+                            "description": "The message to log",
+                            "type": "String"
+                        },
+                        {
+                            "name": "level",
+                            "description": "Log level.  Ex. 'error'. Default: 'info'",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "timestamp",
+                            "description": "",
+                            "type": "Date",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 323,
+            "description": "Record the results of an individual test run; a simple collector of\ntest data.\n\nThe `data` object is stored in its entirety; any field may be passed in.\nThe optional fields documented here are suggestions based on what the\nstandard html-reporter supports.  Whether or not a field is actually\nused is up to the specific test reporter that the user has installed.",
+            "itemtype": "method",
+            "name": "velocity/reports/submit",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "name",
+                            "description": "Name of the test that was executed.",
+                            "type": "String"
+                        },
+                        {
+                            "name": "framework",
+                            "description": "Name of a testing framework.\n                               For example, 'jasmine' or 'mocha'.",
+                            "type": "String"
+                        },
+                        {
+                            "name": "result",
+                            "description": "The results of the test.  Standard values\n                            are 'passed' and 'failed'.  Different test\n                            reporters can support other values.  For\n                            example, the aggregate tests collection uses\n                            'pending' to indicate that results are still\n                            coming in.",
+                            "type": "String"
+                        },
+                        {
+                            "name": "id",
+                            "description": "Used to update a specific test result.  If not\n                          provided, frameworks can use the\n                          `velocity/reports/reset` Meteor method to\n                          clear all tests.",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "ancestors",
+                            "description": "The hierarchy of suites and blocks above\n                                this test. For example,\n                             ['Template', 'leaderboard', 'selected_name']",
+                            "type": "Array",
+                            "optional": true
+                        },
+                        {
+                            "name": "timestamp",
+                            "description": "The time that the test started for this\n                               result.",
+                            "type": "Date",
+                            "optional": true
+                        },
+                        {
+                            "name": "duration",
+                            "description": "The test duration in milliseconds.",
+                            "type": "Number",
+                            "optional": true
+                        },
+                        {
+                            "name": "browser",
+                            "description": "Which browser did the test run in?",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "failureType",
+                            "description": "For example, 'expect' or 'assert'",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "failureMessage",
+                            "description": "",
+                            "type": "String",
+                            "optional": true
+                        },
+                        {
+                            "name": "failureStackTrace",
+                            "description": "The stack trace associated with\n                                         the failure",
+                            "type": "String",
+                            "optional": true
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 383,
+            "description": "Frameworks must call this method to inform Velocity they have completed\ntheir current test runs. Velocity uses this flag when running in CI mode.",
+            "itemtype": "method",
+            "name": "velocity/reports/completed",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "Name of a test framework.  Ex. 'jasmine'",
+                            "type": "String"
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 402,
+            "description": "Copy sample tests from frameworks `sample-tests` directories\nto the user's application's `tests` directory.",
+            "itemtype": "method",
+            "name": "velocity/copySampleTests",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object",
+                    "props": [
+                        {
+                            "name": "framework",
+                            "description": "Framework name. Ex. 'jasmine', 'mocha'",
+                            "type": "String"
+                        }
+                    ]
+                }
+            ],
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 501,
+            "description": "Runs each test framework once when in continous integration mode.",
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 526,
+            "description": "Initialize the directory/file watcher.",
+            "itemtype": "method",
+            "name": "_initFileWatcher",
+            "params": [
+                {
+                    "name": "config",
+                    "description": "See `registerTestingFramework`.",
+                    "type": "Object"
+                },
+                {
+                    "name": "callback",
+                    "description": "Called after the watcher completes its first scan and is ready",
+                    "type": "Function"
+                }
+            ],
+            "access": "private",
+            "tagname": "",
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 625,
+            "description": "Re-init file watcher and clear all test results.",
+            "itemtype": "method",
+            "name": "_reset",
+            "params": [
+                {
+                    "name": "config",
+                    "description": "See `registerTestingFramework`.",
+                    "type": "Object"
+                }
+            ],
+            "access": "private",
+            "tagname": "",
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        },
+        {
+            "file": "src/core.js",
+            "line": 650,
+            "description": "If any one test has failed, mark the aggregate test result as failed.",
+            "itemtype": "method",
+            "name": "_updateAggregateReports",
+            "access": "private",
+            "tagname": "",
+            "class": "Meteor.methods",
+            "module": "Velocity"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " src/mirrors/Mirror.js:332"
+        },
+        {
+            "message": "Missing item type\nStores metadata about the mirror.\nBefore a mirror implementation starts, it needs to call\nthis method to let Velocity know it is starting up.",
+            "line": " src/mirrors/Mirror.js:81"
+        },
+        {
+            "message": "Missing item type\nLets Velocity know the mirror has started successfully",
+            "line": " src/mirrors/Mirror.js:120"
+        },
+        {
+            "message": "Missing item type\nReturns the MongoDB URL for the given database.",
+            "line": " src/mirrors/Mirror.js:303"
+        },
+        {
+            "message": "Missing item type\nReturn URL for the mirror with the given port.",
+            "line": " src/mirrors/Mirror.js:315"
+        },
+        {
+            "message": "Missing item type\nReturn the environment variables that a mirror should run with",
+            "line": " src/mirrors/Mirror.js:332"
+        },
+        {
+            "message": "Missing item type\nThis code will run inside a mirror and connects the mirror to velocity via ddp once the mirror\nstarts. Velocity will then inform frameworks this mirror is ready.",
+            "line": " src/mirrors/mirrorRegistrar.js:45"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/core-shared.js:37"
+        },
+        {
+            "message": "Missing item type",
+            "line": " src/core-shared.js:44"
+        },
+        {
+            "message": "Missing item type\nRuns each test framework once when in continous integration mode.",
+            "line": " src/core.js:501"
+        }
+    ]
+}
