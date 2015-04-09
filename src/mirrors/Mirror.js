@@ -295,7 +295,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       Velocity.mirrorMeteorToolVersion
     );
     if (!isMeteorToolInstalled) {
-      console.log('This can take a few minutes for first-time users.'.yellow);
+      console.log(
+        '[velocity] This takes a few minutes the first time.'.yellow
+      );
     }
 
     console.log(('[velocity] You can see the mirror logs at: tail -f ' +
