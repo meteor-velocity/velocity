@@ -75,6 +75,9 @@
     },
     "mongodb-uri": {
       "version": "0.9.7"
+    },
+    "tmp": {
+      "version": "0.0.25"
     }
   }
 }
