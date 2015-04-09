@@ -3,6 +3,8 @@ Velocity
 
 Test runner (and community) for Meteor apps.  Under heavy development.
 
+<img src="https://codeship.com/projects/ed973200-b7a3-0132-ec13-7eb16f937591/status?branch=master" />
+
 ### What is Velocity?
 Head over to the [official homepage](http://velocity.meteor.com) 
 
