@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.6.0-rc.5',
+  version: '0.6.0-rc.6',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
@@ -14,7 +14,8 @@ Npm.depends({
   'fs-extra': '0.18.0',
   'freeport':'1.0.4',
   'mongodb-uri': '0.9.7',
-  'colors': '1.0.3'
+  'colors': '1.0.3',
+  'tmp': '0.0.25'
 });
 
 Package.on_use(function (api) {
@@ -23,12 +24,13 @@ Package.on_use(function (api) {
       CLIENT = 'client',
       BOTH = [CLIENT, SERVER];
 
-  api.versionsFrom('METEOR@1.0');
+  api.versionsFrom('METEOR@1.1.0.2');
   api.use('mongo');
   api.use('check');
   api.use('velocity:chokidar@0.12.6_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_5');
   api.use('sanjo:long-running-child-process@1.0.3', 'server');
+  api.use('sanjo:meteor-files-helpers@1.1.0_4', 'server');
 
   api.export('Velocity', BOTH);
   api.export('VelocityTestFiles', BOTH);

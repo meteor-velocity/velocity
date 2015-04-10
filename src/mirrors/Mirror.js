@@ -20,10 +20,20 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       url = Npm.require('url'),
       mongodbUri = Npm.require('mongodb-uri'),
       freeport = Npm.require('freeport'),
+      tmp = Npm.require('tmp'),
       files = VelocityMeteorInternals.files,
       _mirrorChildProcesses = {};
   Npm.require('colors');
 
+  // Specifies the Meteor release that we use for mirrors
+  Velocity.mirrorMeteorReleaseName = 'velocity:METEOR';
+  Velocity.mirrorMeteorVersion = '1.1.0.2';
+  Velocity.mirrorMeteorRelease =
+    Velocity.mirrorMeteorReleaseName + '@' + Velocity.mirrorMeteorVersion;
+  Velocity.mirrorMeteorToolReleaseName = 'velocity:meteor-tool';
+  Velocity.mirrorMeteorToolVersion = '1.1.3_1';
+  Velocity.mirrorMeteorToolRelease =
+    Velocity.mirrorMeteorToolReleaseName + '@' + Velocity.mirrorMeteorToolVersion;
 
 //////////////////////////////////////////////////////////////////////
 // Meteor Methods
@@ -230,6 +240,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       args.push('--include-tests', files.convertToStandardPath(options.testsPath));
     }
 
+    if (Meteor.settings) {
+      var settingsPath = _generateSettingsFile();
+      args.push('--settings', settingsPath);
+    }
+
     if (options.args) {
       args.push.apply(args, options.args);
     }
@@ -271,8 +286,19 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
 
     console.log(('[velocity] ' +
-    environment.FRAMEWORK + ' is starting a mirror at ' + options.rootUrl + '. This can take a ' +
-    'few minutes for first-time users.').yellow);
+      environment.FRAMEWORK + ' is starting a mirror at ' +
+      options.rootUrl + '.'
+    ).yellow);
+
+    var isMeteorToolInstalled = MeteorFilesHelpers.isPackageInstalled(
+      Velocity.mirrorMeteorToolReleaseName,
+      Velocity.mirrorMeteorToolVersion
+    );
+    if (!isMeteorToolInstalled) {
+      console.log(
+        '[velocity] This takes a few minutes the first time.'.yellow
+      );
+    }
 
     console.log(('[velocity] You can see the mirror logs at: tail -f ' +
     files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
@@ -364,6 +390,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     return env;
   }
+
+  var _generateSettingsFile = _.memoize(function () {
+    var tmpObject = tmp.fileSync();
+    files.writeFile(tmpObject.name, JSON.stringify(Meteor.settings));
+    return tmpObject.name;
+  });
 
 
 })();
