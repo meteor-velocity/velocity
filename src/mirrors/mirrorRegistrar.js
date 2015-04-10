@@ -14,21 +14,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     return;
   }
 
-  // between this line and the velocity/parentHandshake, is the time the mirror starts initializing
-  // and is ready
+  // between this line and the velocity/parentHandshake, is the time the mirror
+  // starts initializing and is ready
   console.log('[velocity] Starting mirror on port', process.env.MIRROR_PORT);
 
   Meteor.methods({
-
-    /**
-     * Meteor method: velocity/isMirror
-     * Exposes the IS_MIRROR flag to mirror clients
-     *
-     * @method velocity/isMirror
-     */
-    'velocity/isMirror': function () {
-      return !!process.env.IS_MIRROR;
-    },
 
     /**
      * Meteor method: velocity/parentHandshake
@@ -36,16 +26,20 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * when there may be delays
      *
      * @method velocity/parentHandshake
+     * @for Meteor.methods
      */
     'velocity/parentHandshake': function () {
       console.log('[velocity] Established connection with Velocity.');
     }
+
   });
 
-  /**
-   * This code will run inside a mirror and connects the mirror to velocity via ddp once the mirror
-   * starts. Velocity will then inform frameworks this mirror is ready.
-   */
+
+  //////////////////////////////////////////////////////////////////////
+  // This code will run inside a mirror and connects the mirror to
+  // velocity via ddp once the mirror starts. Velocity will then
+  // inform frameworks this mirror is ready.
+  // 
   Meteor.startup(function () {
 
     if (!process.env.HANDSHAKE) {
@@ -77,6 +71,5 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     };
 
   });
-
 
 })();

@@ -35,16 +35,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   Velocity.mirrorMeteorToolRelease =
     Velocity.mirrorMeteorToolReleaseName + '@' + Velocity.mirrorMeteorToolVersion;
 
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 // Meteor Methods
 //
 
-  /**
-   * Most communication with Velocity core is done via the following
-   * Meteor methods.
-   *
-   * @class Meteor.methods
-   */
+  
+  //////////////////////////////////////////////////////////////////////
+  // Most communication with Velocity core is done via the following
+  // Meteor methods.
+  //
   Meteor.methods({
 
     /**
@@ -54,7 +53,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * This method will update the `VelocityMirrors` collection with once the mirror is ready.
      *
      * @method velocity/mirrors/request
-     *
+     * @for Meteor.methods
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
      * @param {String} [options.testsPath]      The path to tests for this framework.
@@ -93,27 +92,33 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * Before a mirror implementation starts, it needs to call
      * this method to let Velocity know it is starting up.
      *
-     * @param options {Object}
-     *            Required fields
-     *                port      : the port this mirror is running on
-     *                mongoUrl  : the mongo url this mirror is using
-     *                host      : the root url of this mirror without any additional paths. Used for
-     *                            making DDP connections
-     *                rootUrl   : the root url of this mirror, which also includes the path and params
-     *                type      : eg 'node-soft-mirror' or 'meteor-soft-mirror'
-     * @param extra {Object}    Any additional metadata the implementing mirror would like to store
-     *                          in the Velocity mirrors collection. This is optional.
-     *
+     * @method velocity/mirrors/init
+     * @param {Object} options
+     *   @param {Number} options.port The port this mirror is running on
+     *   @param {String} options.framework The name of the test framework
+     *                                     making the request
+     *   @param {String} options.mongoUrl The mongo url this mirror is using
+     *   @param {String} options.host The root url of this mirror without any
+     *                        additional paths. Used for making DDP connections
+     *   @param {String} options.rootUrl The root url of this mirror, which also
+     *                           includes the path and params
+     *   @param {String} options.rootUrlPath Adds this string to the end of
+     *                           the root url in the VelocityMirrors
+     *                           collection. To be used by test frameworks to
+     *                           recognize when they are executing in a mirror.
+     *                           eg. `/?jasmine=true`
+     * @param {Object} extra Any additional metadata the implementing mirror
+     *                       would like to store in the Velocity mirrors
+     *                       collection. This is optional.
      */
     'velocity/mirrors/init': function (options, extra) {
       check(options, {
         port: Number,
-        framework: String,
         mongoUrl: String,
+        framework: String,
         host: String,
         rootUrl: String,
-        rootUrlPath: String,
-        type: String
+        rootUrlPath: String
       });
       check(extra, Match.Optional(Object));
 
@@ -130,11 +135,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     /**
      * Lets Velocity know the mirror has started successfully
      *
-     * @param options
-     *            Required fields
-     *                framework  : the framework the mirror was requested by
-     *                host      : the host the mirror is running on
-     *                port      : the port the mirror is running on
+     * @method velocity/mirrors/register
+     * @param {Object} options
+     *   @param {Number} options.port The port this mirror is running on
+     *   @param {String} options.framework The name of the test framework
+     *                                     making the request
+     *   @param {String} options.host The root url of this mirror without any
+     *                        additional paths. Used for making DDP connections
      */
     'velocity/mirrors/register': function (options) {
       check(options, Match.ObjectIncluding({
@@ -181,6 +188,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * Exposes the IS_MIRROR flag to clients
      *
      * @method velocity/isMirror
+     * @for Meteor.methods
      * @return {Boolean} true if currently running in mirror
      */
     'velocity/isMirror': function () {
@@ -310,8 +318,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       mongoUrl: environment.MONGO_URL,
       host: environment.HOST,
       rootUrl: environment.ROOT_URL,
-      rootUrlPath: environment.ROOT_URL_PATH,
-      type: 'meteor-mirror'
+      rootUrlPath: environment.ROOT_URL_PATH
     }, {
       pid: mirrorChild.getPid()
     });
@@ -328,8 +335,10 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   /**
    * Returns the MongoDB URL for the given database.
-   * @param database
-   * @return {string} MongoDB Url
+   *
+   * @method _getMongoUrl
+   * @param {Object} database
+   * @return {String} MongoDB Url
    * @private
    */
   function _getMongoUrl (database) {
@@ -340,8 +349,10 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   /**
    * Return URL for the mirror with the given port.
-   * @param port Mirror port
-   * @return {string} Mirror URL
+   *
+   * @method _getMirrorUrl
+   * @param {Number} port Mirror port
+   * @return {String} Mirror URL
    * @private
    */
   function _getMirrorUrl (port) {
@@ -357,11 +368,24 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   /**
    * Return the environment variables that a mirror should run with
+   * 
+   * @method _getEnvironmentVariables
    * @param {Object} options Required fields:
-   *                   framework - String ex. 'mocha-web-1'
-   *                   rootUrl - String ex. 'http://localhost:5000/x=y'
-   *                   port - a specific port
-   * @returns {string} Mirror URL
+   *   @param {String} options.framework The name of the test framework
+   *                                     making the request
+   *   @param {Number} options.port The port this mirror is running on
+   *   @param {String} options.rootUrl The root url of this mirror, which also
+   *                           includes the path and params
+   *   @param {String} options.host The root url of this mirror without any
+   *                        additional paths. Used for making DDP connections
+   *   @param {String} options.rootUrl The root url of this mirror, which also
+   *                           includes the path and params
+   *   @param {String} options.rootUrlPath Adds this string to the end of
+   *                           the root url in the VelocityMirrors
+   *                           collection. To be used by test frameworks to
+   *                           recognize when they are executing in a mirror.
+   *                           eg. `/?jasmine=true`
+   * @return {String} Mirror URL
    * @private
    */
   function _getEnvironmentVariables (options) {
