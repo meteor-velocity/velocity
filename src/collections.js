@@ -9,13 +9,61 @@
  VelocityOptions: true
  */
 
+/**
+ * @class Collections
+ */
+
+/**
+ * TODO: Needs description and example records
+ *
+ * @property VelocityTestFiles
+ * @type Mongo.Collection
+ */
 VelocityTestFiles = new Mongo.Collection('velocityTestFiles');
+/**
+ * TODO: Needs description and example records
+ *
+ * @property VelocityFixtureFiles
+ * @type Mongo.Collection
+ */
 VelocityFixtureFiles = new Mongo.Collection('velocityFixtureFiles');
+/**
+ * TODO: Needs description and example records
+ *
+ * @property VelocityTestReports
+ * @type Mongo.Collection
+ */
 VelocityTestReports = new Mongo.Collection('velocityTestReports');
+/**
+ * TODO: Needs description and example records
+ *
+ * @property VelocityAggregateReports
+ * @type Mongo.Collection
+ */
 VelocityAggregateReports = new Mongo.Collection('velocityAggregateReports');
+/**
+ * TODO: Needs description and example records
+ *
+ * @property VelocityLogs
+ * @type Mongo.Collection
+ */
 VelocityLogs = new Mongo.Collection('velocityLogs');
+/**
+ * TODO: Needs description and example records
+ *
+ * @property VelocityMirrors
+ * @type Mongo.Collection
+ */
 VelocityMirrors = new Mongo.Collection('velocityMirrors');
+/**
+ * TODO: Needs description and example records
+ *
+ * @property VelocityOptions
+ * @type Mongo.Collection
+ */
 VelocityOptions = new Mongo.Collection('velocityOptions');
+
+
 (function () {
   'use strict';
 
@@ -53,4 +101,3 @@ VelocityOptions = new Mongo.Collection('velocityOptions');
     Meteor.subscribe('VelocityOptions');
   }
 })();
-
