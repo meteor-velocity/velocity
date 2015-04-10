@@ -21,11 +21,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   Meteor.methods({
 
     /**
-     * Meteor method: velocity/isMirror
-     * Exposes the IS_MIRROR flag to mirror clients
+     * Exposes the IS_MIRROR flag to code that *is* running in a mirror
+     * (ie. the test framework code that is running the actual tests).
      *
      * @method velocity/isMirror
      * @for Meteor.methods
+     * @return {Boolean} true if currently running in mirror
      */
     'velocity/isMirror': function () {
       return !!process.env.IS_MIRROR;
