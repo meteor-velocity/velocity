@@ -77,7 +77,7 @@ We would love to add your framework to the list!  Take a look at how some of the
 
 Please see the [velocity-wiki](https://github.com/meteor-velocity/velocity/wiki/How-to-integrate-a-test-framework-with-Velocity) for basic instructions on making your test framework work with Velocity.
 
-Also, be sure to check out the documentation for the public API.  You can view them in the browser by cloning this repo and then running: `open docs/classes/Velocity.html`
+Also, be sure to check out the [documentation for the public API](http://meteor-velocity.github.io/velocity/).
  
 A few notes on being velocity-compatible:
 
