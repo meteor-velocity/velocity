@@ -185,7 +185,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     },
 
     /**
-     * Exposes the IS_MIRROR flag to clients
+     * Exposes the IS_MIRROR flag to code that is *not* running in a mirror
+     * (ie. the velocity core process that kicks off the mirrors).
      *
      * @method velocity/isMirror
      * @for Meteor.methods
