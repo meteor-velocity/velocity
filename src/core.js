@@ -8,6 +8,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
 /**
  * @module Velocity
+ * @class Velocity
  */
 (function () {
   'use strict';
@@ -28,7 +29,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   var _ = Npm.require('lodash'),
       files = VelocityMeteorInternals.files,
       child_process = Npm.require('child_process'),
-      chokidar = Npm.require('chokidar'),
       mkdirp = Npm.require('mkdirp'),
       _config = {},
       _watcher,
@@ -88,7 +88,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         appPath = files.pathResolve(appPath);
       }
 
-      return appPath;
+      return files.convertToOSPath(appPath);
     },
 
 
@@ -100,7 +100,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @return {String} application's tests directory
      */
     getTestsPath: function (packageName) {
-      return files.pathJoin(packageName ? Velocity.getPackagePath(packageName) : Velocity.getAppPath(), 'tests');
+      return files.convertToOSPath(
+        files.pathJoin(packageName ? Velocity.getPackagePath(packageName) : Velocity.getAppPath(), 'tests')
+      );
     },
 
     /**
@@ -110,7 +112,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @return {String} application's packages directory
      */
     getPackagesPath: function () {
-      return files.pathJoin(Velocity.getAppPath(), 'packages');
+      return files.convertToOSPath(files.pathJoin(Velocity.getAppPath(), 'packages'));
     },
 
     /**
@@ -121,8 +123,21 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @return {String} application's packages directory
      */
     getPackagePath: function (packageName) {
-      return files.pathJoin(Velocity.getPackagesPath(), packageName);
+      return files.convertToOSPath(files.pathJoin(Velocity.getPackagesPath(), packageName));
     },
+
+
+    /**
+     * A collection of callbacks to be executed after all tests have completed
+     * and the aggregate test results have been reported.
+     *
+     * See {{#crossLink "Velocity/addPostProcessor:method"}}{{/crossLink}}
+     *
+     * @property postProcessors
+     * @type Array
+     * @default []
+     */
+    postProcessors: [],
 
     /**
      * Add a callback which will execute after all tests have completed
@@ -131,7 +146,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @method addPostProcessor
      * @param {Function} processor
      */
-    postProcessors: [],
     addPostProcessor: function (processor) {
       Velocity.postProcessors.push(processor);
     },
@@ -152,20 +166,23 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * Registers a testing framework plugin.
      *
      * @method registerTestingFramework
-     * @param {String} name                       The name of the testing framework.
-     * @param {Object} [options]                  Options for the testing framework.
-     * @param {String} options.disableAutoReset   Velocity's reset cycle will skip reports and logs for this framework
-     *                                            It will be the responsibility of the framework to clean up its ****!
-     * @param {String} options.regex              The regular expression for test files that should be assigned
-     *                                            to the testing framework.
-     *                                            The path relative to the tests
-     *                                            folder is matched against it.
-     *                                            The default is "name/.+\.js$"
-     *                                            (name is the testing framework name).
-     * @param options.sampleTestGenerator {Function} sampleTestGenerator
-     *    returns an array of fileObjects with the following fields:
-     * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
-     * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
+     * @param {String} name The name of the testing framework.
+     * @param {Object} [options] Options for the testing framework.
+     *   @param {String} [options.regex] The regular expression for test files
+     *                    that should be assigned to the testing framework.
+     *                    The path relative to the tests folder is matched
+     *                    against it. Default: "name/.+\.js$" (name is
+     *                    the testing framework name).
+     *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
+     *                    will skip reports and logs for this framework.
+     *                    It is up to the framework to clean up its ****!
+     *   @param {Function} [options.sampleTestGenerator] sampleTestGenerator
+     *                    returns an array of fileObjects with the following
+     *                    fields:
+     *                      path - String - relative path to place test files
+     *                                      (from PROJECT/tests)
+     *                      contents - String - contents to put in the test file
+     *                                          at the corresponding path
      */
     registerTestingFramework: function (name, options) {
       DEBUG && console.log('[velocity] Register framework ' + name + ' with regex ' + options.regex);
@@ -195,21 +212,24 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     /**
      * Registers a testing framework plugin via a Meteor method.
      *
-     * @method registerTestingFramework
-     * @param {String} name                       The name of the testing framework.
-     * @param {Object} [options]                  Options for the testing framework.
-     * @param {String} options.disableAutoReset   Velocity's reset cycle will skip reports and logs for this framework
-     *                                            It will be the responsibility of the framework to clean up its ****!
-     * @param {String} options.regex              The regular expression for test files that should be assigned
-     *                                            to the testing framework.
-     *                                            The path relative to the tests
-     *                                            folder is matched against it.
-     *                                            The default is "name/.+\.js$"
-     *                                            (name is the testing framework name).
-     * @param options.sampleTestGenerator {Function} sampleTestGenerator
-     *    returns an array of fileObjects with the following fields:
-     * @param options.sampleTestGenerator.path {String} relative path to place test file (from PROJECT/tests)
-     * @param options.sampleTestGenerator.contents {String} contents of the test file the path that's returned
+     * @method velocity/register/framework 
+     * @param {String} name The name of the testing framework.
+     * @param {Object} [options] Options for the testing framework.
+     *   @param {String} [options.regex] The regular expression for test files
+     *                    that should be assigned to the testing framework.
+     *                    The path relative to the tests folder is matched
+     *                    against it. Default: "name/.+\.js$" (name is
+     *                    the testing framework name).
+     *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
+     *                    will skip reports and logs for this framework.
+     *                    It is up to the framework to clean up its ****!
+     *   @param {Function} [options.sampleTestGenerator] sampleTestGenerator
+     *                    returns an array of fileObjects with the following
+     *                    fields:
+     *                      path - String - relative path to place test files
+     *                                      (from PROJECT/tests)
+     *                      contents - String - contents to put in the test file
+     *                                          at the corresponding path
      */
     'velocity/register/framework': function (name, options) {
       options = options || {};
@@ -241,11 +261,11 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *
      * @method velocity/reports/reset
      * @param {Object} [options]
-     * @param {String} [options.framework] The name of a specific framework
-     *                  to clear results for.  Ex. 'jasmine' or 'mocha'
-     * @param {Array} [options.notIn] A list of test Ids which should be kept
-     *                                (not cleared).  These Ids must match the
-     *                                ones passed to `velocity/reports/submit`.
+     *   @param {String} [options.framework] The name of a specific framework
+     *                    to clear results for.  Ex. 'jasmine' or 'mocha'
+     *   @param {Array} [options.notIn] A list of test Ids which should be kept
+     *                                  (not cleared).  These Ids must match the
+     *                                  ones passed to `velocity/reports/submit`.
      */
     'velocity/reports/reset': function (options) {
       options = options || {};
@@ -257,13 +277,12 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       var query = {};
       if (options.framework) {
         query.framework = options.framework;
+        VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
       }
       if (options.notIn) {
         query = _.assign(query, {_id: {$nin: options.notIn}});
       }
       VelocityTestReports.remove(query);
-
-      VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
 
       _updateAggregateReports();
     },
@@ -274,8 +293,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *
      * @method velocity/logs/reset
      * @param {Object} [options]
-     * @param {String} [options.framework] The name of a specific framework
-     *                                     to clear logs for.
+     *   @param {String} [options.framework] The name of a specific framework
+     *                                       to clear logs for.
      */
     'velocity/logs/reset': function (options) {
       options = options || {};
@@ -298,10 +317,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *
      * @method velocity/logs/submit
      * @param {Object} options
-     * @param {String} options.framework The name of the test framework
-     * @param {String} options.message The message to log
-     * @param {String} [options.level] Log level.  Ex. 'error'. Default: 'info'
-     * @param {Date} [options.timestamp]
+     *   @param {String} options.framework The name of the test framework
+     *   @param {String} options.message The message to log
+     *   @param {String} [options.level] Log level.  Ex. 'error'. Default: 'info'
+     *   @param {Date} [options.timestamp]
      */
     'velocity/logs/submit': function (options) {
       check(options, {
@@ -331,30 +350,30 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *
      * @method velocity/reports/submit
      * @param {Object} data
-     * @param {String} data.name Name of the test that was executed.
-     * @param {String} data.framework Name of a testing framework.
-     *                                For example, 'jasmine' or 'mocha'.
-     * @param {String} data.result The results of the test.  Standard values
-     *                             are 'passed' and 'failed'.  Different test
-     *                             reporters can support other values.  For
-     *                             example, the aggregate tests collection uses
-     *                             'pending' to indicate that results are still
-     *                             coming in.
-     * @param {String} [data.id] Used to update a specific test result.  If not
-     *                           provided, frameworks can use the
-     *                           `velocity/reports/reset` Meteor method to
-     *                           clear all tests.
-     * @param {Array} [data.ancestors] The hierarchy of suites and blocks above
-     *                                 this test. For example,
-     *                              ['Template', 'leaderboard', 'selected_name']
-     * @param {Date} [data.timestamp] The time that the test started for this
-     *                                result.
-     * @param {Number} [data.duration] The test duration in milliseconds.
-     * @param {String} [data.browser] Which browser did the test run in?
-     * @param {String} [data.failureType] For example, 'expect' or 'assert'
-     * @param {String} [data.failureMessage]
-     * @param {String} [data.failureStackTrace] The stack trace associated with
-     *                                          the failure
+     *   @param {String} data.name Name of the test that was executed.
+     *   @param {String} data.framework Name of a testing framework.
+     *                                  For example, 'jasmine' or 'mocha'.
+     *   @param {String} data.result The results of the test.  Standard values
+     *                               are 'passed' and 'failed'.  Different test
+     *                               reporters can support other values.  For
+     *                               example, the aggregate tests collection uses
+     *                               'pending' to indicate that results are still
+     *                               coming in.
+     *   @param {String} [data.id] Used to update a specific test result.  If not
+     *                             provided, frameworks can use the
+     *                             `velocity/reports/reset` Meteor method to
+     *                             clear all tests.
+     *   @param {Array} [data.ancestors] The hierarchy of suites and blocks above
+     *                                   this test. For example,
+     *                                ['Template', 'leaderboard', 'selected_name']
+     *   @param {Date} [data.timestamp] The time that the test started for this
+     *                                  result.
+     *   @param {Number} [data.duration] The test duration in milliseconds.
+     *   @param {String} [data.browser] Which browser did the test run in?
+     *   @param {String} [data.failureType] For example, 'expect' or 'assert'
+     *   @param {String} [data.failureMessage]
+     *   @param {String} [data.failureStackTrace] The stack trace associated with
+     *                                            the failure
      */
     'velocity/reports/submit': function (data) {
       check(data, Match.ObjectIncluding({
@@ -386,7 +405,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *
      * @method velocity/reports/completed
      * @param {Object} data
-     * @param {String} data.framework Name of a test framework.  Ex. 'jasmine'
+     *   @param {String} data.framework Name of a test framework.  Ex. 'jasmine'
      */
     'velocity/reports/completed': function (data) {
       check(data, {
@@ -406,8 +425,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @method velocity/copySampleTests
      *
      * @param {Object} options
-     * @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
+     *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
      */
+    // TODO: Support Windows
     'velocity/copySampleTests': function (options) {
       var sampleTests,
           samplesPath,
@@ -440,11 +460,11 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         testsPath = Velocity.getTestsPath();
 
         DEBUG && console.log('[velocity] checking for sample tests in',
-          files.pathJoin(samplesPath, '*'));
+          files.convertToOSPath(files.pathJoin(samplesPath, '*')));
 
         if (files.exists(samplesPath)) {
           command = 'mkdir -p ' + testsPath + ' && ' +
-          'rsync -au ' + files.pathJoin(samplesPath, '*') +
+          'rsync -au ' + files.convertToOSPath(files.pathJoin(samplesPath, '*')) +
           ' ' + testsPath + '/';
 
           DEBUG && console.log('[velocity] copying sample tests (if any) ' +
@@ -498,10 +518,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     return options;
   }
 
-  /**
-   * Runs each test framework once when in continous integration mode.
-   *
-   */
+
+  // Runs each test framework once when in continous integration mode.
   function _launchContinuousIntegration () {
 
     if (CONTINUOUS_INTEGRATION) {
@@ -527,7 +545,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * Initialize the directory/file watcher.
    *
    * @method _initFileWatcher
-   * @param {Object} config  See `registerTestingFramework`.
+   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
    * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
@@ -538,11 +556,15 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     var paths = [Velocity.getTestsPath()];
 
-    _.each(files.readdir(Velocity.getPackagesPath()), function (dir) {
-      if (dir !== 'tests-proxy' && files.lstat(Velocity.getPackagePath(dir)).isDirectory() && files.exists(Velocity.getTestsPath(dir))) {
-        paths.push(Velocity.getTestsPath(dir));
-      }
-    });
+    var packagesPath = Velocity.getPackagesPath();
+    if (files.lstat(packagesPath).isDirectory()) {
+      var packageNames = files.readdir(packagesPath);
+      var packageTestsPaths = _.chain(packageNames)
+        .filter(_isPackageWithTests)
+        .map(Velocity.getTestsPath)
+        .value();
+      paths.push.apply(paths, packageTestsPaths);
+    }
 
     paths = _.map(paths, files.convertToOSPath);
 
@@ -622,11 +644,17 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
   }  // end _initFileWatcher
 
+  function _isPackageWithTests(packageName) {
+    return packageName !== 'tests-proxy' &&
+      files.lstat(Velocity.getPackagePath(packageName)).isDirectory() &&
+      files.exists(Velocity.getTestsPath(packageName));
+  }
+
   /**
    * Re-init file watcher and clear all test results.
    *
    * @method _reset
-   * @param {Object} config  See `registerTestingFramework`.
+   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
    * @private
    */
   function _reset (config) {

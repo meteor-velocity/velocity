@@ -6,5 +6,5 @@
 
 meteor-platform
 #sanjo:jasmine
-xolvio:cucumber
+xolvio:cucumber@0.6.0-rc.3
 velocity:html-reporter

@@ -46,7 +46,7 @@ Most of these frameworks have an example in the [velocity-examples](https://gith
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) - Write client and server unit and integration tests with Jasmine.
 * [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
 * [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) - Use Gherkin-syntax cucumber to 
-test your app. Integrated nicely with [meteor-webdriver](https://github.com/xolvio/meteor-webdriver)  
+test your app. Includes PhantomJS and Selenium as well as SauceLabs support. 
 * [clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
 * [nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration 
 * [rsbatech:robotframework](https://github.com/rjsmith/meteor-robotframework) - [Robot Framework](http://robotframework.org/) end to end test integration using Selenium and many other [test libraries](http://robotframework.org/#test-libraries)
@@ -91,6 +91,27 @@ Use `Velocity.registerTestingFramework(frameworkName, options)` to register your
 Please put some sample tests in a directory named `sample-tests` at the root of your package. 
 These will be used by the velocity-quick-start package and also allows users to click a button 
 in the html-reporter to have them added to their apps.
+
+### Fixtures / Test Data
+A good pattern for creating fixtures is to do the following inside your app:
+
+```bash
+meteor create --package fixtures
+```
+
+Then modify the package.js file to set the `debugOnly` flag to true like this:
+```javascript
+Package.describe({
+  name: 'fixtures',
+  version: '0.0.1',
+  debugOnly: true,
+  // ...
+});
+```
+The `debugOnly` flag instruct Meteor not to bundle this package when building, which is how you 
+ensure this package does not make it to production. You can now define all your fixtures in this 
+package.
+
 
 ### Debug output
 
@@ -193,8 +214,3 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 For general questions about testing, check out [Testing](https://forums.meteor.com/c/testing) on the Meteor forums.
 
 For specific questions about velocity core, please post in [Velocity Core](https://forums.meteor.com/c/testing/velocity-core).
-
-## Roadmap
-
-https://trello.com/b/VCmaj73b/velocity-project
-
