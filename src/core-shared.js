@@ -8,14 +8,13 @@
 //
 
     /**
-     * Mirrors can share the same codebase as the main process. This method will run provided code
-     * inside a mirror only.
+     * Mirrors can share the same codebase as the main process.
+     * This method will run provided code inside a mirror only.
      *
      * where: client / server
      *
      * @method onTest
      * @param {Function} code
-     *
      */
     Velocity.onTest = function (code) {
       Meteor.call('velocity/isMirror', function (err, res) {
@@ -25,51 +24,13 @@
       });
     };
 
-    if (Meteor.isServer) {
-      /**
-       * @method
-       * @see velocity/setOption
-       */
-      Velocity.setOption = function (name, value) {
-        Meteor.call('velocity/setOption', name, value);
-      };
-
-      /**
-       * @see velocity/setOptions
-       */
-      Velocity.setOptions = function (options) {
-        Meteor.call('velocity/setOptions', options);
-      };
-
-      /**
-       * @see velocity/getOption
-       */
-      Velocity.getOption = function (name) {
-        Meteor.call('velocity/getOption', name);
-      };
-
-      Meteor.methods({
-        /**
-         * Exposes the VELOCITY flag
-         *
-         * @method velocity/isEnabled
-         */
-        'velocity/isEnabled': function () {
-          if (process.env.VELOCITY === undefined) {
-            return true;
-          } else {
-            return !!parseInt(process.env.VELOCITY);
-          }
-        }
-      });
-    }
-
     Meteor.methods({
       /**
        * Set a option.
+       *
        * @method velocity/setOption
-       * @param name The name of the option.
-       * @param value The value of the option.
+       * @param {String} name The name of the option.
+       * @param {*} value The value of the option.
        */
       'velocity/setOption': function (name, value) {
         check(name, String);
@@ -83,6 +44,7 @@
 
       /**
        * Set multiple options.
+       *
        * @method velocity/setOptions
        * @param options Hash with options (name: value).
        */
@@ -97,9 +59,10 @@
       },
 
       /**
-       * Get a option
+       * Get an option
+       *
        * @method velocity/getOption
-       * @param name The name of the option.
+       * @param {String} name The name of the option.
        * @return {*} The value of the option or null.
        */
       'velocity/getOption': function (name) {
@@ -109,5 +72,48 @@
         return option ? option.value : null;
       },
     });
+
+
+    if (Meteor.isServer) {
+      /**
+       * @method setOption
+       * @see velocity/setOption
+       */
+      Velocity.setOption = function (name, value) {
+        Meteor.call('velocity/setOption', name, value);
+      };
+
+      /**
+       * @method setOptions
+       * @see velocity/setOptions
+       */
+      Velocity.setOptions = function (options) {
+        Meteor.call('velocity/setOptions', options);
+      };
+
+      /**
+       * @method getOption
+       * @see velocity/getOption
+       */
+      Velocity.getOption = function (name) {
+        Meteor.call('velocity/getOption', name);
+      };
+
+      Meteor.methods({
+        /**
+         * Exposes the VELOCITY environment variable.
+         *
+         * @method velocity/isEnabled
+         * @return {Boolean} true if VELOCITY environment variable is truthy
+         */
+        'velocity/isEnabled': function () {
+          if (process.env.VELOCITY === undefined) {
+            return true;
+          } else {
+            return !!parseInt(process.env.VELOCITY);
+          }
+        }
+      });
+    }
 
 })();
