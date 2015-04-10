@@ -545,7 +545,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * Initialize the directory/file watcher.
    *
    * @method _initFileWatcher
-   * @param {Object} config  See `registerTestingFramework`.
+   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
    * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
@@ -654,7 +654,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * Re-init file watcher and clear all test results.
    *
    * @method _reset
-   * @param {Object} config  See `registerTestingFramework`.
+   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
    * @private
    */
   function _reset (config) {

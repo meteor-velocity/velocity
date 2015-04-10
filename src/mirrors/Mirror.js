@@ -33,7 +33,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * Most communication with Velocity core is done via the following
    * Meteor methods.
    *
-   * @class Meteor.methods
+   * @for Meteor.methods
    */
   Meteor.methods({
 
@@ -179,6 +179,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * Exposes the IS_MIRROR flag to clients
      *
      * @method velocity/isMirror
+     * @for Meteor.methods
      * @return {Boolean} true if currently running in mirror
      */
     'velocity/isMirror': function () {
