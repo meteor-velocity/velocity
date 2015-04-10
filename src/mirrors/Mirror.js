@@ -25,16 +25,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   Npm.require('colors');
 
 
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 // Meteor Methods
 //
 
-  /**
-   * Most communication with Velocity core is done via the following
-   * Meteor methods.
-   *
-   * @for Meteor.methods
-   */
+  
+  //////////////////////////////////////////////////////////////////////
+  // Most communication with Velocity core is done via the following
+  // Meteor methods.
+  //
   Meteor.methods({
 
     /**
@@ -44,7 +43,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * This method will update the `VelocityMirrors` collection with once the mirror is ready.
      *
      * @method velocity/mirrors/request
-     *
+     * @for Meteor.methods
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
      * @param {String} [options.testsPath]      The path to tests for this framework.

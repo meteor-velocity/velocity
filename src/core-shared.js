@@ -8,16 +8,13 @@
   //
 
   /**
-   * @for Velocity
-   */
-
-  /**
    * Mirrors can share the same codebase as the main process.
    * This method will run provided code inside a mirror only.
    *
    * where: client / server
    *
    * @method onTest
+   * @for Velocity
    * @param {Function} code
    */
   Velocity.onTest = function (code) {
@@ -59,14 +56,12 @@
   }
 
 
-  /**
-   * @for Meteor.methods
-   */
   Meteor.methods({
     /**
      * Set an option.
      *
      * @method velocity/setOption
+     * @for Meteor.methods
      * @param {String} name The name of the option.
      * @param {*} value The value of the option.
      */
