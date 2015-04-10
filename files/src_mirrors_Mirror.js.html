@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src/mirrors/Mirror.js - Velocity</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="http://velocity.meteor.com/images/velocity_logo.svg" title="Velocity"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.6.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/Collections.html">Collections</a></li>
+                                <li><a href="../classes/Meteor.methods.html">Meteor.methods</a></li>
+                                <li><a href="../classes/Velocity.html">Velocity</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/Velocity.html">Velocity</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: src/mirrors/Mirror.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/*jshint -W030 */
+/* global
+ DEBUG:true
+ */
+
+DEBUG = !!process.env.VELOCITY_DEBUG;
+
+(function () {
+
+  &#x27;use strict&#x27;;
+
+  if (process.env.NODE_ENV !== &#x27;development&#x27; ||
+    process.env.IS_MIRROR) {
+    DEBUG &amp;&amp; console.log(&#x27;[velocity] Not adding mirror-registry because NODE_ENV is&#x27;,
+      process.env.NODE_ENV, &#x27; and IS_MIRROR is&#x27;, process.env.IS_MIRROR);
+    return;
+  }
+
+  var _ = Npm.require(&#x27;lodash&#x27;),
+      url = Npm.require(&#x27;url&#x27;),
+      mongodbUri = Npm.require(&#x27;mongodb-uri&#x27;),
+      freeport = Npm.require(&#x27;freeport&#x27;),
+      tmp = Npm.require(&#x27;tmp&#x27;),
+      files = VelocityMeteorInternals.files,
+      _mirrorChildProcesses = {};
+  Npm.require(&#x27;colors&#x27;);
+
+  // Specifies the Meteor release that we use for mirrors
+  Velocity.mirrorMeteorReleaseName = &#x27;velocity:METEOR&#x27;;
+  Velocity.mirrorMeteorVersion = &#x27;1.1.0.2&#x27;;
+  Velocity.mirrorMeteorRelease =
+    Velocity.mirrorMeteorReleaseName + &#x27;@&#x27; + Velocity.mirrorMeteorVersion;
+  Velocity.mirrorMeteorToolReleaseName = &#x27;velocity:meteor-tool&#x27;;
+  Velocity.mirrorMeteorToolVersion = &#x27;1.1.3_1&#x27;;
+  Velocity.mirrorMeteorToolRelease =
+    Velocity.mirrorMeteorToolReleaseName + &#x27;@&#x27; + Velocity.mirrorMeteorToolVersion;
+
+////////////////////////////////////////////////////////////////////////
+// Meteor Methods
+//
+
+  
+  //////////////////////////////////////////////////////////////////////
+  // Most communication with Velocity core is done via the following
+  // Meteor methods.
+  //
+  Meteor.methods({
+
+    /**
+     * Starts a new mirror if it has not already been started, and reuses an
+     * existing one if it is already started.
+     *
+     * This method will update the &#x60;VelocityMirrors&#x60; collection with once the mirror is ready.
+     *
+     * @method velocity/mirrors/request
+     * @for Meteor.methods
+     * @param {Object} options                  Options for the mirror.
+     * @param {String} options.framework        The name of the calling framework
+     * @param {String} [options.testsPath]      The path to tests for this framework.
+     *                                          For example &quot;jasmine/server/unit&quot;.
+     *                                          Don&#x27;t include a leading or trailing slash.
+     * @param {String} [options.args]           Additional arguments that the mirror is called with
+     *                                          It accepts all the options that are available for &#x60;meteor run&#x60;.
+     * @param {String} [options.env]            Additional environment variables that the mirror is called with.
+     * @param {String} [options.port]           String use a specific port
+     * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the
+     *                                          VelocityMirrors collection. eg. &#x60;/?jasmine=true&#x60;
+     * @param {String} [options.nodes]          The number of mirrors required. This is used by
+     *                                          distributable frameworks. Default is 1
+     * @param {String} [options.handshake]      Specifies whether or not this mirror should perform
+     *                                          a DDP handshake with the parent. Distributable
+     *                                          frameworks can use this to get mirrors to behave
+     *                                          like workers. The default is true
+     *
+     */
+    &#x27;velocity/mirrors/request&#x27;: function (options) {
+      check(options, {
+        framework: String,
+        testsPath: Match.Optional(String),
+        args: Match.Optional([Match.Any]),
+        env: Match.Optional(Object),
+        port: Match.Optional(Number),
+        rootUrlPath: Match.Optional(String),
+        nodes: Match.Optional(Number),
+        handshake: Match.Optional(Boolean)
+      });
+      _startMirrors(options);
+    },
+
+    /**
+     * Stores metadata about the mirror.
+     * Before a mirror implementation starts, it needs to call
+     * this method to let Velocity know it is starting up.
+     *
+     * @method velocity/mirrors/init
+     * @param {Object} options
+     *   @param {Number} options.port The port this mirror is running on
+     *   @param {String} options.framework The name of the test framework
+     *                                     making the request
+     *   @param {String} options.mongoUrl The mongo url this mirror is using
+     *   @param {String} options.host The root url of this mirror without any
+     *                        additional paths. Used for making DDP connections
+     *   @param {String} options.rootUrl The root url of this mirror, which also
+     *                           includes the path and params
+     *   @param {String} options.rootUrlPath Adds this string to the end of
+     *                           the root url in the VelocityMirrors
+     *                           collection. To be used by test frameworks to
+     *                           recognize when they are executing in a mirror.
+     *                           eg. &#x60;/?jasmine=true&#x60;
+     * @param {Object} extra Any additional metadata the implementing mirror
+     *                       would like to store in the Velocity mirrors
+     *                       collection. This is optional.
+     */
+    &#x27;velocity/mirrors/init&#x27;: function (options, extra) {
+      check(options, {
+        port: Number,
+        mongoUrl: String,
+        framework: String,
+        host: String,
+        rootUrl: String,
+        rootUrlPath: String
+      });
+      check(extra, Match.Optional(Object));
+
+      if (extra) {
+        _.extend(options, extra);
+      }
+
+      VelocityMirrors.upsert({framework: options.framework},
+        _.extend(options, {
+          state: &#x27;starting&#x27;
+        }));
+    },
+
+    /**
+     * Lets Velocity know the mirror has started successfully
+     *
+     * @method velocity/mirrors/register
+     * @param {Object} options
+     *   @param {Number} options.port The port this mirror is running on
+     *   @param {String} options.framework The name of the test framework
+     *                                     making the request
+     *   @param {String} options.host The root url of this mirror without any
+     *                        additional paths. Used for making DDP connections
+     */
+    &#x27;velocity/mirrors/register&#x27;: function (options) {
+      check(options, Match.ObjectIncluding({
+        framework: String,
+        host: String,
+        port: Match.OneOf(Number, String)
+      }));
+
+      DEBUG &amp;&amp; console.log(&#x27;[velocity] Mirror registered. Handshaking with mirror...&#x27;);
+
+      // Ugliness! It seems the DDP connect has a exponential back-off, which means the tests take
+      // around 5 seconds to rerun. This setTimeout helps.
+      Meteor.setTimeout(function () {
+        // TODO: Should the host really include the port?
+        var mirrorConnection = DDP.connect(options.host, {
+          // Don&#x27;t show the user connection errors when not in debug mode.
+          // We will normally eventually connect to the mirror after
+          // a connection error has been shown.
+          _dontPrintErrors: !DEBUG
+        });
+        mirrorConnection.onReconnect = function () {
+          DEBUG &amp;&amp; console.log(&#x27;[velocity] Connected to mirror, setting state to ready&#x27;, options);
+          mirrorConnection.call(&#x27;velocity/parentHandshake&#x27;, function(e, r) {
+            DEBUG &amp;&amp; console.log(&#x27;[velocity] Parent Handshake response&#x27;, e, r);
+          });
+          mirrorConnection.disconnect();
+          // TODO: This does not support starting multiple mirror for one framework
+          VelocityMirrors.update({
+            framework: options.framework
+          }, {
+            $set: {
+              state: &#x27;ready&#x27;,
+              lastModified: Date.now()
+            }
+          });
+        };
+      }, 300);
+
+
+
+    },
+
+    /**
+     * Exposes the IS_MIRROR flag to code that is *not* running in a mirror
+     * (ie. the velocity core process that kicks off the mirrors).
+     *
+     * @method velocity/isMirror
+     * @for Meteor.methods
+     * @return {Boolean} true if currently running in mirror
+     */
+    &#x27;velocity/isMirror&#x27;: function () {
+      return !!process.env.IS_MIRROR;
+    }
+
+  });  // end Meteor methods
+
+
+
+//////////////////////////////////////////////////////////////////////
+// Private functions
+//
+
+  function _startMirrors (options) {
+    options = _.extend({
+      nodes: 1
+    }, options);
+    DEBUG &amp;&amp; console.log(&#x27;[velocity]&#x27;, options.nodes, &#x27;mirror(s) requested&#x27;);
+
+    // only respect a provided port if a single mirror is requested
+    if (options.port &amp;&amp; options.nodes === 1) {
+      _startMirror(options);
+    } else {
+      var startWithFreePort = Meteor.bindEnvironment(function (err, port) {
+        options.port = port;
+        _startMirror(options);
+      });
+
+      for (var i = 0; i &lt; options.nodes; i++) {
+        freeport(startWithFreePort);
+      }
+    }
+  }
+
+  function _startMirror (options) {
+    options.handshake = options.handshake === undefined ? true : options.handshake;
+    options.rootUrlPath = (options.rootUrlPath || &#x27;&#x27;);
+    options.host = _getMirrorUrl(options.port);
+    options.rootUrl = options.host;
+
+    var environment = _getEnvironmentVariables(options);
+
+    var mirrorChild = _getMirrorChild(environment.FRAMEWORK);
+    if (mirrorChild.isRunning()) {
+      return;
+    }
+
+    var command = VelocityInternals.isWindows() ? &#x27;meteor.bat&#x27; : &#x27;meteor&#x27;;
+    var args = [
+      &#x27;run&#x27;,
+      &#x27;--test-app&#x27;,
+      &#x27;--port&#x27;, String(environment.PORT)
+    ];
+
+    if (options.testsPath) {
+      args.push(&#x27;--include-tests&#x27;, files.convertToStandardPath(options.testsPath));
+    }
+
+    if (Meteor.settings) {
+      var settingsPath = _generateSettingsFile();
+      args.push(&#x27;--settings&#x27;, settingsPath);
+    }
+
+    if (options.args) {
+      args.push.apply(args, options.args);
+    }
+
+    // Make it possible to debug a mirror
+    if (
+      process.env.VELOCITY_DEBUG_MIRROR &amp;&amp;
+      process.env.VELOCITY_DEBUG_MIRROR === environment.FRAMEWORK &amp;&amp;
+      !_.contains(options.args, &#x27;--debug-port&#x27;)
+    ) {
+      var debugPort = &#x27;5858&#x27;;
+      args.push(&#x27;--debug-port&#x27;, debugPort);
+      console.log(&#x27;[velocity] Your mirror is now paused and ready for debugging!&#x27;);
+      console.log();
+      console.log(&#x27;[velocity] To debug the server process using a graphical debugging interface,&#x27;);
+      console.log(&#x27;[velocity] visit this URL in your web browser:&#x27;);
+      console.log(&#x27;[velocity] http://localhost:8080/debug?port=&#x27; + debugPort);
+    }
+
+    // Allow to use checked out meteor for spawning mirrors
+    // for development on our Meteor fork
+    if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
+      args.push(&#x27;--release&#x27;, &#x27;velocity:METEOR@1.1.0.2&#x27;);
+    }
+
+    mirrorChild.spawn({
+      command: command,
+      args: args,
+      options: {
+        cwd: process.env.VELOCITY_APP_PATH || process.env.PWD,
+        env: environment
+      }
+    });
+
+    DEBUG &amp;&amp; console.log(
+      &#x27;[velocity] Mirror process forked with pid&#x27;,
+      mirrorChild.getPid()
+    );
+
+
+    console.log((&#x27;[velocity] &#x27; +
+      environment.FRAMEWORK + &#x27; is starting a mirror at &#x27; +
+      options.rootUrl + &#x27;.&#x27;
+    ).yellow);
+
+    var isMeteorToolInstalled = MeteorFilesHelpers.isPackageInstalled(
+      Velocity.mirrorMeteorToolReleaseName,
+      Velocity.mirrorMeteorToolVersion
+    );
+    if (!isMeteorToolInstalled) {
+      console.log(
+        &#x27;[velocity] This takes a few minutes the first time.&#x27;.yellow
+      );
+    }
+
+    console.log((&#x27;[velocity] You can see the mirror logs at: tail -f &#x27; +
+    files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
+      &#x27;.meteor&#x27;, &#x27;local&#x27;, &#x27;log&#x27;, environment.FRAMEWORK + &#x27;.log&#x27;))).yellow);
+
+    Meteor.call(&#x27;velocity/mirrors/init&#x27;, {
+      framework: environment.FRAMEWORK,
+      port: environment.PORT,
+      mongoUrl: environment.MONGO_URL,
+      host: environment.HOST,
+      rootUrl: environment.ROOT_URL,
+      rootUrlPath: environment.ROOT_URL_PATH
+    }, {
+      pid: mirrorChild.getPid()
+    });
+  }
+
+  function _getMirrorChild (framework) {
+    var mirrorChild = _mirrorChildProcesses[framework];
+    if (!mirrorChild) {
+      mirrorChild = new sanjo.LongRunningChildProcess(framework);
+      _mirrorChildProcesses[framework] = mirrorChild;
+    }
+    return mirrorChild;
+  }
+
+  /**
+   * Returns the MongoDB URL for the given database.
+   *
+   * @method _getMongoUrl
+   * @param {Object} database
+   * @return {String} MongoDB Url
+   * @private
+   */
+  function _getMongoUrl (database) {
+    var parts = mongodbUri.parse(process.env.MONGO_URL);
+    parts.database = database;
+    return mongodbUri.format(parts);
+  }
+
+  /**
+   * Return URL for the mirror with the given port.
+   *
+   * @method _getMirrorUrl
+   * @param {Number} port Mirror port
+   * @return {String} Mirror URL
+   * @private
+   */
+  function _getMirrorUrl (port) {
+    var rootUrlParts = url.parse(Meteor.absoluteUrl());
+    return url.format({
+      protocol: rootUrlParts.protocol,
+      slashes: rootUrlParts.slashes,
+      hostname: rootUrlParts.hostname,
+      port: port,
+      pathname: rootUrlParts.pathname
+    });
+  }
+
+  /**
+   * Return the environment variables that a mirror should run with
+   * 
+   * @method _getEnvironmentVariables
+   * @param {Object} options Required fields:
+   *   @param {String} options.framework The name of the test framework
+   *                                     making the request
+   *   @param {Number} options.port The port this mirror is running on
+   *   @param {String} options.rootUrl The root url of this mirror, which also
+   *                           includes the path and params
+   *   @param {String} options.host The root url of this mirror without any
+   *                        additional paths. Used for making DDP connections
+   *   @param {String} options.rootUrl The root url of this mirror, which also
+   *                           includes the path and params
+   *   @param {String} options.rootUrlPath Adds this string to the end of
+   *                           the root url in the VelocityMirrors
+   *                           collection. To be used by test frameworks to
+   *                           recognize when they are executing in a mirror.
+   *                           eg. &#x60;/?jasmine=true&#x60;
+   * @return {String} Mirror URL
+   * @private
+   */
+  function _getEnvironmentVariables (options) {
+    var env = {
+      PORT: options.port,
+      // PORT gets overridden by Meteor so we save the mirror port in
+      // MIRROR_PORT too.
+      MIRROR_PORT: options.port,
+      HOST: options.host,
+      ROOT_URL_PATH: options.rootUrlPath,
+      ROOT_URL: options.rootUrl,
+      FRAMEWORK: options.framework,
+      MONGO_URL: _getMongoUrl(options.framework),
+      PARENT_URL: process.env.ROOT_URL,
+      IS_MIRROR: true,
+      HANDSHAKE: options.handshake,
+      VELOCITY_MAIN_APP_PATH: Velocity.getAppPath(),
+      METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings))
+    };
+
+    if (options.env) {
+      _.defaults(env, options.env);
+    }
+
+    _.defaults(env, process.env);
+
+    return env;
+  }
+
+  var _generateSettingsFile = _.memoize(function () {
+    var tmpObject = tmp.fileSync();
+    files.writeFile(tmpObject.name, JSON.stringify(Meteor.settings));
+    return tmpObject.name;
+  });
+
+
+})();
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

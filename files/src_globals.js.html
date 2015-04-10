@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Velocity</title>
+    <title>src/globals.js - Velocity</title>
     <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
-    <link rel="stylesheet" href="./assets/vendor/prettify/prettify-min.css">
-    <link rel="stylesheet" href="./assets/css/main.css" id="site_styles">
-    <link rel="icon" href="./assets/favicon.ico">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
     <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
 </head>
 <body class="yui3-skin-sam">
@@ -38,13 +38,13 @@
                 
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
-                                <li><a href="./classes/Collections.html">Collections</a></li>
-                                <li><a href="./classes/Meteor.methods.html">Meteor.methods</a></li>
-                                <li><a href="./classes/Velocity.html">Velocity</a></li>
+                                <li><a href="../classes/Collections.html">Collections</a></li>
+                                <li><a href="../classes/Meteor.methods.html">Meteor.methods</a></li>
+                                <li><a href="../classes/Velocity.html">Velocity</a></li>
                             </ul>
                 
                             <ul id="api-modules" class="apis modules">
-                                <li><a href="./modules/Velocity.html">Velocity</a></li>
+                                <li><a href="../modules/Velocity.html">Velocity</a></li>
                             </ul>
                         </div>
                     </div>
@@ -78,40 +78,45 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-    <div class="apidocs">
-        <div id="docs-main" class="content">
-            <p>
-            Browse to a module or class using the sidebar to view its API documentation.
-            </p>
+<h1 class="file-heading">File: src/globals.js</h1>
 
-            <h2>Keyboard Shortcuts</h2>
+<div class="file">
+    <pre class="code prettyprint linenums">
+/* globals
+   Velocity: true,
+   VelocityInternals: true
+*/
 
-            <ul>
-                <li><p>Press <kbd>s</kbd> to focus the API search box.</p></li>
+/**
+ * The &#x60;Velocity&#x60; object provides a common API for test frameworks to report
+ * test results.  Frameworks can also request assets, such as a copy of the
+ * user&#x27;s application (the &#x27;mirror&#x27;) in which tests can be safely run without
+ * impacting on-going development.
+ *
+ * Test results and log activity are reported via
+ * {{#crossLink &quot;Meteor.methods&quot;}}Meteor methods{{/crossLink}}.
+ *
+ * @class Velocity
+ */
+Velocity = {};
 
-                <li><p>Use <kbd>Up</kbd> and <kbd>Down</kbd> to select classes, modules, and search results.</p></li>
+VelocityInternals = {};
 
-                <li class="mac-only"><p>With the API search box or sidebar focused, use <kbd><span class="cmd">&#x2318;</span>-Left</kbd> or <kbd><span class="cmd">&#x2318;</span>-Right</kbd> to switch sidebar tabs.</p></li>
-
-                <li class="pc-only"><p>With the API search box or sidebar focused, use <kbd>Ctrl+Left</kbd> and <kbd>Ctrl+Right</kbd> to switch sidebar tabs.</p></li>
-            </ul>
-        </div>
-    </div>
-
-
+    </pre>
+</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script src="./assets/vendor/prettify/prettify-min.js"></script>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
 <script>prettyPrint();</script>
-<script src="./assets/js/yui-prettify.js"></script>
-<script src="./assets/../api.js"></script>
-<script src="./assets/js/api-filter.js"></script>
-<script src="./assets/js/api-list.js"></script>
-<script src="./assets/js/api-search.js"></script>
-<script src="./assets/js/apidocs.js"></script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
 </body>
 </html>

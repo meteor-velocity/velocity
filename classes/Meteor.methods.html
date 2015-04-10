@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Meteor.methods - Velocity</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="http://velocity.meteor.com/images/velocity_logo.svg" title="Velocity"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.6.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/Collections.html">Collections</a></li>
+                                <li><a href="../classes/Meteor.methods.html">Meteor.methods</a></li>
+                                <li><a href="../classes/Velocity.html">Velocity</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/Velocity.html">Velocity</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1>Meteor.methods Class</h1>
+<div class="box meta">
+
+
+        <div class="foundat">
+            Defined in: <a href="../files/src_core.js.html#l204"><code>src&#x2F;core.js:204</code></a>
+        </div>
+
+            Module: <a href="../modules/Velocity.html">Velocity</a>
+
+</div>
+
+
+<div class="box intro">
+    <p>Most communication with Velocity core is done via the following
+Meteor methods.</p>
+
+</div>
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                            <li class="index-item method private">
+                                <a href="#method__getEnvironmentVariables">_getEnvironmentVariables</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__getMirrorUrl">_getMirrorUrl</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__getMongoUrl">_getMongoUrl</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__initFileWatcher">_initFileWatcher</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__reset">_reset</a>
+
+                            </li>
+                            <li class="index-item method private">
+                                <a href="#method__updateAggregateReports">_updateAggregateReports</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/copySampleTests">velocity/copySampleTests</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/getOption">velocity/getOption</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/isEnabled">velocity/isEnabled</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/isMirror">velocity/isMirror</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/isMirror">velocity/isMirror</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/logs/reset">velocity/logs/reset</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/logs/submit">velocity/logs/submit</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/mirrors/init">velocity/mirrors/init</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/mirrors/register">velocity/mirrors/register</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/mirrors/request">velocity/mirrors/request</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/parentHandshake">velocity/parentHandshake</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/register/framework">velocity/register/framework</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/reports/completed">velocity/reports/completed</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/reports/reset">velocity/reports/reset</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/reports/submit">velocity/reports/submit</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/reset">velocity/reset</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/setOption">velocity/setOption</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_velocity/setOptions">velocity/setOptions</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+
+
+        </div>
+
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+<div id="method__getEnvironmentVariables" class="method item private">
+    <h3 class="name"><code>_getEnvironmentVariables</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>options</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_Mirror.js.html#l370"><code>src&#x2F;mirrors&#x2F;Mirror.js:370</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Return the environment variables that a mirror should run with</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">options</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>Required fields:</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The name of the test framework
+making the request</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">port</code>
+                                    <span class="type">Number</span>
+
+                                <div class="param-description">
+                                    <p>The port this mirror is running on</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">rootUrl</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The root url of this mirror, which also
+includes the path and params</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">host</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The root url of this mirror without any
+additional paths. Used for making DDP connections</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">rootUrl</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The root url of this mirror, which also
+includes the path and params</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">rootUrlPath</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>Adds this string to the end of
+the root url in the VelocityMirrors
+collection. To be used by test frameworks to
+recognize when they are executing in a mirror.
+eg. <code>/?jasmine=true</code></p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>Mirror URL</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method__getMirrorUrl" class="method item private">
+    <h3 class="name"><code>_getMirrorUrl</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>port</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_Mirror.js.html#l351"><code>src&#x2F;mirrors&#x2F;Mirror.js:351</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Return URL for the mirror with the given port.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">port</code>
+                        <span class="type">Number</span>
+
+
+                    <div class="param-description">
+                        <p>Mirror port</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>Mirror URL</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method__getMongoUrl" class="method item private">
+    <h3 class="name"><code>_getMongoUrl</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>database</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_Mirror.js.html#l337"><code>src&#x2F;mirrors&#x2F;Mirror.js:337</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Returns the MongoDB URL for the given database.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">database</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">String</span>:
+                    <p>MongoDB Url</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method__initFileWatcher" class="method item private">
+    <h3 class="name"><code>_initFileWatcher</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>config</code>
+                </li>
+                <li class="arg">
+                        <code>callback</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l507"><code>src&#x2F;core.js:507</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Initialize the directory/file watcher.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">config</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>See <a href="../classes/Velocity.html#method_registerTestingFramework" class="crosslink">registerTestingFramework</a></p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">callback</code>
+                        <span class="type">Function</span>
+
+
+                    <div class="param-description">
+                        <p>Called after the watcher completes its first scan and is ready</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method__reset" class="method item private">
+    <h3 class="name"><code>_reset</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>config</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l615"><code>src&#x2F;core.js:615</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Re-init file watcher and clear all test results.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">config</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>See <a href="../classes/Velocity.html#method_registerTestingFramework" class="crosslink">registerTestingFramework</a></p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method__updateAggregateReports" class="method item private">
+    <h3 class="name"><code>_updateAggregateReports</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag private">private</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l640"><code>src&#x2F;core.js:640</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>If any one test has failed, mark the aggregate test result as failed.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_velocity/copySampleTests" class="method item">
+    <h3 class="name"><code>velocity/copySampleTests</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>options</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l421"><code>src&#x2F;core.js:421</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Copy sample tests from frameworks <code>sample-tests</code> directories
+to the user's application's <code>tests</code> directory.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">options</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>Framework name. Ex. 'jasmine', 'mocha'</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/getOption" class="method item">
+    <h3 class="name"><code>velocity/getOption</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>name</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core-shared.js.html#l94"><code>src&#x2F;core-shared.js:94</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Get an option</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">name</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The name of the option.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"></span>:
+                    <p>The value of the option or null.</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_velocity/isEnabled" class="method item">
+    <h3 class="name"><code>velocity/isEnabled</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core-shared.js.html#l112"><code>src&#x2F;core-shared.js:112</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Exposes the VELOCITY environment variable.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Boolean</span>:
+                    <p>true if VELOCITY environment variable is truthy</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_velocity/isMirror" class="method item">
+    <h3 class="name"><code>velocity/isMirror</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_Mirror.js.html#l187"><code>src&#x2F;mirrors&#x2F;Mirror.js:187</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Exposes the IS_MIRROR flag to code that is <em>not</em> running in a mirror
+(ie. the velocity core process that kicks off the mirrors).</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Boolean</span>:
+                    <p>true if currently running in mirror</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_velocity/isMirror" class="method item">
+    <h3 class="name"><code>velocity/isMirror</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type">Boolean</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_mirrorRegistrar.js.html#l23"><code>src&#x2F;mirrors&#x2F;mirrorRegistrar.js:23</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Exposes the IS_MIRROR flag to code that <em>is</em> running in a mirror
+(ie. the test framework code that is running the actual tests).</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Boolean</span>:
+                    <p>true if currently running in mirror</p>
+
+            </div>
+        </div>
+
+
+</div>
+<div id="method_velocity/logs/reset" class="method item">
+    <h3 class="name"><code>velocity/logs/reset</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l291"><code>src&#x2F;core.js:291</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Clear all log entries.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name optional">[framework]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The name of a specific framework
+to clear logs for.</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/logs/submit" class="method item">
+    <h3 class="name"><code>velocity/logs/submit</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>options</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l313"><code>src&#x2F;core.js:313</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Log a message to the Velocity log store.  This provides a central
+location for different reporters to query for test framework log
+entries.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">options</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The name of the test framework</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">message</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The message to log</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[level]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Log level.  Ex. 'error'. Default: 'info'</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[timestamp]</code>
+                                    <span class="type">Date</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/mirrors/init" class="method item">
+    <h3 class="name"><code>velocity/mirrors/init</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>options</code>
+                </li>
+                <li class="arg">
+                        <code>extra</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_Mirror.js.html#l90"><code>src&#x2F;mirrors&#x2F;Mirror.js:90</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Stores metadata about the mirror.
+Before a mirror implementation starts, it needs to call
+this method to let Velocity know it is starting up.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">options</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">port</code>
+                                    <span class="type">Number</span>
+
+                                <div class="param-description">
+                                    <p>The port this mirror is running on</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The name of the test framework
+making the request</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">mongoUrl</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The mongo url this mirror is using</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">host</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The root url of this mirror without any
+additional paths. Used for making DDP connections</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">rootUrl</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The root url of this mirror, which also
+includes the path and params</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">rootUrlPath</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>Adds this string to the end of
+the root url in the VelocityMirrors
+collection. To be used by test frameworks to
+recognize when they are executing in a mirror.
+eg. <code>/?jasmine=true</code></p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">extra</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>Any additional metadata the implementing mirror
+would like to store in the Velocity mirrors
+collection. This is optional.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/mirrors/register" class="method item">
+    <h3 class="name"><code>velocity/mirrors/register</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>options</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_Mirror.js.html#l135"><code>src&#x2F;mirrors&#x2F;Mirror.js:135</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Lets Velocity know the mirror has started successfully</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">options</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">port</code>
+                                    <span class="type">Number</span>
+
+                                <div class="param-description">
+                                    <p>The port this mirror is running on</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The name of the test framework
+making the request</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">host</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The root url of this mirror without any
+additional paths. Used for making DDP connections</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/mirrors/request" class="method item">
+    <h3 class="name"><code>velocity/mirrors/request</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>options</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_Mirror.js.html#l49"><code>src&#x2F;mirrors&#x2F;Mirror.js:49</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Starts a new mirror if it has not already been started, and reuses an
+existing one if it is already started.</p>
+<p>This method will update the <code>VelocityMirrors</code> collection with once the mirror is ready.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">options</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>Options for the mirror.</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The name of the calling framework</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[testsPath]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The path to tests for this framework.
+For example &quot;jasmine/server/unit&quot;.
+Don't include a leading or trailing slash.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[args]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Additional arguments that the mirror is called with
+It accepts all the options that are available for <code>meteor run</code>.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[env]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Additional environment variables that the mirror is called with.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[port]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>String use a specific port</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[rootUrlPath]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Adds this string to the end of the root url in the
+VelocityMirrors collection. eg. <code>/?jasmine=true</code></p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[nodes]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The number of mirrors required. This is used by
+distributable frameworks. Default is 1</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[handshake]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Specifies whether or not this mirror should perform
+a DDP handshake with the parent. Distributable
+frameworks can use this to get mirrors to behave
+like workers. The default is true</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/parentHandshake" class="method item">
+    <h3 class="name"><code>velocity/parentHandshake</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_mirrors_mirrorRegistrar.js.html#l35"><code>src&#x2F;mirrors&#x2F;mirrorRegistrar.js:35</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Meteor method: velocity/parentHandshake
+This is the best indicator of the mirror's ready status, so it's used to inform the user
+when there may be delays</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_velocity/register/framework" class="method item">
+    <h3 class="name"><code>velocity/register/framework</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>name</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l212"><code>src&#x2F;core.js:212</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Registers a testing framework plugin via a Meteor method.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">name</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The name of the testing framework.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                        <p>Options for the testing framework.</p>
+
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name optional">[regex]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The regular expression for test files
+that should be assigned to the testing framework.
+The path relative to the tests folder is matched
+against it. Default: &quot;name/.+.js$&quot; (name is
+the testing framework name).</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[disableAutoReset]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Velocity's reset cycle
+will skip reports and logs for this framework.
+It is up to the framework to clean up its ****!</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[sampleTestGenerator]</code>
+                                    <span class="type">Function</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>sampleTestGenerator
+returns an array of fileObjects with the following
+fields:
+path - String - relative path to place test files
+(from PROJECT/tests)
+contents - String - contents to put in the test file
+at the corresponding path</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/reports/completed" class="method item">
+    <h3 class="name"><code>velocity/reports/completed</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>data</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l402"><code>src&#x2F;core.js:402</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Frameworks must call this method to inform Velocity they have completed
+their current test runs. Velocity uses this flag when running in CI mode.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">data</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>Name of a test framework.  Ex. 'jasmine'</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/reports/reset" class="method item">
+    <h3 class="name"><code>velocity/reports/reset</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l259"><code>src&#x2F;core.js:259</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Clear all test results.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type">Object</span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name optional">[framework]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The name of a specific framework
+to clear results for.  Ex. 'jasmine' or 'mocha'</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[notIn]</code>
+                                    <span class="type">Array</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>A list of test Ids which should be kept
+(not cleared).  These Ids must match the
+ones passed to <code>velocity/reports/submit</code>.</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/reports/submit" class="method item">
+    <h3 class="name"><code>velocity/reports/submit</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>data</code>
+                </li>
+                <li class="arg">
+                        <code>[data.ancestors] The hierarchy of suites and blocks above
+                                  this test. For example,
+                               [&#x27;Template&#x27;, &#x27;leaderboard&#x27;, &#x27;selected_name&#x27;]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l342"><code>src&#x2F;core.js:342</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Record the results of an individual test run; a simple collector of
+test data.</p>
+<p>The <code>data</code> object is stored in its entirety; any field may be passed in.
+The optional fields documented here are suggestions based on what the
+standard html-reporter supports.  Whether or not a field is actually
+used is up to the specific test reporter that the user has installed.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">data</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                        <ul class="params-list">
+                            <li class="param">
+                                    <code class="param-name">name</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>Name of the test that was executed.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">framework</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>Name of a testing framework.
+For example, 'jasmine' or 'mocha'.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name">result</code>
+                                    <span class="type">String</span>
+
+                                <div class="param-description">
+                                    <p>The results of the test.  Standard values
+are 'passed' and 'failed'.  Different test
+reporters can support other values.  For
+example, the aggregate tests collection uses
+'pending' to indicate that results are still
+coming in.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[id]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Used to update a specific test result.  If not
+provided, frameworks can use the
+<code>velocity/reports/reset</code> Meteor method to
+clear all tests.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[timestamp]</code>
+                                    <span class="type">Date</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The time that the test started for this
+result.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[duration]</code>
+                                    <span class="type">Number</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The test duration in milliseconds.</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[browser]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>Which browser did the test run in?</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[failureType]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>For example, 'expect' or 'assert'</p>
+
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[failureMessage]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    
+                                </div>
+
+                            </li>
+                            <li class="param">
+                                    <code class="param-name optional">[failureStackTrace]</code>
+                                    <span class="type">String</span>
+                                    <span class="flag optional" title="This parameter is optional.">optional</span>
+
+                                <div class="param-description">
+                                    <p>The stack trace associated with
+the failure</p>
+
+                                </div>
+
+                            </li>
+                        </ul>
+                </li>
+                <li class="param">
+                        <code class="param-name">[data.ancestors] The hierarchy of suites and blocks above
+                                  this test. For example,
+                               [&#x27;Template&#x27;, &#x27;leaderboard&#x27;, &#x27;selected_name&#x27;]</code>
+                        <span class="type">Array</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/reset" class="method item">
+    <h3 class="name"><code>velocity/reset</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core.js.html#l250"><code>src&#x2F;core.js:250</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Re-init file watcher and clear all test results.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_velocity/setOption" class="method item">
+    <h3 class="name"><code>velocity/setOption</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>name</code>
+                </li>
+                <li class="arg">
+                        <code>value</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core-shared.js.html#l60"><code>src&#x2F;core-shared.js:60</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set an option.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">name</code>
+                        <span class="type">String</span>
+
+
+                    <div class="param-description">
+                        <p>The name of the option.</p>
+
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">value</code>
+                        <span class="type"></span>
+
+
+                    <div class="param-description">
+                        <p>The value of the option.</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_velocity/setOptions" class="method item">
+    <h3 class="name"><code>velocity/setOptions</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>options</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/src_core-shared.js.html#l78"><code>src&#x2F;core-shared.js:78</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Set multiple options.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">options</code>
+                        <span class="type">Object</span>
+
+
+                    <div class="param-description">
+                        <p>Hash with options (name: value).</p>
+
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+            </div>
+
+
+
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
