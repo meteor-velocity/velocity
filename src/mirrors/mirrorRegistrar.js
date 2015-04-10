@@ -21,6 +21,17 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   Meteor.methods({
 
     /**
+     * Meteor method: velocity/isMirror
+     * Exposes the IS_MIRROR flag to mirror clients
+     *
+     * @method velocity/isMirror
+     * @for Meteor.methods
+     */
+    'velocity/isMirror': function () {
+      return !!process.env.IS_MIRROR;
+    },
+
+    /**
      * Meteor method: velocity/parentHandshake
      * This is the best indicator of the mirror's ready status, so it's used to inform the user
      * when there may be delays
@@ -31,7 +42,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     'velocity/parentHandshake': function () {
       console.log('[velocity] Established connection with Velocity.');
     }
-
   });
 
 
@@ -39,7 +49,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   // This code will run inside a mirror and connects the mirror to
   // velocity via ddp once the mirror starts. Velocity will then
   // inform frameworks this mirror is ready.
-  // 
+  //
   Meteor.startup(function () {
 
     if (!process.env.HANDSHAKE) {
