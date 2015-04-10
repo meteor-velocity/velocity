@@ -93,7 +93,8 @@
         'METEOR_PARENT_PID',
         'TMPDIR',
         'APP_ID',
-        'OLDPWD'
+        'OLDPWD',
+        'IS_MIRROR'
       ];
 
       var currentEnv = _.omit(process.env, toOmit);
