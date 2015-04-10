@@ -1,5 +1,7 @@
 (function () {
 
+  // TODO: Replace process.env.PWD with getAppPath for Windows support
+
   'use strict';
 
   module.exports = function () {
@@ -34,6 +36,7 @@
 
     this.When(/^I run cuke-monkey inside "([^"]*)"$/, function (directory, callback) {
 
+      // TODO: Not sure if that process.env.PWD works here
       var proc = spawn(path.join(process.env.PWD, 'bin/cuke-monkey'), [], {
         cwd: _resolveToCurrentDir(directory),
         stdio: null
@@ -95,7 +98,8 @@
 
       var currentEnv = _.omit(process.env, toOmit);
 
-      meteor = spawn('meteor', ['-p', '3030'], {
+      var command = isWindows() ? 'meteor.bat' : 'meteor';
+      meteor = spawn(command, ['-p', '3030'], {
         cwd: cwd,
         stdio: null,
         detached: true,
@@ -117,7 +121,7 @@
 
 
     this.Given(/^I create a fresh meteor project called "([^"]*)"$/, function (arg1, callback) {
-      _runCliCommand('rm -rf myApp', function () {
+      fs.remove('myApp', function () {
         _runCliCommand('meteor create myApp', callback);
       });
     });
@@ -135,13 +139,11 @@
       var velocityPackagePath = path.resolve(process.env.PWD, '..');
       var genericPackagePath = path.resolve(process.env.PWD, '..', 'generic-framework');
 
-      _runCliCommand('ln -s ' + velocityPackagePath + ' .', function () {
-        _runCliCommand('ln -s ' + genericPackagePath + ' .', function () {
-          cwd = path.resolve(cwd, '..');
-          //And   I ran "meteor add velocity:generic-test-framework"
-          _runCliCommand('meteor add velocity:generic-framework', callback);
-        });
-      });
+      fs.copySync(velocityPackagePath, path.join(cwd, 'velocity-core'));
+      fs.copySync(genericPackagePath, path.join(cwd, 'generic-framework');
+      cwd = path.resolve(cwd, '..');
+      //And   I ran "meteor add velocity:generic-test-framework"
+      _runCliCommand('meteor add velocity:generic-framework', callback);
     });
 
 
@@ -191,6 +193,10 @@
     });
 
 
+
+    function isWindows() {
+      return process.platform === 'win32';
+    }
 
     function _resolveToCurrentDir (location) {
       return path.join(cwd, location);
