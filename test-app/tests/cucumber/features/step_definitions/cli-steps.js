@@ -75,7 +75,7 @@
     this.Given(/^I ran "([^"]*)"$/, _runCliCommand);
 
     this.Given(/^I changed directory to "([^"]*)"$/, function (directory, callback) {
-      cwd = path.resolve(cwd, directory);
+      cwd = _resolveToCurrentDir(directory);
       callback();
     });
 
@@ -101,7 +101,7 @@
       var command = isWindows() ? 'meteor.bat' : 'meteor';
       meteor = spawn(command, ['-p', '3030'], {
         cwd: cwd,
-        stdio: null,
+        stdio: 'pipe',
         detached: true,
         env: currentEnv
       });
@@ -111,17 +111,19 @@
         //console.log('[meteor-output]', stdout);
         if (stdout.match(/=> App running at/i)) {
           //console.log('[meteor-output] Meteor started', stdout);
-          meteor.stdout.removeListener('data', onMeteorData);
+          //meteor.stdout.removeListener('data', onMeteorData);
           callback();
         }
       };
       meteor.stdout.on('data', onMeteorData);
+      meteor.stdout.pipe(process.stdout);
+      meteor.stderr.pipe(process.stderr);
 
     });
 
 
     this.Given(/^I create a fresh meteor project called "([^"]*)"$/, function (arg1, callback) {
-      fs.remove('myApp', function () {
+      fs.remove(_resolveToCurrentDir('myApp'), function () {
         _runCliCommand('meteor create myApp', callback);
       });
     });
@@ -133,15 +135,15 @@
       fs.mkdirsSync(_resolveToCurrentDir(path.join(appName, 'packages')));
 
       //And   I changed directory to "myApp/packages"
-      cwd = path.resolve(cwd, path.join(appName, 'packages'));
+      cwd = _resolveToCurrentDir(path.join(appName, 'packages'));
 
       //And   I symlinked the generic framework to this directory
       var velocityPackagePath = path.resolve(process.env.PWD, '..');
       var genericPackagePath = path.resolve(process.env.PWD, '..', 'generic-framework');
 
-      fs.copySync(velocityPackagePath, path.join(cwd, 'velocity-core'));
-      fs.copySync(genericPackagePath, path.join(cwd, 'generic-framework');
-      cwd = path.resolve(cwd, '..');
+      fs.copySync(velocityPackagePath, _resolveToCurrentDir('velocity-core'));
+      fs.copySync(genericPackagePath, _resolveToCurrentDir('generic-framework'));
+      cwd = _resolveToCurrentDir('..');
       //And   I ran "meteor add velocity:generic-test-framework"
       _runCliCommand('meteor add velocity:generic-framework', callback);
     });
@@ -182,7 +184,7 @@
 
 
     this.Then(/^I should see the file "([^"]*)"$/, function (file, callback) {
-      fs.exists(path.resolve(cwd, file), function(exists){
+      fs.exists(_resolveToCurrentDir(file), function(exists){
         if (exists) {
           callback();
         } else {
