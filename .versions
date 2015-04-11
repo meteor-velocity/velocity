@@ -24,5 +24,5 @@ sanjo:meteor-version@1.0.0
 tracker@1.0.7
 underscore@1.0.3
 velocity:chokidar@0.12.6_1
-velocity:core@0.6.0-rc.7
+velocity:core@0.6.0-rc.8
 velocity:meteor-internals@1.1.0_5
