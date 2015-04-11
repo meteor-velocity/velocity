@@ -27,11 +27,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   // Specifies the Meteor release that we use for mirrors
   Velocity.mirrorMeteorReleaseName = 'velocity:METEOR';
-  Velocity.mirrorMeteorVersion = '1.1.0.2';
+  Velocity.mirrorMeteorVersion = '1.1.0.2_1';
   Velocity.mirrorMeteorRelease =
     Velocity.mirrorMeteorReleaseName + '@' + Velocity.mirrorMeteorVersion;
   Velocity.mirrorMeteorToolReleaseName = 'velocity:meteor-tool';
-  Velocity.mirrorMeteorToolVersion = '1.1.3_1';
+  Velocity.mirrorMeteorToolVersion = '1.1.3_2';
   Velocity.mirrorMeteorToolRelease =
     Velocity.mirrorMeteorToolReleaseName + '@' + Velocity.mirrorMeteorToolVersion;
 
@@ -39,7 +39,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 // Meteor Methods
 //
 
-  
+
   //////////////////////////////////////////////////////////////////////
   // Most communication with Velocity core is done via the following
   // Meteor methods.
@@ -276,7 +276,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     // Allow to use checked out meteor for spawning mirrors
     // for development on our Meteor fork
     if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
-      args.push('--release', 'velocity:METEOR@1.1.0.2');
+      args.push('--release', Velocity.mirrorMeteorRelease);
     }
 
     mirrorChild.spawn({
@@ -369,7 +369,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   /**
    * Return the environment variables that a mirror should run with
-   * 
+   *
    * @method _getEnvironmentVariables
    * @param {Object} options Required fields:
    *   @param {String} options.framework The name of the test framework
