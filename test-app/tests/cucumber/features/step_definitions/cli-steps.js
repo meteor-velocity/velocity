@@ -217,13 +217,13 @@
         env: process.env
       });
 
-      //proc.stdout.on('data', function (data) {
-      //  console.log('[cli]', data.toString());
-      //});
-      //
-      //proc.stderr.on('data', function (data) {
-      //  console.error('[cli]', data.toString());
-      //});
+      proc.stdout.on('data', function (data) {
+        console.log('[cli]', data.toString());
+      });
+
+      proc.stderr.on('data', function (data) {
+        console.error('[cli]', data.toString());
+      });
 
       proc.on('exit', function (code) {
         if (code !== 0) {
