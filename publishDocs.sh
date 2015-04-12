@@ -6,7 +6,7 @@ set -u
 git config --global user.email "velocity-robot@xolv.io"
 git config --global user.name "Velocity Robot"
 
-rm -rf .build || true
+rm -rf .build* || true
 rm -rf docs || true
 
 branch=$(git rev-parse --abbrev-ref HEAD)
