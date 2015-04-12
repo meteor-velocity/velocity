@@ -137,9 +137,9 @@ See [instructions here](https://github.com/meteor-velocity/velocity/wiki/How-to-
 ```bash
 git clone git@gthub.com:meteor-velocity/velocity.git velocity-core
 cd velocity-core
-``
+```
 
-#### 2. Setup Git Flow
+##### 2. Setup Git Flow
 
 We ue Git Flow with the standard branch names.
 Look at the [cheatsheet](http://danielkummer.github.io/git-flow-cheatsheet/)
@@ -153,7 +153,7 @@ git flow init -d
 git config gitflow.prefix.versiontag v
 ```
 
-#### 3. Testing
+##### 3. Testing
 
 We use:
 
@@ -164,11 +164,11 @@ You can run the tests with: `./ci.sh`
 
 Add or edit tests in: `test-app/tests/`.
 
-#### 4. Code conventions
+##### 4. Code conventions
 
 We JSHint to ensure a common code style. It's also part of our CI.
 
-#### 5. Contribute and ask questions
+##### 5. Contribute and ask questions
 
 Now you know the basics of how to contribute code to velocity:core.
 Make sure that you get in contact with the other core contributors before
