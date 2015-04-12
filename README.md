@@ -138,7 +138,7 @@ See [instructions here](https://github.com/meteor-velocity/velocity/wiki/How-to-
 5. Delete .build* folders and execute `yuidoc` command from velocity root path.
 6. Commit changes
 7. `meteor publish`
-8. Tag last commit with the new version `X.X.X`
+8. Tag last commit with the new version (`git tag vX.X.X`)
 9. Push to github. Also push the new tag! (`git push --tags`)
 
 
