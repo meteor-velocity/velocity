@@ -17,12 +17,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 // Init
 //
 
-  if (process.env.NODE_ENV !== 'development' ||
-    process.env.VELOCITY === '0' ||
-    process.env.IS_MIRROR) {
-    DEBUG && console.log('[velocity] ' + (process.env.IS_MIRROR ? 'Mirror detected - ' : '') + 'Not adding velocity core');
-    return;
-  }
   DEBUG && console.log('[velocity] adding velocity core');
   CONTINUOUS_INTEGRATION && console.log('[velocity] is in continuous integration mode');
 
@@ -37,21 +31,24 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$');
 
 
-  Meteor.startup(function initializeVelocity () {
-    DEBUG && console.log('[velocity] Server startup');
-    DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
-    DEBUG && console.log('[velocity] config =', JSON.stringify(_config, null, 2));
+  if (process.env.NODE_ENV === 'development' &&
+    process.env.VELOCITY !== '0' &&
+    !process.env.IS_MIRROR
+  ) {
+    Meteor.startup(function initializeVelocity () {
+      DEBUG && console.log('[velocity] Server startup');
+      DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
+      DEBUG && console.log('[velocity] config =', JSON.stringify(_config, null, 2));
 
-    //kick-off everything
-    _reset(_config);
+      //kick-off everything
+      _reset(_config);
 
-    if (!process.env.IS_MIRROR) {
       _initFileWatcher(_config, _triggerVelocityStartupFunctions);
-    }
 
-    _launchContinuousIntegration(_config);
+      _launchContinuousIntegration(_config);
 
-  });
+    });
+  }
 
 //////////////////////////////////////////////////////////////////////
 // Public Methods
@@ -212,7 +209,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     /**
      * Registers a testing framework plugin via a Meteor method.
      *
-     * @method velocity/register/framework 
+     * @method velocity/register/framework
      * @param {String} name The name of the testing framework.
      * @param {Object} [options] Options for the testing framework.
      *   @param {String} [options.regex] The regular expression for test files

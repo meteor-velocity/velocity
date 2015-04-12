@@ -9,13 +9,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   'use strict';
 
-  if (process.env.NODE_ENV !== 'development' ||
-    process.env.IS_MIRROR) {
-    DEBUG && console.log('[velocity] Not adding mirror-registry because NODE_ENV is',
-      process.env.NODE_ENV, ' and IS_MIRROR is', process.env.IS_MIRROR);
-    return;
-  }
-
   var _ = Npm.require('lodash'),
       url = Npm.require('url'),
       mongodbUri = Npm.require('mongodb-uri'),
@@ -185,8 +178,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     },
 
     /**
-     * Exposes the IS_MIRROR flag to code that is *not* running in a mirror
-     * (ie. the velocity core process that kicks off the mirrors).
+     * Exposes the IS_MIRROR flag.
      *
      * @method velocity/isMirror
      * @for Meteor.methods
