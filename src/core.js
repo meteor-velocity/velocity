@@ -57,8 +57,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   _.extend(Velocity, {
 
     /**
-     * Run code when Velocity is started. Velocity is considered started when the file watcher has
-     * completed the scan of the  file system
+     * Run code when Velocity is started.
+     *
+     * Velocity is considered started when the file watcher has
+     * completed the scan of the file system.
      *
      * @method startup
      * @return {function} A function to run on startup
@@ -74,10 +76,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     },
 
     /**
-     * Get application directory path.
+     * Get the application root path.
      *
      * @method getAppPath
-     * @return {String} app directory path
+     * @return {String} app root path
      */
     getAppPath: function () {
       var appPath = files.findAppDir();
@@ -230,7 +232,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      */
     'velocity/register/framework': function (name, options) {
       options = options || {};
-      check(name, Match.Optional(String));
+      check(name, String);
       check(options, {
         disableAutoReset: Match.Optional(Boolean),
         regex: Match.Optional(RegExp),
