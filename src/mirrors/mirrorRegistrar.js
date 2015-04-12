@@ -15,9 +15,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   Meteor.methods({
 
     /**
-     * Meteor method: velocity/parentHandshake
-     * This is the best indicator of the mirror's ready status, so it's used to inform the user
-     * when there may be delays
+     * This is the best indicator of the mirror's ready status, so it's used
+     * to inform the user when there may be delays
      *
      * @method velocity/parentHandshake
      * @for Meteor.methods
@@ -25,6 +24,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     'velocity/parentHandshake': function () {
       console.log('[velocity] Established connection with Velocity.');
     }
+
   });
 
 
@@ -48,7 +48,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         DEBUG && console.log('[velocity] Mirror connected to parent. Registering mirror...');
         velocityConnection.call('velocity/mirrors/register', {
           framework: process.env.FRAMEWORK,
-          port: process.env.MIRROR_PORT,
           host: process.env.HOST
         }, function (error) {
           if (error) {

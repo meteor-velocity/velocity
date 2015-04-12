@@ -54,13 +54,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *                                          Don't include a leading or trailing slash.
      * @param {String} [options.args]           Additional arguments that the mirror is called with
      *                                          It accepts all the options that are available for `meteor run`.
-     * @param {String} [options.env]            Additional environment variables that the mirror is called with.
-     * @param {String} [options.port]           String use a specific port
+     * @param {Object} [options.env]            Additional environment variables that the mirror is called with.
+     * @param {Number} [options.port]           Use a specific port.  Default is random, free port.
      * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the
      *                                          VelocityMirrors collection. eg. `/?jasmine=true`
-     * @param {String} [options.nodes]          The number of mirrors required. This is used by
+     * @param {Number} [options.nodes]          The number of mirrors required. This is used by
      *                                          distributable frameworks. Default is 1
-     * @param {String} [options.handshake]      Specifies whether or not this mirror should perform
+     * @param {Boolean} [options.handshake]     Specifies whether or not this mirror should perform
      *                                          a DDP handshake with the parent. Distributable
      *                                          frameworks can use this to get mirrors to behave
      *                                          like workers. The default is true
@@ -87,9 +87,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @method velocity/mirrors/init
      * @param {Object} options
-     *   @param {Number} options.port The port this mirror is running on
      *   @param {String} options.framework The name of the test framework
      *                                     making the request
+     *   @param {Number} options.port The port this mirror is running on
      *   @param {String} options.mongoUrl The mongo url this mirror is using
      *   @param {String} options.host The root url of this mirror without any
      *                        additional paths. Used for making DDP connections
@@ -100,15 +100,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *                           collection. To be used by test frameworks to
      *                           recognize when they are executing in a mirror.
      *                           eg. `/?jasmine=true`
-     * @param {Object} extra Any additional metadata the implementing mirror
-     *                       would like to store in the Velocity mirrors
-     *                       collection. This is optional.
+     * @param {Object} [extra] Any additional metadata the implementing mirror
+     *                         would like to store in the Velocity mirrors
+     *                         collection.
      */
     'velocity/mirrors/init': function (options, extra) {
       check(options, {
+        framework: String,
         port: Number,
         mongoUrl: String,
-        framework: String,
         host: String,
         rootUrl: String,
         rootUrlPath: String
@@ -130,17 +130,16 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @method velocity/mirrors/register
      * @param {Object} options
-     *   @param {Number} options.port The port this mirror is running on
      *   @param {String} options.framework The name of the test framework
      *                                     making the request
      *   @param {String} options.host The root url of this mirror without any
-     *                        additional paths. Used for making DDP connections
+     *                                additional paths. Must include port. Used
+     *                                for making DDP connections
      */
     'velocity/mirrors/register': function (options) {
       check(options, Match.ObjectIncluding({
         framework: String,
-        host: String,
-        port: Match.OneOf(Number, String)
+        host: String
       }));
 
       DEBUG && console.log('[velocity] Mirror registered. Handshaking with mirror...');
@@ -172,9 +171,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
           });
         };
       }, 300);
-
-
-
     },
 
     /**
@@ -367,8 +363,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    *   @param {String} options.framework The name of the test framework
    *                                     making the request
    *   @param {Number} options.port The port this mirror is running on
-   *   @param {String} options.rootUrl The root url of this mirror, which also
-   *                           includes the path and params
    *   @param {String} options.host The root url of this mirror without any
    *                        additional paths. Used for making DDP connections
    *   @param {String} options.rootUrl The root url of this mirror, which also
@@ -378,7 +372,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    *                           collection. To be used by test frameworks to
    *                           recognize when they are executing in a mirror.
    *                           eg. `/?jasmine=true`
-   * @return {String} Mirror URL
+   *   @param {Boolean} options.handshake Specifies whether or not this mirror
+   *                                      should perform a DDP handshake with
+   *                                      the parent. Distributable frameworks
+   *                                      can use this to get mirrors to behave
+   *                                      like workers.
+   *   @param {Object} [options.env] Additional environment variables that the
+   *                                 mirror is called with.
+   * @return {Object} environment variables
    * @private
    */
   function _getEnvironmentVariables (options) {
