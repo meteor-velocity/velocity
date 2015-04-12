@@ -1,17 +1,24 @@
 (function () {
 
+  // TODO: Replace process.env.PWD with getAppPath for Windows support
+
   'use strict';
 
   module.exports = function () {
 
-    var fs = Package['xolvio:cucumber'].cucumber.fs,
+    var fs = require('fs-extra'),
+        _ = require('underscore'),
         path = require('path'),
-        spawn = require('child_process').spawn;
-
-    var helper = this;
+        spawn = require('child_process').spawn,
+        DDPClient = require('ddp');
 
     var stdOutMessages = [],
         stdErrMessages = [];
+
+    var cwd = require('os').tmpdir(),
+        meteor;
+
+    console.log(cwd);
 
     this.Given(/^I deleted the folder called "([^"]*)"$/, function (folder, callback) {
       fs.remove(_resolveToCurrentDir(folder), callback);
@@ -29,6 +36,7 @@
 
     this.When(/^I run cuke-monkey inside "([^"]*)"$/, function (directory, callback) {
 
+      // TODO: Not sure if that process.env.PWD works here
       var proc = spawn(path.join(process.env.PWD, 'bin/cuke-monkey'), [], {
         cwd: _resolveToCurrentDir(directory),
         stdio: null
@@ -67,7 +75,7 @@
     this.Given(/^I ran "([^"]*)"$/, _runCliCommand);
 
     this.Given(/^I changed directory to "([^"]*)"$/, function (directory, callback) {
-      helper.world.cwd = path.resolve(helper.world.cwd, directory);
+      cwd = _resolveToCurrentDir(directory);
       callback();
     });
 
@@ -85,34 +93,38 @@
         'METEOR_PARENT_PID',
         'TMPDIR',
         'APP_ID',
-        'OLDPWD'
+        'OLDPWD',
+        'IS_MIRROR'
       ];
 
       var currentEnv = _.omit(process.env, toOmit);
 
-      helper.world.meteor = spawn('meteor', ['-p', '3030'], {
-        cwd: helper.world.cwd,
-        stdio: null,
+      var command = isWindows() ? 'meteor.bat' : 'meteor';
+      meteor = spawn(command, ['-p', '3030'], {
+        cwd: cwd,
+        stdio: 'pipe',
         detached: true,
         env: currentEnv
       });
 
-      var onMeteorData = Meteor.bindEnvironment(function (data) {
+      var onMeteorData = function (data) {
         var stdout = data.toString();
         //console.log('[meteor-output]', stdout);
         if (stdout.match(/=> App running at/i)) {
-          console.log('[meteor-output] Meteor started', stdout);
-          helper.world.meteor.stdout.removeListener('data', onMeteorData);
+          //console.log('[meteor-output] Meteor started', stdout);
+          //meteor.stdout.removeListener('data', onMeteorData);
           callback();
         }
-      });
-      helper.world.meteor.stdout.on('data', onMeteorData);
+      };
+      meteor.stdout.on('data', onMeteorData);
+      meteor.stdout.pipe(process.stdout);
+      meteor.stderr.pipe(process.stderr);
 
     });
 
 
     this.Given(/^I create a fresh meteor project called "([^"]*)"$/, function (arg1, callback) {
-      _runCliCommand('rm -rf myApp', function () {
+      fs.remove(_resolveToCurrentDir('myApp'), function () {
         _runCliCommand('meteor create myApp', callback);
       });
     });
@@ -124,37 +136,56 @@
       fs.mkdirsSync(_resolveToCurrentDir(path.join(appName, 'packages')));
 
       //And   I changed directory to "myApp/packages"
-      helper.world.cwd = path.resolve(helper.world.cwd, path.join(appName, 'packages'));
+      cwd = _resolveToCurrentDir(path.join(appName, 'packages'));
 
       //And   I symlinked the generic framework to this directory
-      var velocityPackagePath = path.resolve(process.env.PWD, '..', 'src');
+      var velocityPackagePath = path.resolve(process.env.PWD, '..');
       var genericPackagePath = path.resolve(process.env.PWD, '..', 'generic-framework');
 
-      _runCliCommand('ln -s ' + velocityPackagePath + ' .', function () {
-        _runCliCommand('ln -s ' + genericPackagePath + ' .', function () {
-          helper.world.cwd = path.resolve(helper.world.cwd, '..');
-          //And   I ran "meteor add velocity:generic-test-framework"
-          _runCliCommand('meteor add velocity:generic-framework', callback);
-        });
-      });
+      fs.copySync(velocityPackagePath, _resolveToCurrentDir('velocity-core'));
+      fs.copySync(genericPackagePath, _resolveToCurrentDir('generic-framework'));
+      cwd = _resolveToCurrentDir('..');
+      //And   I ran "meteor add velocity:generic-test-framework"
+      _runCliCommand('meteor add velocity:generic-framework', callback);
     });
 
 
 
     this.When(/^I call "([^"]*)" via DDP$/, function (method, callback) {
-      var app = DDP.connect('http://localhost:3030');
-      app.call(method, {framework: 'generic'}, function (e) {
-        if (e) {
-          callback.fail(e);
+      var app = new DDPClient({
+        host: 'localhost',
+        port: '3030',
+        ssl: false,
+        autoReconnect: true,
+        autoReconnectTimer: 500,
+        maintainCollections: true,
+        ddpVersion: '1',
+        useSockJs: true
+      });
+
+
+      app.connect(function (error) {
+        if (error) {
+          console.error('DDP connection error!', error);
+          callback.fail();
         } else {
-          callback();
+          app.call(method, [{framework: 'generic'}], function (e) {
+            if (e) {
+              callback.fail(e.message);
+            } else {
+              callback();
+            }
+          });
         }
       });
+
+
+
     });
 
 
     this.Then(/^I should see the file "([^"]*)"$/, function (file, callback) {
-      fs.exists(path.resolve(helper.world.cwd, file), function(exists){
+      fs.exists(_resolveToCurrentDir(file), function(exists){
         if (exists) {
           callback();
         } else {
@@ -166,8 +197,12 @@
 
 
 
+    function isWindows() {
+      return process.platform === 'win32';
+    }
+
     function _resolveToCurrentDir (location) {
-      return path.join(helper.world.cwd, location);
+      return path.join(cwd, location);
     }
 
 
@@ -177,18 +212,18 @@
       var command = splitCommand.splice(0, 1)[0];
 
       var proc = spawn(command, splitCommand, {
-        cwd: helper.world.cwd,
+        cwd: cwd,
         stdio: null,
         env: process.env
       });
 
-      //proc.stdout.on('data', function (data) {
-      //  console.log('[cli]', data.toString());
-      //});
-      //
-      //proc.stderr.on('data', function (data) {
-      //  console.error('[cli]', data.toString());
-      //});
+      proc.stdout.on('data', function (data) {
+        console.log('[cli]', data.toString());
+      });
+
+      proc.stderr.on('data', function (data) {
+        console.error('[cli]', data.toString());
+      });
 
       proc.on('exit', function (code) {
         if (code !== 0) {

@@ -1,15 +1,25 @@
-#! /bin/bash
+#!/bin/bash
+
 set -e
 set -u
 
-rm -rf .build || true
+git config --global user.email "velocity-robot@xolv.io"
+git config --global user.name "Velocity Robot"
+
+rm -rf .build* || true
 rm -rf docs || true
+
 branch=$(git rev-parse --abbrev-ref HEAD)
+
 yuidoc .
 mv docs /tmp/docs
+git remote set-branches --add origin gh-pages
+git fetch
 git checkout gh-pages
-mv /tmp/docs docs
-git add docs
-git commit --author "Velocity Robot <robot@meteorvelocity.com>" --message "Update docs"
+# Remove everything but .git
+rm -r *
+mv /tmp/docs/* ./
+git add --all .
+git commit --message "Update docs [skip ci]"
 git push --force origin gh-pages
-git checkout -b $branch
+git checkout $branch

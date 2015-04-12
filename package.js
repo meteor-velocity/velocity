@@ -4,19 +4,18 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.5.1',
+  version: '0.6.0-rc.8',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
 
 Npm.depends({
-  'chokidar': '0.11.1',
   'lodash': '2.4.1',
-  'mkdirp': '0.5.0',
-  'fs-extra': '0.12.0',
+  'fs-extra': '0.18.0',
   'freeport':'1.0.4',
   'mongodb-uri': '0.9.7',
-  'colors': '1.0.3'
+  'colors': '1.0.3',
+  'tmp': '0.0.25'
 });
 
 Package.on_use(function (api) {
@@ -25,11 +24,13 @@ Package.on_use(function (api) {
       CLIENT = 'client',
       BOTH = [CLIENT, SERVER];
 
-  api.versionsFrom('METEOR@1.0');
+  api.versionsFrom('METEOR@1.1.0.2');
   api.use('mongo');
   api.use('check');
+  api.use('velocity:chokidar@0.12.6_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_5');
   api.use('sanjo:long-running-child-process@1.0.3', 'server');
+  api.use('sanjo:meteor-files-helpers@1.1.0_4', 'server');
 
   api.export('Velocity', BOTH);
   api.export('VelocityTestFiles', BOTH);
@@ -40,13 +41,13 @@ Package.on_use(function (api) {
   api.export('VelocityMirrors', BOTH);
   api.export('VelocityOptions', BOTH);
 
-  api.add_files('globals.js', BOTH);
-  api.add_files('collections.js', BOTH);
-  api.add_files('helpers.js', SERVER);
-  api.add_files('core.js', SERVER);
-  api.add_files('core-shared.js', BOTH);
+  api.add_files('src/globals.js', BOTH);
+  api.add_files('src/collections.js', BOTH);
+  api.add_files('src/helpers.js', SERVER);
+  api.add_files('src/core.js', SERVER);
+  api.add_files('src/core-shared.js', BOTH);
 
-  api.add_files('mirrors/Mirror.js', SERVER);
-  api.add_files('mirrors/mirrorRegistrar.js', SERVER);
+  api.add_files('src/mirrors/Mirror.js', SERVER);
+  api.add_files('src/mirrors/mirrorRegistrar.js', SERVER);
 
 });

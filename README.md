@@ -46,7 +46,7 @@ Most of these frameworks have an example in the [velocity-examples](https://gith
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) - Write client and server unit and integration tests with Jasmine.
 * [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
 * [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) - Use Gherkin-syntax cucumber to 
-test your app. Integrated nicely with [meteor-webdriver](https://github.com/xolvio/meteor-webdriver)  
+test your app. Includes PhantomJS and Selenium as well as SauceLabs support. 
 * [clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
 * [nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration 
 * [rsbatech:robotframework](https://github.com/rjsmith/meteor-robotframework) - [Robot Framework](http://robotframework.org/) end to end test integration using Selenium and many other [test libraries](http://robotframework.org/#test-libraries)
@@ -92,6 +92,27 @@ Please put some sample tests in a directory named `sample-tests` at the root of 
 These will be used by the velocity-quick-start package and also allows users to click a button 
 in the html-reporter to have them added to their apps.
 
+### Fixtures / Test Data
+A good pattern for creating fixtures is to do the following inside your app:
+
+```bash
+meteor create --package fixtures
+```
+
+Then modify the package.js file to set the `debugOnly` flag to true like this:
+```javascript
+Package.describe({
+  name: 'fixtures',
+  version: '0.0.1',
+  debugOnly: true,
+  // ...
+});
+```
+The `debugOnly` flag instruct Meteor not to bundle this package when building, which is how you 
+ensure this package does not make it to production. You can now define all your fixtures in this 
+package.
+
+
 ### Debug output
 
 Please include a way to get more detailed info about your frameworks' test runs.  
@@ -107,65 +128,67 @@ For example, you could write your logging like this:
 
 See [instructions here](https://github.com/meteor-velocity/velocity/wiki/How-to-Write-a-Mirror-Package)
 
-## For velocity:core maintainers
+## For velocity:core code contributors
 
-### Developing with a local version of velocity:core
+### Developing on velocity:core
 
-1. Clone https://github.com/meteor-velocity/velocity-examples.git
-2. Create a symlink to your local velocity:core package:
+#### Getting started
 
- ```bash
- cd velocity-examples/leaderboard-jasmine
- mkdir packages
- cd packages
- # Replace ~/velocity with your path 
- ln -s ~/velocity velocity:core
- ```
-
-3. Start the velocity example app. It will use your local velocity:core version.
-
- ```bash
- cd ..
- meteor
- ```
-
-### Publishing to Meteor Package System
-
-1. Make code changes
-2. Commit changes
-3. Update History.md with summary of changes
-4. Bump version numbers in package.js, History.md and yuidoc.json
-5. Delete .build* folders and execute `yuidoc` command from velocity root path.
-6. Commit changes
-7. `meteor publish`
-8. Tag last commit with the new version `X.X.X`
-9. Push to github. Also push the new tag! (`git push --tags`)
-
-
-We have to publish velocity:core for the different architectures (Mac OS, 64-bit Linux and 32-bit Linux). This is how it is done:
+##### 1. Clone the repository
 
 ```bash
-# Publish new version
-meteor publish
+git clone git@gthub.com:meteor-velocity/velocity.git velocity-core
+cd velocity-core
+``
 
-# Open Mac build machine
-meteor admin get-machine os.osx.x86_64
-# Build on the machine
-meteor publish-for-arch velocity:core@<VERSION>
-# Login
-# Exit
-exit
+#### 2. Setup Git Flow
 
-# Open Linux build machine
-meteor admin get-machine os.linux.x86_64
-# Build on the machine (this will build a version for 64-bit and 32-bit Linux)
-meteor publish-for-arch velocity:core@<VERSION>
-# Login
-# Exit
-exit
+We ue Git Flow with the standard branch names.
+Look at the [cheatsheet](http://danielkummer.github.io/git-flow-cheatsheet/)
+for an introduction and installation instructions.
+
+When you have installed Git Flow, make sure that you have the local branches
+`develop` an `master` and do this in the velocity-core folder:
+
+```bash
+git flow init -d
+git config gitflow.prefix.versiontag v
 ```
 
-The build for your own architecture can also be done on the own machine. But the publish-for-arch command for your architecture is still required.
+#### 3. Testing
+
+We use:
+
+* [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) for end-to-end tests
+* [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) for integration and unit tests
+
+You can run the tests with: `./ci.sh`
+
+Add or edit tests in: `test-app/tests/`.
+
+#### 4. Code conventions
+
+We JSHint to ensure a common code style. It's also part of our CI.
+
+#### 5. Contribute and ask questions
+
+Now you know the basics of how to contribute code to velocity:core.
+Make sure that you get in contact with the other core contributors before
+you do something bigger. We use Slack where you can communicate with the team.
+You can ask questions there.
+
+### Publishing a new version
+
+Replace X.X.X in the following steps with the version that you release.
+Make sure that you follow the [Semver](http://semver.org/) conventions for increasing the version.
+
+1. Pull the latest changes from the branch `develop`
+1. Start a release with: `git flow release start X.X.X`
+3. Update History.md with summary ofchanges
+4. Bump version numbers in package.js and yuidoc.json
+5. Publish to Meteor with: `meteor publish`
+6. Commit release changes with the commit message "Release of X.X.X".
+7. Finish the release with: `git flow release finish -p X.X.X`
 
 ### Meteor Method Naming Convention
 
@@ -193,8 +216,3 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 For general questions about testing, check out [Testing](https://forums.meteor.com/c/testing) on the Meteor forums.
 
 For specific questions about velocity core, please post in [Velocity Core](https://forums.meteor.com/c/testing/velocity-core).
-
-## Roadmap
-
-https://trello.com/b/VCmaj73b/velocity-project
-
