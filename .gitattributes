@@ -1,0 +1,6 @@
+* text eol=lf
+
+# Make sure that images are treated as binary files
+*.jpg binary
+*.png binary
+*.gif binary
