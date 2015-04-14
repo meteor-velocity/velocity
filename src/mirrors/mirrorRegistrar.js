@@ -1,6 +1,7 @@
 /*jshint -W030 */
-/* global
- DEBUG:true
+/* globals
+ DEBUG: true,
+ WebApp: false
  */
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
@@ -51,36 +52,34 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   // velocity via ddp once the mirror starts. Velocity will then
   // inform frameworks this mirror is ready.
   //
-  Meteor.startup(function () {
+  if (process.env.HANDSHAKE) {
+    WebApp.onListening(function () {
+      DEBUG && console.log('[velocity] Mirror started. Connecting via DDP to parent');
 
-    if (!process.env.HANDSHAKE) {
-      DEBUG && console.log('[velocity] Mirror', process.env.MIRROR_PORT , 'configured not to handshake');
-      return;
-    }
+      var velocityConnection = DDP.connect(process.env.PARENT_URL);
+      velocityConnection.onReconnect = function () {
+        DEBUG && console.log('[velocity] Mirror connected to parent. Registering mirror...');
+        velocityConnection.call('velocity/mirrors/register', {
+          framework: process.env.FRAMEWORK,
+          port: process.env.MIRROR_PORT,
+          host: process.env.HOST
+        }, function (error) {
+          if (error) {
+            console.error(
+              '[velocity] Could not connect to parent via DDP. ' +
+              'Please restart your app and try again. ' +
+              'If this happens often please report it as issue to velocity:core.',
+              error
+            );
+          }
+          // Disconnect because we no longer need the connection
+          velocityConnection.disconnect();
+        });
+      };
 
-    DEBUG && console.log('[velocity] Mirror started. Connecting via DDP to parent');
-
-    var velocityConnection = DDP.connect(process.env.PARENT_URL);
-    velocityConnection.onReconnect = function () {
-      DEBUG && console.log('[velocity] Mirror connected to parent. Registering mirror...');
-      velocityConnection.call('velocity/mirrors/register', {
-        framework: process.env.FRAMEWORK,
-        port: process.env.MIRROR_PORT,
-        host: process.env.HOST
-      }, function (error) {
-        if (error) {
-          console.error(
-            '[velocity] Could not connect to parent via DDP. ' +
-            'Please restart your app and try again. ' +
-            'If this happens often please report it as issue to velocity:core.',
-            error
-          );
-        }
-        // Disconnect because we no longer need the connection
-        velocityConnection.disconnect();
-      });
-    };
-
-  });
+    });
+  } else {
+    DEBUG && console.log('[velocity] Mirror', process.env.MIRROR_PORT , 'configured not to handshake');
+  }
 
 })();

@@ -25,6 +25,7 @@ Package.on_use(function (api) {
       BOTH = [CLIENT, SERVER];
 
   api.versionsFrom('METEOR@1.1.0.2');
+  api.use('webapp');
   api.use('mongo');
   api.use('check');
   api.use('velocity:chokidar@0.12.6_1', 'server');
