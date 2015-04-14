@@ -144,33 +144,29 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
       DEBUG && console.log('[velocity] Mirror registered. Handshaking with mirror...');
 
-      // Ugliness! It seems the DDP connect has a exponential back-off, which means the tests take
-      // around 5 seconds to rerun. This setTimeout helps.
-      Meteor.setTimeout(function () {
-        // TODO: Should the host really include the port?
-        var mirrorConnection = DDP.connect(options.host, {
-          // Don't show the user connection errors when not in debug mode.
-          // We will normally eventually connect to the mirror after
-          // a connection error has been shown.
-          _dontPrintErrors: !DEBUG
+      // TODO: Should the host really include the port?
+      var mirrorConnection = DDP.connect(options.host, {
+        // Don't show the user connection errors when not in debug mode.
+        // We will normally eventually connect to the mirror after
+        // a connection error has been shown.
+        _dontPrintErrors: !DEBUG
+      });
+      mirrorConnection.onReconnect = function () {
+        DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
+        mirrorConnection.call('velocity/parentHandshake', function(e, r) {
+          DEBUG && console.log('[velocity] Parent Handshake response', e, r);
         });
-        mirrorConnection.onReconnect = function () {
-          DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
-          mirrorConnection.call('velocity/parentHandshake', function(e, r) {
-            DEBUG && console.log('[velocity] Parent Handshake response', e, r);
-          });
-          mirrorConnection.disconnect();
-          // TODO: This does not support starting multiple mirror for one framework
-          VelocityMirrors.update({
-            framework: options.framework
-          }, {
-            $set: {
-              state: 'ready',
-              lastModified: Date.now()
-            }
-          });
-        };
-      }, 300);
+        mirrorConnection.disconnect();
+        // TODO: This does not support starting multiple mirror for one framework
+        VelocityMirrors.update({
+          framework: options.framework
+        }, {
+          $set: {
+            state: 'ready',
+            lastModified: Date.now()
+          }
+        });
+      };
     },
 
     /**
