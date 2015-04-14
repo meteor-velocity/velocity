@@ -1,3 +1,11 @@
+## v0.6.0
+
+* Support for Windows
+* Improved mirrors
+* Debugging mirrors
+
+Make sure you read https://github.com/meteor-velocity/velocity/wiki/Changes-in-0.6.0.
+
 ## v0.5.1
 
 * Prototype of testing lifecycle (run, reset, etc.)
