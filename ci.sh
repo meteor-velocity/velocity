@@ -15,7 +15,13 @@ echo "Checking Yuidoc syntax"
 yuidoc --lint
 echo "Yuidoc checks were successful"
 
-echo "Testing app"
+
+echo "Running unit and integration tests..."
+
+# TODO: Fix that it never exists.
+#VELOCITY_TEST_PACKAGES=1 meteor test-packages --driver-package velocity:html-reporter --velocity ./
+
+echo "Running end-to-end tests..."
 
 echo "Killing node and phantomjs processes"
 pkill -9 phantomjs || true

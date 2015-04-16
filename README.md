@@ -166,7 +166,10 @@ We use:
 
 You can run the tests with: `./ci.sh`
 
-Add or edit tests in: `test-app/tests/`.
+Add or edit end to end tests in: `test-app/tests/`.
+
+The Jasmine unit and integration tests are located in `tests/` and added via package.js `Package.onTest`.
+You can run only the unit and integration tests with `./run-jasmine.js`.
 
 ##### 4. Code conventions
 

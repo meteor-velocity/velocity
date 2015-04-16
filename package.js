@@ -52,3 +52,9 @@ Package.on_use(function (api) {
   api.add_files('src/mirrors/mirrorRegistrar.js', SERVER);
 
 });
+
+Package.onTest(function(api) {
+  api.use('sanjo:jasmine@0.13.0');
+  api.use('velocity:core');
+  api.addFiles('tests/server/VelocitySpec.js', 'server');
+});
