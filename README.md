@@ -173,7 +173,11 @@ You can run only the unit and integration tests with `./run-jasmine.js`.
 
 ##### 4. Code conventions
 
-We JSHint to ensure a common code style. It's also part of our CI.
+We use JSHint to ensure a common code style. It's also part of our CI.
+
+```
+npm install jshint@2.5 -g
+```
 
 ##### 5. Contribute and ask questions
 
