@@ -247,7 +247,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
 
     /**
-     * Re-init file watcher and clear all test results.
+     * Clear all test reports, aggregate reports, and logs.
      *
      * @method velocity/reset
      */
@@ -255,88 +255,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _reset(_config);
     },
 
-    /**
-     * Clear all test results.
-     *
-     * @method velocity/reports/reset
-     * @param {Object} [options]
-     *   @param {String} [options.framework] The name of a specific framework
-     *                    to clear results for.  Ex. 'jasmine' or 'mocha'
-     *   @param {Array} [options.notIn] A list of test Ids which should be kept
-     *                                  (not cleared).  These Ids must match the
-     *                                  ones passed to `velocity/reports/submit`.
-     */
-    'velocity/reports/reset': function (options) {
-      options = options || {};
-      check(options, {
-        framework: Match.Optional(String),
-        notIn: Match.Optional([String])
-      });
 
-      var query = {};
-      if (options.framework) {
-        query.framework = options.framework;
-        VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
-      }
-      if (options.notIn) {
-        query = _.assign(query, {_id: {$nin: options.notIn}});
-      }
-      VelocityTestReports.remove(query);
-
-      _updateAggregateReports();
-    },
-
-
-    /**
-     * Clear all log entries.
-     *
-     * @method velocity/logs/reset
-     * @param {Object} [options]
-     *   @param {String} [options.framework] The name of a specific framework
-     *                                       to clear logs for.
-     */
-    'velocity/logs/reset': function (options) {
-      options = options || {};
-      check(options, {
-        framework: Match.Optional(String)
-      });
-
-      var query = {};
-      if (options.framework) {
-        query.framework = options.framework;
-      }
-      VelocityLogs.remove(query);
-    },
-
-
-    /**
-     * Log a message to the Velocity log store.  This provides a central
-     * location for different reporters to query for test framework log
-     * entries.
-     *
-     * @method velocity/logs/submit
-     * @param {Object} options
-     *   @param {String} options.framework The name of the test framework
-     *   @param {String} options.message The message to log
-     *   @param {String} [options.level] Log level.  Ex. 'error'. Default: 'info'
-     *   @param {Date} [options.timestamp]
-     */
-    'velocity/logs/submit': function (options) {
-      check(options, {
-        framework: String,
-        message: String,
-        level: Match.Optional(String),
-        timestamp: Match.Optional(Match.OneOf(Date, String))
-      });
-
-      VelocityLogs.insert({
-        timestamp: options.timestamp ? new Date(options.timestamp) : new Date(),
-        level: options.level || 'info',
-        message: options.message,
-        framework: options.framework
-      });
-    },
-
+    //////////////////////////////////////////////////////////////////////
+    // Reports
+    //
 
     /**
      * Record the results of an individual test run; a simple collector of
@@ -395,7 +317,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityTestReports.upsert(data.id, {$set: data});
 
       _updateAggregateReports();
-    },  // end postResult
+    },
 
 
     /**
@@ -414,7 +336,98 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityAggregateReports.upsert({'name': data.framework},
         {$set: {'result': 'completed'}});
       _updateAggregateReports();
-    },  // end completed
+    },
+
+
+    /**
+     * Clear test and aggregate reports, either for a specific framework or for
+     * all frameworks.
+     *
+     * @method velocity/reports/reset
+     * @param {Object} [options]
+     *   @param {String} [options.framework] The name of a specific framework
+     *                    to clear results for.  Ex. 'jasmine' or 'mocha'
+     *   @param {Array} [options.notIn] A list of test Ids which should be kept
+     *                                  (not cleared).  These Ids must match the
+     *                                  ones passed to `velocity/reports/submit`.
+     */
+    'velocity/reports/reset': function (options) {
+      options = options || {};
+      check(options, {
+        framework: Match.Optional(String),
+        notIn: Match.Optional([String])
+      });
+
+      var query = {};
+      if (options.framework) {
+        query.framework = options.framework;
+        VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
+      }
+      if (options.notIn) {
+        query = _.assign(query, {_id: {$nin: options.notIn}});
+      }
+      VelocityTestReports.remove(query);
+
+      _updateAggregateReports();
+    },
+
+
+
+    //////////////////////////////////////////////////////////////////////
+    // Logs
+    //
+
+    /**
+     * Log a message to the Velocity log store.  This provides a central
+     * location for different reporters to query for test framework log
+     * entries.
+     *
+     * @method velocity/logs/submit
+     * @param {Object} options
+     *   @param {String} options.framework The name of the test framework
+     *   @param {String} options.message The message to log
+     *   @param {String} [options.level] Log level.  Ex. 'error'. Default: 'info'
+     *   @param {Date} [options.timestamp]
+     */
+    'velocity/logs/submit': function (options) {
+      check(options, {
+        framework: String,
+        message: String,
+        level: Match.Optional(String),
+        timestamp: Match.Optional(Match.OneOf(Date, String))
+      });
+
+      VelocityLogs.insert({
+        framework: options.framework,
+        message: options.message,
+        level: options.level || 'info',
+        timestamp: options.timestamp ? new Date(options.timestamp) : new Date()
+      });
+    },
+
+    /**
+     * Clear log entries, either for a specific framework or for
+     * all frameworks.
+     *
+     * @method velocity/logs/reset
+     * @param {Object} [options]
+     *   @param {String} [options.framework] The name of a specific framework
+     *                                       to clear logs for.  Ex. 'mocha'
+     */
+    'velocity/logs/reset': function (options) {
+      options = options || {};
+      check(options, {
+        framework: Match.Optional(String)
+      });
+
+      var query = {};
+      if (options.framework) {
+        query.framework = options.framework;
+      }
+      VelocityLogs.remove(query);
+    },
+
+
 
 
     /**
@@ -612,7 +625,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   }
 
   /**
-   * Re-init file watcher and clear all test results.
+   * Clear all test reports, aggregate reports, and logs.
    *
    * @method _reset
    * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
