@@ -180,6 +180,11 @@ We use JSHint to ensure a common code style. It's also part of our CI.
 npm install jshint@2.5 -g
 ```
 
+__Please also follow:__
+
+* The [Meteor Style Guide](https://github.com/meteor/meteor/wiki/Meteor-Style-Guide)
+* [Style guide](https://meteor.hackpad.com/Style-guide-for-cross-platform-server-side-development-YaSdh7tFxAt) for cross-platform server-side development
+
 ##### 5. Contribute and ask questions
 
 Now you know the basics of how to contribute code to velocity:core.
