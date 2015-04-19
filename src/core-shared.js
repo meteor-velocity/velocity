@@ -51,7 +51,7 @@
      * @for Velocity
      */
     Velocity.getOption = function (name) {
-      Meteor.call('velocity/getOption', name);
+      return Meteor.call('velocity/getOption', name);
     };
   }
 
