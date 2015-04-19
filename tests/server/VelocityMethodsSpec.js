@@ -2,6 +2,24 @@
 
 describe('Velocity Methods', function () {
 
+  /*
+   * TODO: Figure out why including this test prevents the tests in
+   * `VelocitySpec.js` from executing.
+  describe('velocity/register/framework', function () {
+    it('creates a pending aggregate report', function () {
+      var options = {
+            regex: /foo\/.+\.js$/
+          },
+          report;
+
+      Meteor.call('velocity/register/framework', 'foo', options);
+      report = VelocityAggregateReports.findOne({name: 'foo'});
+      expect(report.result).toBe('pending');
+    });
+  });
+  */
+
+
   describe('velocity/setOption', function () {
     it('sets an option', function () {
       var name,
