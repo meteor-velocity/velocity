@@ -352,20 +352,24 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *                                  ones passed to `velocity/reports/submit`.
      */
     'velocity/reports/reset': function (options) {
+      var query = {};
+
       options = options || {};
       check(options, {
         framework: Match.Optional(String),
         notIn: Match.Optional([String])
       });
 
-      var query = {};
       if (options.framework) {
         query.framework = options.framework;
-        VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
+        VelocityAggregateReports.upsert({name: options.framework},
+                                        {$set: {result: 'pending'}});
       }
+
       if (options.notIn) {
         query = _.assign(query, {_id: {$nin: options.notIn}});
       }
+
       VelocityTestReports.remove(query);
 
       _updateAggregateReports();
@@ -440,21 +444,25 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
      */
     'velocity/copySampleTests': function (options) {
+      var sampleTestGenerator,
+          sampleTests;
+
       options = options || {};
       check(options, {
         framework: String
       });
 
-      var sampleTestGenerator = _config[options.framework].sampleTestGenerator;
+      sampleTestGenerator = _config[options.framework].sampleTestGenerator;
       if (sampleTestGenerator) {
-        var sampleTests = sampleTestGenerator(options);
+        sampleTests = sampleTestGenerator(options);
 
         DEBUG && console.log('[velocity] found ', sampleTests.length,
-          'sample test files for', options.framework);
+                             'sample test files for', options.framework);
 
         sampleTests.forEach(function (testFile) {
-          var fullTestPath = files.pathJoin(Velocity.getTestsPath(), testFile.path);
-          var testDir = files.pathDirname(fullTestPath);
+          var fullTestPath = files.pathJoin(Velocity.getTestsPath(), testFile.path),
+              testDir = files.pathDirname(fullTestPath);
+
           mkdirp(files.convertToOSPath(testDir));
           files.writeFile(fullTestPath, testFile.contents);
         });
@@ -525,19 +533,21 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * @private
    */
   function _initFileWatcher (config, callback) {
+    var paths,
+        packagesPath;
 
     VelocityTestFiles.remove({});
     VelocityFixtureFiles.remove({});
 
-    var paths = [Velocity.getTestsPath()];
+    paths = [Velocity.getTestsPath()];
+    packagesPath = Velocity.getPackagesPath();
 
-    var packagesPath = Velocity.getPackagesPath();
     if (VelocityInternals.isDirectory(packagesPath)) {
-      var packageNames = files.readdir(packagesPath);
-      var packageTestsPaths = _.chain(packageNames)
-        .filter(_isPackageWithTests)
-        .map(Velocity.getTestsPath)
-        .value();
+      var packageNames = files.readdir(packagesPath),
+          packageTestsPaths = _.chain(packageNames)
+                               .filter(_isPackageWithTests)
+                               .map(Velocity.getTestsPath)
+                               .value();
       paths.push.apply(paths, packageTestsPaths);
     }
 
@@ -547,8 +557,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     _watcher = chokidar.watch(paths, {ignored: /[\/\\]\./, persistent: true});
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
-
       var relativePath,
+          packageRelativePath,
           targetFramework,
           data;
 
@@ -570,13 +580,14 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
       DEBUG && console.log('[velocity] Search framework for path', relativePath);
 
-      var packageRelativePath = (relativePath.indexOf('packages') === 0) ?
-        relativePath.split('/').slice(2).join('/') :
-        relativePath;
+      packageRelativePath = (relativePath.indexOf('packages') === 0) ?
+                             relativePath.split('/').slice(2).join('/') :
+                             relativePath;
+
       // test against each test framework's regexp matcher, use first one that matches
       targetFramework = _.find(config, function (framework) {
-        return framework._regexp.test(packageRelativePath);
-      });
+                            return framework._regexp.test(packageRelativePath);
+                          });
 
       if (targetFramework) {
         DEBUG && console.log('[velocity] Target framework for', relativePath, 'is', targetFramework.name);
@@ -606,18 +617,21 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     }));
 
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
-      DEBUG && console.log('[velocity] File removed:', _getRelativePath(filePath));
+      DEBUG && console.log('[velocity] File removed:',
+                           _getRelativePath(filePath));
+
       VelocityTestFiles.remove(filePath);
     }));
 
     _watcher.on('ready', Meteor.bindEnvironment(function () {
-      DEBUG && console.log('[velocity] File scan complete, now watching', Velocity.getTestsPath().substring(Velocity.getAppPath().length));
-      if (callback) {
-        callback();
-      }
+      DEBUG && console.log('[velocity] File scan complete, now watching',
+        Velocity.getTestsPath().substring(Velocity.getAppPath().length));
+
+      callback && callback();
     }));
 
   }  // end _initFileWatcher
+
 
   function _isPackageWithTests(packageName) {
     return packageName !== 'tests-proxy' &&
