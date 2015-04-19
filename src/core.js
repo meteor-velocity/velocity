@@ -632,22 +632,34 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * @private
    */
   function _reset (config) {
+    var allFrameworks,
+        frameworksToIgnore;
 
     DEBUG && console.log('[velocity] resetting the world');
 
-    var frameworksWithDisableAutoReset = _(config).where({disableAutoReset: true}).pluck('name').value();
-    DEBUG && console.log('[velocity] frameworks with disable auto reset:', frameworksWithDisableAutoReset);
-    VelocityTestReports.remove({framework: {$nin: frameworksWithDisableAutoReset}});
-    VelocityLogs.remove({framework: {$nin: frameworksWithDisableAutoReset}});
+    allFrameworks = _getTestFrameworkNames();
+
+    // ignore frameworks that have opted-out
+    frameworksToIgnore = _(config)
+                           .where({disableAutoReset: true})
+                           .pluck('name')
+                           .value();
+
+    DEBUG && console.log('[velocity] frameworks with disable auto reset:',
+                         frameworksToIgnore);
+
     VelocityAggregateReports.remove({});
-    _.forEach(_getTestFrameworkNames(), function (testFramework) {
+    VelocityLogs.remove({framework: {$nin: frameworksToIgnore}});
+    VelocityTestReports.remove({framework: {$nin: frameworksToIgnore}});
+
+    _.forEach(allFrameworks, function (testFramework) {
       VelocityAggregateReports.insert({
         name: testFramework,
         result: 'pending'
       });
     });
-
   }
+
 
   /**
    * If any one test has failed, mark the aggregate test result as failed.
@@ -656,45 +668,52 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * @private
    */
   function _updateAggregateReports () {
+    var aggregateResult,
+        completedFrameworksCount,
+        allFrameworks = _getTestFrameworkNames();
 
-    VelocityAggregateReports.upsert({name: 'aggregateResult'}, {$set: {result: 'pending'}});
-    VelocityAggregateReports.upsert({name: 'aggregateComplete'}, {$set: {result: 'pending'}});
+    VelocityAggregateReports.upsert({name: 'aggregateResult'},
+                                    {$set: {result: 'pending'}});
+    VelocityAggregateReports.upsert({name: 'aggregateComplete'},
+                                    {$set: {result: 'pending'}});
 
     // if all of our test reports have valid results
     if (!VelocityTestReports.findOne({result: ''})) {
 
-      // pessimistically set passed state, ensuring all other states take precedence in order below
-      var aggregateResult =
-            VelocityTestReports.findOne({result: 'failed'}) ||
-            VelocityTestReports.findOne({result: 'undefined'}) ||
-            VelocityTestReports.findOne({result: 'skipped'}) ||
-            VelocityTestReports.findOne({result: 'pending'}) ||
-            VelocityTestReports.findOne({result: 'passed'}) ||
-            {result: 'pending'};
+      // pessimistically set passed state, ensuring all other states
+      // take precedence in order below
+      aggregateResult =
+        VelocityTestReports.findOne({result: 'failed'}) ||
+        VelocityTestReports.findOne({result: 'undefined'}) ||
+        VelocityTestReports.findOne({result: 'skipped'}) ||
+        VelocityTestReports.findOne({result: 'pending'}) ||
+        VelocityTestReports.findOne({result: 'passed'}) ||
+        {result: 'pending'};
 
       // update the global status
-      VelocityAggregateReports.update({'name': 'aggregateResult'}, {$set: {result: aggregateResult.result}});
+      VelocityAggregateReports.update({name: 'aggregateResult'},
+                                      {$set: {result: aggregateResult.result}});
     }
 
-    // if all test frameworks have completed, upsert an aggregate completed record
-    var completedFrameworksCount = VelocityAggregateReports.find({
-      'name': {$in: _getTestFrameworkNames()},
-      'result': 'completed'
-    }).count();
 
-    var aggregateComplete = VelocityAggregateReports.findOne({'name': 'aggregateComplete'});
-    if (aggregateComplete) {
-      if ((aggregateComplete.result !== 'completed') && (_getTestFrameworkNames().length === completedFrameworksCount)) {
-        VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
-        _.each(Velocity.postProcessors, function (processor) {
-          processor();
-        });
-      }
+    // Check if all test frameworks have completed successfully
+    completedFrameworksCount = VelocityAggregateReports.find({
+                                   name: {$in: allFrameworks},
+                                   result: 'completed'
+                                 }).count();
+
+    if (allFrameworks.length === completedFrameworksCount) {
+      VelocityAggregateReports.update({name: 'aggregateComplete'},
+                                      {$set: {'result': 'completed'}});
+      _.each(Velocity.postProcessors, function (processor) {
+        processor();
+      });
     }
   }
 
   function _getRelativePath (filePath) {
     var relativePath = filePath.substring(Velocity.getAppPath().length);
+
     if (relativePath[0] === '/') {
       relativePath = relativePath.substring(1);
     }
