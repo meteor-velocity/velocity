@@ -49,11 +49,13 @@ Most of these frameworks have an example in the [velocity-examples](https://gith
 * [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
 * [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) - Use Gherkin-syntax cucumber to 
 test your app. Includes PhantomJS and Selenium as well as SauceLabs support. 
-* [clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
-* [nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration 
 * [rsbatech:robotframework](https://github.com/rjsmith/meteor-robotframework) - [Robot Framework](http://robotframework.org/) end to end test integration using Selenium and many other [test libraries](http://robotframework.org/#test-libraries)
 
 A lot more information on these frameworks can be found on the [Velocity website](http://velocity.meteor.com/) and in their respective repositories.
+
+*These frameworks are no longer maintained since Velocity v0.6.0*
+* *[clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium*
+* *[nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration*
 
 ### Reporters
 
