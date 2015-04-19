@@ -54,6 +54,14 @@ describe('Velocity Methods', function () {
   });
 
   describe('velocity/isEnabled', function () {
+    beforeEach(function () {
+      this.original = process.env.VELOCITY;
+    });
+
+    afterEach(function () {
+      process.env.VELOCITY = this.original;
+    });
+
     it('returns false when environment variable is not set', function () {
       var actual;
 
