@@ -20,6 +20,110 @@ describe('Velocity Methods', function () {
   */
 
 
+  //////////////////////////////////////////////////////////////////////
+  // Logs
+  //
+  describe('velocity/logs/submit', function () {
+    it('stores a log entry', function () {
+      var entry = {
+            framework: 'logSubmitTest',
+            message: 'Test message'
+          },
+          record;
+
+      Meteor.call('velocity/logs/submit', entry);
+      record = VelocityLogs.findOne({framework: 'logSubmitTest'});
+      expect(record.message).toBe('Test message');
+    });
+  });
+
+  describe('velocity/logs/reset', function () {
+    it('clears log entries', function () {
+      var count = 0,
+          framework = "logResetTest";
+
+      Meteor.call('velocity/logs/submit', {framework: framework,
+                                           message: 'Test1' });
+      Meteor.call('velocity/logs/submit', {framework: framework,
+                                           message: 'Test2' });
+      count = VelocityLogs.find({framework: framework}).count();
+      expect(count).toBe(2);
+
+      Meteor.call('velocity/logs/reset', {framework: framework});
+      count = VelocityLogs.find({framework: framework}).count();
+      expect(count).toBe(0);
+    });
+  });
+
+
+  //////////////////////////////////////////////////////////////////////
+  // Reports
+  //
+  describe('velocity/reports/submit', function () {
+    it('stores a report entry', function () {
+      var framework = 'reportSubmitTest',
+          entry = {
+            framework: framework,
+            name: 'Test1',
+            result: 'passed'
+          },
+          record;
+
+      Meteor.call('velocity/reports/submit', entry);
+      record = VelocityTestReports.findOne({framework: framework});
+      expect(record.name).toBe('Test1');
+      expect(record.result).toBe('passed');
+    });
+  });
+
+  describe('velocity/reports/completed', function () {
+    it('marks framework aggregate report as completed', function () {
+      var framework = 'reportCompletedTest',
+          entry = {
+            framework: framework,
+            name: 'Test1',
+            result: 'passed'
+          },
+          record;
+
+      Meteor.call('velocity/reports/submit', entry);
+      Meteor.call('velocity/reports/completed', {framework: framework});
+
+      record = VelocityAggregateReports.findOne({'name': framework});
+      expect(record.result).toBe('completed');
+
+      console.log(VelocityAggregateReports.find({}).fetch());
+    });
+  });
+
+  describe('velocity/reports/reset', function () {
+    it('clears report entries', function () {
+      var count = 0,
+          framework = 'reportResetTest',
+          entry = {
+            framework: framework,
+            name: 'Test1',
+            result: 'passed'
+          },
+          record;
+
+      Meteor.call('velocity/reports/submit', entry);
+      entry.name = 'Test2';
+      Meteor.call('velocity/reports/submit', entry);
+      count = VelocityTestReports.find({framework: framework}).count();
+      expect(count).toBe(2);
+
+      Meteor.call('velocity/reports/reset', {framework: framework});
+      count = VelocityTestReports.find({framework: framework}).count();
+      expect(count).toBe(0);
+    });
+  });
+
+
+
+  //////////////////////////////////////////////////////////////////////
+  // Options
+  //
   describe('velocity/setOption', function () {
     it('sets an option', function () {
       var name,
@@ -71,6 +175,10 @@ describe('Velocity Methods', function () {
     });
   });
 
+
+  //////////////////////////////////////////////////////////////////////
+  // isEnabled
+  //
   describe('velocity/isEnabled', function () {
     beforeEach(function () {
       this.original = process.env.VELOCITY;
@@ -115,6 +223,9 @@ describe('Velocity Methods', function () {
   });
 
 
+  //////////////////////////////////////////////////////////////////////
+  // isMirror
+  //
   describe('velocity/isMirror', function () {
 
     beforeEach(function () {
