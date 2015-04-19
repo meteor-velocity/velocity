@@ -114,13 +114,23 @@
        *
        * @method velocity/isEnabled
        * @for Meteor.methods
-       * @return {Boolean} true if VELOCITY environment variable is truthy
+       * @return {Boolean} true if VELOCITY environment variable is truthy.
+       *                   Default: false
        */
       'velocity/isEnabled': function () {
-        if (process.env.VELOCITY === undefined) {
-          return true;
-        } else {
-          return !!parseInt(process.env.VELOCITY);
+        var type = typeof process.env.VELOCITY
+
+        switch (type) {
+          case "undefined":
+            return false;
+          case "string":
+            if (process.env.VELOCITY.toLowerCase() == "false" ||
+                parseInt(process.env.VELOCITY) == 0) {
+              return false
+            }
+            return true
+          default:
+            return !!process.env.VELOCITY;
         }
       }
     });
