@@ -56,5 +56,8 @@ Package.on_use(function (api) {
 Package.onTest(function(api) {
   api.use('sanjo:jasmine@0.13.0');
   api.use('velocity:core');
-  api.addFiles('tests/server/VelocitySpec.js', 'server');
+  api.addFiles([
+    'tests/server/VelocitySpec.js',
+    'tests/server/VelocityMethodsSpec.js'
+  ], 'server');
 });
