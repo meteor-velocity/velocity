@@ -37,6 +37,7 @@
     "VelocityFixtureFiles": false,
     "VelocityAggregateReports": false,
     "VelocityMirrors": false,
+    "VelocityOptions": false,
     "VelocityLogs": false,
     "VelocityVars": false,
     "$": false,

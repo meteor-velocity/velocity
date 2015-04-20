@@ -40,7 +40,7 @@ describe('Velocity Methods', function () {
   describe('velocity/logs/reset', function () {
     it('clears log entries', function () {
       var count = 0,
-          framework = "logResetTest";
+          framework = 'logResetTest';
 
       Meteor.call('velocity/logs/submit', {framework: framework,
                                            message: 'Test1' });
@@ -121,21 +121,21 @@ describe('Velocity Methods', function () {
    * @return {Array} Entries that were removed
    * @private
    */
-  function _removeJasmineReports () {
-    var collection = VelocityAggregateReports, 
-        query,
-        records;
-
-    query = {name: "jasmine-server-integration"};
-    records = collection.find(query).fetch();
-    collection.remove(query);
-
-    query.name = "jasmine-client-integration";
-    records = records.concat(collection.find(query).fetch());
-    collection.remove(query);
-
-    return records;
-  }
+  //function _removeJasmineReports () {
+  //  var collection = VelocityAggregateReports,
+  //      query,
+  //      records;
+  //
+  //  query = {name: "jasmine-server-integration"};
+  //  records = collection.find(query).fetch();
+  //  collection.remove(query);
+  //
+  //  query.name = "jasmine-client-integration";
+  //  records = records.concat(collection.find(query).fetch());
+  //  collection.remove(query);
+  //
+  //  return records;
+  //}
 
   describe('velocity/reports/reset', function () {
     it('clears report entries', function () {
@@ -145,8 +145,7 @@ describe('Velocity Methods', function () {
             framework: framework,
             name: 'Test1',
             result: 'passed'
-          },
-          record;
+          };
 
       Meteor.call('velocity/reports/submit', entry);
       entry.name = 'Test2';
@@ -169,11 +168,10 @@ describe('Velocity Methods', function () {
     it('sets an option', function () {
       var name,
           value,
-          expected,
           actual;
-          
-      name = "foo";
-      value = "bar";
+
+      name = 'foo';
+      value = 'bar';
       Meteor.call('velocity/setOption', name, value);
       actual = VelocityOptions.findOne({name: name});
       expect(actual.value).toEqual(value);
@@ -184,11 +182,10 @@ describe('Velocity Methods', function () {
     it('gets an option', function () {
       var name,
           value,
-          expected,
           actual;
-          
-      name = "foo";
-      value = "bar";
+
+      name = 'foo';
+      value = 'bar';
       Meteor.call('velocity/setOption', name, value);
       actual = Meteor.call('velocity/getOption', name);
       expect(actual).toEqual(value);
@@ -198,20 +195,20 @@ describe('Velocity Methods', function () {
   describe('velocity/setOptions', function () {
     it('sets multiple options', function () {
       var options = {
-            "foo": "bar",
-            "foo2": "baz",
-            "number": 1
+            'foo': 'bar',
+            'foo2': 'baz',
+            'number': 1
           },
           actual;
-          
+
       Meteor.call('velocity/setOptions', options);
-      actual = VelocityOptions.findOne({name: "foo"});
-      expect(actual.value).toEqual("bar");
+      actual = VelocityOptions.findOne({name: 'foo'});
+      expect(actual.value).toEqual('bar');
 
-      actual = VelocityOptions.findOne({name: "foo2"});
-      expect(actual.value).toEqual("baz");
+      actual = VelocityOptions.findOne({name: 'foo2'});
+      expect(actual.value).toEqual('baz');
 
-      actual = VelocityOptions.findOne({name: "number"});
+      actual = VelocityOptions.findOne({name: 'number'});
       expect(actual.value).toEqual(1);
     });
   });

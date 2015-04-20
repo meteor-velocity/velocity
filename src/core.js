@@ -206,7 +206,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityAggregateReports.remove({name: name});
       VelocityTestFiles.remove({targetFramework: name});
 
-      delete _config[name]
+      delete _config[name];
     }
   });
 

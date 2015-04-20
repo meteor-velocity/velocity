@@ -8,11 +8,10 @@ describe('Velocity', function () {
   it('getOption returns option', function () {
     var name,
         value,
-        expected,
         actual;
-        
-    name = "foo";
-    value = "bar";
+
+    name = 'foo';
+    value = 'bar';
     Meteor.call('velocity/setOption', name, value);
     actual = Velocity.getOption(name);
     expect(actual).toEqual(value);
@@ -21,11 +20,10 @@ describe('Velocity', function () {
   it('setOption sets an option', function () {
     var name,
         value,
-        expected,
         actual;
-        
-    name = "foo";
-    value = "bar";
+
+    name = 'foo';
+    value = 'bar';
     Velocity.setOption(name, value);
     actual = VelocityOptions.findOne({name: name});
     expect(actual.value).toEqual(value);
@@ -38,7 +36,7 @@ describe('Velocity', function () {
 
     it('creates a pending aggregate report', function () {
       var options = {
-            color: 'blue' 
+            color: 'blue'
           },
           report;
 

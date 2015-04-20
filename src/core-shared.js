@@ -118,17 +118,17 @@
        *                   Default: false
        */
       'velocity/isEnabled': function () {
-        var type = typeof process.env.VELOCITY
+        var type = typeof process.env.VELOCITY;
 
         switch (type) {
-          case "undefined":
+          case 'undefined':
             return false;
-          case "string":
-            if (process.env.VELOCITY.toLowerCase() == "false" ||
-                parseInt(process.env.VELOCITY) == 0) {
-              return false
+          case 'string':
+            if (process.env.VELOCITY.toLowerCase() === 'false' ||
+                parseInt(process.env.VELOCITY) === 0) {
+              return false;
             }
-            return true
+            return true;
           default:
             return !!process.env.VELOCITY;
         }
