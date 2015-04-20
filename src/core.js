@@ -41,7 +41,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       DEBUG && console.log('[velocity] config =', JSON.stringify(_config, null, 2));
 
       //kick-off everything
-      _reset(_config);
+      _resetAll();
 
       _initFileWatcher(_config, _triggerVelocityStartupFunctions);
 
@@ -191,8 +191,23 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         name: name,
         result: 'pending'
       });
-    }
+    },
 
+    /**
+     * Unregister a testing framework.  Mostly used for internal testing
+     * of core Velocity functions.
+     *
+     * @method unregisterTestingFramework
+     * @param {String} name Name of framework to unregister
+     */
+    unregisterTestingFramework: function (name) {
+      VelocityTestReports.remove({framework: name});
+      VelocityLogs.remove({framework: name});
+      VelocityAggregateReports.remove({name: name});
+      VelocityTestFiles.remove({targetFramework: name});
+
+      delete _config[name]
+    }
   });
 
 
@@ -242,7 +257,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _config[name] = _parseTestingFrameworkOptions(name, options);
 
       // make sure the appropriate aggregate records are added
-      _reset(_config);
+      _reset(name);
     },
 
 
@@ -251,8 +266,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *
      * @method velocity/reset
      */
-    'velocity/reset': function () {
-      _reset(_config);
+    'velocity/reset': function (name) {
+      check(name, String);
+      _reset(name);
     },
 
 
@@ -638,6 +654,27 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityInternals.isDirectory(Velocity.getTestsPath(packageName));
   }
 
+
+  /**
+   * Clear test reports, aggregate reports, and logs for a specific framework.
+   *
+   * @method _reset
+   * @param {String} name Framework to reset
+   * @private
+   */
+  function _reset (name) {
+    DEBUG && console.log('[velocity] resetting', name);
+
+    VelocityLogs.remove({framework: name});
+    VelocityTestReports.remove({framework: name});
+    VelocityAggregateReports.remove({name: name});
+
+    VelocityAggregateReports.insert({
+      name: name,
+      result: 'pending'
+    });
+  }
+
   /**
    * Clear all test reports, aggregate reports, and logs.
    *
@@ -645,7 +682,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
    * @private
    */
-  function _reset (config) {
+  function _resetAll () {
     var allFrameworks,
         frameworksToIgnore;
 
@@ -654,7 +691,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     allFrameworks = _getTestFrameworkNames();
 
     // ignore frameworks that have opted-out
-    frameworksToIgnore = _(config)
+    frameworksToIgnore = _(_config)
                            .where({disableAutoReset: true})
                            .pluck('name')
                            .value();

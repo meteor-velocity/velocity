@@ -2,22 +2,22 @@
 
 describe('Velocity Methods', function () {
 
-  /*
-   * TODO: Figure out why including this test prevents the tests in
-   * `VelocitySpec.js` from executing.
+  //////////////////////////////////////////////////////////////////////
+  // Register
+  //
   describe('velocity/register/framework', function () {
-    it('creates a pending aggregate report', function () {
-      var options = {
-            regex: /foo\/.+\.js$/
-          },
-          report;
+    afterEach(function () {
+      Velocity.unregisterTestingFramework('foo');
+    });
 
-      Meteor.call('velocity/register/framework', 'foo', options);
+    it('creates a pending aggregate report', function () {
+      var report;
+
+      Meteor.call('velocity/register/framework', 'foo');
       report = VelocityAggregateReports.findOne({name: 'foo'});
       expect(report.result).toBe('pending');
     });
   });
-  */
 
 
   //////////////////////////////////////////////////////////////////////
@@ -77,6 +77,23 @@ describe('Velocity Methods', function () {
   });
 
   describe('velocity/reports/completed', function () {
+
+    /*
+     * NOTE: Attempted to remove jasmine so we could test aggregate results
+     *       but check of total test framework count still prevents that.
+     *       Need a way to hide the jasmine test frameworks when checking
+     *       aggregate.
+    beforeEach(function () {
+      this.jasmineReports = _removeJasmineReports();
+    });
+
+    afterEach(function () {
+      this.jasmineReports.forEach(function (entry) {
+        VelocityAggregateReports.insert(entry);
+      });
+    });
+    */
+
     it('marks framework aggregate report as completed', function () {
       var framework = 'reportCompletedTest',
           entry = {
@@ -92,9 +109,33 @@ describe('Velocity Methods', function () {
       record = VelocityAggregateReports.findOne({'name': framework});
       expect(record.result).toBe('completed');
 
-      console.log(VelocityAggregateReports.find({}).fetch());
+      //console.log(VelocityAggregateReports.find({}).fetch());
     });
   });
+
+  /**
+   * Removes jasmine entries from aggregate report collection.
+   * For use when testing aggregate completion code.
+   *
+   * @method removeJasmineReports
+   * @return {Array} Entries that were removed
+   * @private
+   */
+  function _removeJasmineReports () {
+    var collection = VelocityAggregateReports, 
+        query,
+        records;
+
+    query = {name: "jasmine-server-integration"};
+    records = collection.find(query).fetch();
+    collection.remove(query);
+
+    query.name = "jasmine-client-integration";
+    records = records.concat(collection.find(query).fetch());
+    collection.remove(query);
+
+    return records;
+  }
 
   describe('velocity/reports/reset', function () {
     it('clears report entries', function () {

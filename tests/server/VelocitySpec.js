@@ -32,6 +32,10 @@ describe('Velocity', function () {
   });
 
   describe('registerTestingFramework', function () {
+    afterEach(function () {
+      Velocity.unregisterTestingFramework('foo');
+    });
+
     it('creates a pending aggregate report', function () {
       var options = {
             color: 'blue' 
@@ -43,4 +47,5 @@ describe('Velocity', function () {
       expect(report.result).toBe('pending');
     });
   });
+
 });
