@@ -30,6 +30,15 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _velocityStartupFunctions = [],
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$');
 
+  // Remove terminated mirrors from previous runs
+  // This is needed for `meteor --test` to work properly
+  VelocityMirrors.find({}).forEach(function (mirror) {
+    try {
+      process.kill(mirror.pid, 0);
+    } catch (error) {
+      VelocityMirrors.remove({pid: mirror.pid});
+    }
+  });
 
   if (process.env.NODE_ENV === 'development' &&
     process.env.VELOCITY !== '0' &&

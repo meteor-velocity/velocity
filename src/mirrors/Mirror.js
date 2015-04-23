@@ -111,7 +111,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         mongoUrl: String,
         host: String,
         rootUrl: String,
-        rootUrlPath: String
+        rootUrlPath: String,
+        pid: Number
       });
       check(extra, Match.Optional(Object));
 
@@ -303,8 +304,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       mongoUrl: environment.MONGO_URL,
       host: environment.HOST,
       rootUrl: environment.ROOT_URL,
-      rootUrlPath: environment.ROOT_URL_PATH
-    }, {
+      rootUrlPath: environment.ROOT_URL_PATH,
       pid: mirrorChild.getPid()
     });
   }
