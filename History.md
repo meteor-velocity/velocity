@@ -1,3 +1,8 @@
+## v0.6.1
+
+* Remove terminated mirrors from previous runs.
+  Fixes that `meteor --test` is not exiting after first run.
+
 ## v0.6.0
 
 * Support for Windows

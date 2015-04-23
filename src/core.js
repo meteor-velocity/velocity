@@ -36,6 +36,15 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _velocityStartupFunctions = [],
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$');
 
+  // Remove terminated mirrors from previous runs
+  // This is needed for `meteor --test` to work properly
+  VelocityMirrors.find({}).forEach(function (mirror) {
+    try {
+      process.kill(mirror.pid, 0);
+    } catch (error) {
+      VelocityMirrors.remove({pid: mirror.pid});
+    }
+  });
 
   Meteor.startup(function initializeVelocity () {
     DEBUG && console.log('[velocity] Server startup');
@@ -212,7 +221,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     /**
      * Registers a testing framework plugin via a Meteor method.
      *
-     * @method velocity/register/framework 
+     * @method velocity/register/framework
      * @param {String} name The name of the testing framework.
      * @param {Object} [options] Options for the testing framework.
      *   @param {String} [options.regex] The regular expression for test files
