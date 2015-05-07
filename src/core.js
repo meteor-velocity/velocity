@@ -442,6 +442,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         framework: String
       });
 
+      this.unblock();
+
       var sampleTestGenerator = _config[options.framework].sampleTestGenerator;
       if (sampleTestGenerator) {
         var sampleTests = sampleTestGenerator(options);

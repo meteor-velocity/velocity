@@ -84,6 +84,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         nodes: Match.Optional(Number),
         handshake: Match.Optional(Boolean)
       });
+
+      this.unblock();
+
       _startMirrors(options);
     },
 
@@ -152,6 +155,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       }));
 
       DEBUG && console.log('[velocity] Mirror registered. Handshaking with mirror...');
+
+      this.unblock();
 
       // TODO: Should the host really include the port?
       var mirrorConnection = DDP.connect(options.host, {
