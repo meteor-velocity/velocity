@@ -1,3 +1,8 @@
+## v0.6.3
+
+* Don't print errors when a test frameworks hasn't implemented the experimental lifecycle hooks.
+* Unblock longer running Velocity method calls for improved performance.
+
 ## v0.6.2
 
 * Fixes performance issue when you have node_modules in your tests folder.
