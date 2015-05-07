@@ -28,7 +28,7 @@ Package.on_use(function (api) {
   api.use('webapp');
   api.use('mongo');
   api.use('check');
-  api.use('velocity:chokidar@0.12.6_1', 'server');
+  api.use('velocity:chokidar@1.0.1_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_7');
   api.use('sanjo:long-running-child-process@1.0.3', 'server');
   api.use('sanjo:meteor-files-helpers@1.1.0_4', 'server');
