@@ -542,7 +542,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     DEBUG && console.log('[velocity] Add paths to watcher', paths);
 
-    _watcher = chokidar.watch(paths, {ignored: /[\/\\]\./, persistent: true});
+    _watcher = chokidar.watch(paths, {
+      ignored: /[\/\\](\.|node_modules)/,
+      persistent: true
+    });
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
 
       var relativePath,
