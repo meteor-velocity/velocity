@@ -1,3 +1,8 @@
+## v0.6.2
+
+* Fixes performance issue when you have node_modules in your tests folder.
+* Use velocity:METEOR@1.1.0.2_3 to spawn mirrors.
+
 ## v0.6.1
 
 * Remove terminated mirrors from previous runs.
