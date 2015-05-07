@@ -497,16 +497,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _.forEach(_getTestFrameworkNames(), function (testFramework) {
         Meteor.call('velocity/logs/reset', {framework: testFramework}, function () {
 
-          Meteor.call(testFramework + '/reset', function (error) {
-            if (error) {
-              console.error('[velocity] ERROR; testFramework/rest not implemented', error);
-            }
-          });
-          Meteor.call(testFramework + '/run', function (error) {
-            if (error) {
-              console.error('[velocity] ERROR; testFramework/run not implemented', error);
-            }
-          });
+          Meteor.call(testFramework + '/reset', function () {});
+          Meteor.call(testFramework + '/run', function () {});
         });
       });
     }
