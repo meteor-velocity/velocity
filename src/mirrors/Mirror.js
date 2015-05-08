@@ -27,11 +27,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   // Specifies the Meteor release that we use for mirrors
   Velocity.mirrorMeteorReleaseName = 'velocity:METEOR';
-  Velocity.mirrorMeteorVersion = '1.1.0.2_1';
+  Velocity.mirrorMeteorVersion = '1.1.0.2_3';
   Velocity.mirrorMeteorRelease =
     Velocity.mirrorMeteorReleaseName + '@' + Velocity.mirrorMeteorVersion;
   Velocity.mirrorMeteorToolReleaseName = 'velocity:meteor-tool';
-  Velocity.mirrorMeteorToolVersion = '1.1.3_2';
+  Velocity.mirrorMeteorToolVersion = '1.1.3_4';
   Velocity.mirrorMeteorToolRelease =
     Velocity.mirrorMeteorToolReleaseName + '@' + Velocity.mirrorMeteorToolVersion;
 
@@ -84,6 +84,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         nodes: Match.Optional(Number),
         handshake: Match.Optional(Boolean)
       });
+
+      this.unblock();
+
       _startMirrors(options);
     },
 
@@ -161,6 +164,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       }));
 
       DEBUG && console.log('[velocity] Mirror registered. Handshaking with mirror...');
+
+      this.unblock();
 
       // TODO: Should the host really include the port?
       var mirrorConnection = DDP.connect(options.host, {

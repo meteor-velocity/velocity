@@ -442,6 +442,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         framework: String
       });
 
+      this.unblock();
+
       var sampleTestGenerator = _config[options.framework].sampleTestGenerator;
       if (sampleTestGenerator) {
         var sampleTests = sampleTestGenerator(options);
@@ -544,16 +546,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _.forEach(_getTestFrameworkNames(), function (testFramework) {
         Meteor.call('velocity/logs/reset', {framework: testFramework}, function () {
 
-          Meteor.call(testFramework + '/reset', function (error) {
-            if (error) {
-              console.error('[velocity] ERROR; testFramework/rest not implemented', error);
-            }
-          });
-          Meteor.call(testFramework + '/run', function (error) {
-            if (error) {
-              console.error('[velocity] ERROR; testFramework/run not implemented', error);
-            }
-          });
+          Meteor.call(testFramework + '/reset', function () {});
+          Meteor.call(testFramework + '/run', function () {});
         });
       });
     }
@@ -588,7 +582,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     DEBUG && console.log('[velocity] Add paths to watcher', paths);
 
-    _watcher = chokidar.watch(paths, {ignored: /[\/\\]\./, persistent: true});
+    _watcher = chokidar.watch(paths, {
+      ignored: /[\/\\](\.|node_modules)/,
+      persistent: true
+    });
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
 
       var relativePath,
