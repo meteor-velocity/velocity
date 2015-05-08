@@ -469,22 +469,27 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @param {Object} options
      *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
      */
-    'velocity/returnTODOTestAndMarkItAsDOING': function (options) {
-      // TODO: Refactor to do findAndModify to prevent race condition
+    'velocity/returnTODOTestAndMarkItAsDOING': function(options) {
       check(options, {
         framework: String
       });
 
-      var _feature = VelocityTestFiles.findOne({
+      var _query = {
         targetFramework: options.framework,
         status: 'TODO'
-      });
+      };
+
+      var _update = {
+        $set: {status: 'DOING'}
+      };
 
 
-      if (_feature) {
-        VelocityTestFiles.update({_id: _feature.id, status: 'TODO'}, {$set: {status: 'DOING'}})
-      }
-      return _feature;
+      var collectionObj = VelocityTestFiles.rawCollection();
+      var wrappedFunc = Meteor.wrapAsync(collectionObj.findAndModify,
+        collectionObj);
+      var _TODOtest = wrappedFunc(_query, {}, _update, {});
+      
+      return _TODOtest;
     },
 
     /**
@@ -504,6 +509,27 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         _id: options.featureId
       }, {
         $set: {status: 'DONE'}
+      });
+
+    },
+
+    /**
+     * Marks test file as TODO
+     *
+     * @method velocity/featureTestFailed
+     *
+     * @param {Object} options
+     *   @param {String} options.featureId id of test
+     */
+    'velocity/featureTestFailed': function (options) {
+      check(options, {
+        featureId: String
+      });
+
+      VelocityTestFiles.update({
+        _id: options.featureId
+      }, {
+        $set: {status: 'TODO'}
       });
 
     }
