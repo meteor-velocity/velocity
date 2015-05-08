@@ -123,10 +123,19 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         _.extend(options, extra);
       }
 
-      VelocityMirrors.upsert({framework: options.framework},
-        _.extend(options, {
-          state: 'starting'
-        }));
+
+      var _upsertQuery = {framework: options.framework};
+      var _options = _.extend(options, {
+        state: 'starting'
+      });
+
+      // TODO: Should we just check port for all of the frameworks?
+      if (options.framework === "cucumber") {
+        _upsertQuery.port = options.port;
+      }
+
+      VelocityMirrors.upsert(_upsertQuery,
+        _options);
     },
 
     /**
@@ -163,15 +172,18 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
           DEBUG && console.log('[velocity] Parent Handshake response', e, r);
         });
         mirrorConnection.disconnect();
-        // TODO: This does not support starting multiple mirror for one framework
-        VelocityMirrors.update({
-          framework: options.framework
-        }, {
+
+        var _updateQuery = {
+          framework: options.framework,
+          port: parseInt(options.port)
+        };
+        VelocityMirrors.update(_updateQuery, {
           $set: {
             state: 'ready',
             lastModified: Date.now()
           }
         });
+
       };
     },
 
@@ -216,6 +228,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
   }
 
   function _startMirror (options) {
+
+    // TODO, options is passed as a reference, maybe we should pass a copy instead
+
     options.handshake = options.handshake === undefined ? true : options.handshake;
     options.rootUrlPath = (options.rootUrlPath || '');
     options.host = _getMirrorUrl(options.port);
@@ -269,6 +284,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       args.push('--release', Velocity.mirrorMeteorRelease);
     }
 
+    console.log("mirrorChild spawn command:", command, " args: ", args);
+    //console.log("environment ", environment);
     mirrorChild.spawn({
       command: command,
       args: args,
@@ -286,7 +303,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     console.log(('[velocity] ' +
       environment.FRAMEWORK + ' is starting a mirror at ' +
-      options.rootUrl + '.'
+      environment.ROOT_URL + '.'
     ).yellow);
 
     var isMeteorToolInstalled = MeteorFilesHelpers.isPackageInstalled(
@@ -316,7 +333,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   function _getMirrorChild (framework) {
     var mirrorChild = _mirrorChildProcesses[framework];
-    if (!mirrorChild) {
+    if (!mirrorChild || framework === "cucumber") {
       mirrorChild = new sanjo.LongRunningChildProcess(framework);
       _mirrorChildProcesses[framework] = mirrorChild;
     }

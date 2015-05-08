@@ -457,9 +457,55 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
           files.writeFile(fullTestPath, testFile.contents);
         });
       }
-    }  // end copySampleTests
+    },  // end copySampleTests
+
+    /**
+     * Finds a test file with TODO status
+     * changes the status to "DOING", and returns it
+     *
+     * @method velocity/returnTODOTestAndMarkItAsDOING
+     *
+     * @param {Object} options
+     *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
+     */
+    'velocity/returnTODOTestAndMarkItAsDOING': function (options) {
+      // TODO: Refactor to do findAndModify to prevent race condition
+      check(options, {
+        framework: String
+      });
+
+      var _feature = VelocityTestFiles.findOne({
+        targetFramework: options.framework,
+        status: 'TODO'
+      });
 
 
+      if (_feature) {
+        VelocityTestFiles.update({_id: _feature.id, status: 'TODO'}, {$set: {status: 'DOING'}})
+      }
+      return _feature;
+    },
+
+    /**
+     * Marks test file as DONE
+     *
+     * @method velocity/featureTestDone
+     *
+     * @param {Object} options
+     *   @param {String} options.featureId id of test
+     */
+    'velocity/featureTestDone': function (options) {
+      check(options, {
+        featureId: String
+      });
+
+      VelocityTestFiles.update({
+        _id: options.featureId
+      }, {
+        $set: {status: 'DONE'}
+      });
+
+    }
 
   });  // end Meteor methods
 
