@@ -283,9 +283,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
       args.push('--release', Velocity.mirrorMeteorRelease);
     }
-
-    console.log("mirrorChild spawn command:", command, " args: ", args);
-    //console.log("environment ", environment);
+    
     mirrorChild.spawn({
       command: command,
       args: args,
