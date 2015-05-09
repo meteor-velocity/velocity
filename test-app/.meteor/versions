@@ -53,8 +53,8 @@ tracker@1.0.7
 ui@1.0.6
 underscore@1.0.3
 url@1.0.4
-velocity:chokidar@0.12.6_1
-velocity:core@0.6.1
+velocity:chokidar@1.0.1_1
+velocity:core@0.6.3
 velocity:html-reporter@0.5.3
 velocity:meteor-internals@1.1.0_7
 velocity:meteor-stubs@1.0.3
