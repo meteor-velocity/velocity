@@ -635,10 +635,12 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       // Since we key on filePath and we only add files we're interested in,
       // we don't have to worry about inadvertently updating records for files
       // we don't care about.
+      filePath = files.convertToStandardPath(files.pathNormalize(filePath));
       VelocityTestFiles.update(filePath, {$set: {lastModified: Date.now()}});
     }));
 
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
+      filePath = files.convertToStandardPath(files.pathNormalize(filePath));
       DEBUG && console.log('[velocity] File removed:',
                            _getRelativePath(filePath));
 
