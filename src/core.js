@@ -139,7 +139,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * A collection of callbacks to be executed after all tests have completed
      * and the aggregate test results have been reported.
      *
-     * See {{#crossLink "Velocity/addPostProcessor:method"}}{{/crossLink}}
+     * See {{#crossLink 'Velocity/addPostProcessor:method'}}{{/crossLink}}
      *
      * @property postProcessors
      * @type Array
@@ -179,7 +179,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} [options.regex] The regular expression for test files
      *                    that should be assigned to the testing framework.
      *                    The path relative to the tests folder is matched
-     *                    against it. Default: "name/.+\.js$" (name is
+     *                    against it. Default: 'name/.+\.js$' (name is
      *                    the testing framework name).
      *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
      *                    will skip reports and logs for this framework.
@@ -226,7 +226,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} [options.regex] The regular expression for test files
      *                    that should be assigned to the testing framework.
      *                    The path relative to the tests folder is matched
-     *                    against it. Default: "name/.+\.js$" (name is
+     *                    against it. Default: 'name/.+\.js$' (name is
      *                    the testing framework name).
      *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
      *                    will skip reports and logs for this framework.
@@ -461,7 +461,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     /**
      * Finds a test file with TODO status
-     * changes the status to "DOING", and returns it
+     * changes the status to 'DOING', and returns it
      *
      * @method velocity/returnTODOTestAndMarkItAsDOING
      *
@@ -582,7 +582,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * Initialize the directory/file watcher.
    *
    * @method _initFileWatcher
-   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
+   * @param {Object} config See {{#crossLink 'Velocity/registerTestingFramework:method'}}{{/crossLink}}
    * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
@@ -693,7 +693,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * Re-init file watcher and clear all test results.
    *
    * @method _reset
-   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
+   * @param {Object} config See {{#crossLink 'Velocity/registerTestingFramework:method'}}{{/crossLink}}
    * @private
    */
   function _reset (config) {

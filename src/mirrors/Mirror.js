@@ -50,7 +50,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
      * @param {String} [options.testsPath]      The path to tests for this framework.
-     *                                          For example "jasmine/server/unit".
+     *                                          For example 'jasmine/server/unit'.
      *                                          Don't include a leading or trailing slash.
      * @param {String} [options.args]           Additional arguments that the mirror is called with
      *                                          It accepts all the options that are available for `meteor run`.
@@ -130,7 +130,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       });
 
       // TODO: Should we just check port for all of the frameworks?
-      if (options.framework === "cucumber") {
+      if (options.framework === 'cucumber') {
         _upsertQuery.port = options.port;
       }
 
@@ -331,7 +331,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   function _getMirrorChild (framework) {
     var mirrorChild = _mirrorChildProcesses[framework];
-    if (!mirrorChild || framework === "cucumber") {
+    if (!mirrorChild || framework === 'cucumber') {
       mirrorChild = new sanjo.LongRunningChildProcess(framework);
       _mirrorChildProcesses[framework] = mirrorChild;
     }
