@@ -185,8 +185,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         });
 
       };
-
-      };
     },
 
     /**
