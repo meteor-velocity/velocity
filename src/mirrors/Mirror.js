@@ -185,6 +185,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         });
 
       };
+
+      };
     },
 
     /**
@@ -283,7 +285,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
       args.push('--release', Velocity.mirrorMeteorRelease);
     }
-    
+
     mirrorChild.spawn({
       command: command,
       args: args,

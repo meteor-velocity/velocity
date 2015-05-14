@@ -487,7 +487,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       var wrappedFunc = Meteor.wrapAsync(collectionObj.findAndModify,
         collectionObj);
       var _TODOtest = wrappedFunc(_query, {}, _update, {});
-      
+
       return _TODOtest;
     },
 
