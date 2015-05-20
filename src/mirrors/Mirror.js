@@ -237,7 +237,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     var environment = _getEnvironmentVariables(options);
 
-    var mirrorChild = _getMirrorChild(environment.FRAMEWORK);
+    var mirrorChild = _getMirrorChild(environment.FRAMEWORK, options.port);
     if (mirrorChild.isRunning()) {
       return;
     }
@@ -328,11 +328,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     });
   }
 
-  function _getMirrorChild (framework) {
-    var mirrorChild = _mirrorChildProcesses[framework];
-    if (!mirrorChild || framework === 'cucumber') {
-      mirrorChild = new sanjo.LongRunningChildProcess(framework);
-      _mirrorChildProcesses[framework] = mirrorChild;
+  function _getMirrorChild (framework, port) {
+    var _processName = framework + '_' + port;
+    var mirrorChild = _mirrorChildProcesses[_processName];
+    if (!mirrorChild) {
+      mirrorChild = new sanjo.LongRunningChildProcess(_processName);
+      _mirrorChildProcesses[_processName] = mirrorChild;
     }
     return mirrorChild;
   }
