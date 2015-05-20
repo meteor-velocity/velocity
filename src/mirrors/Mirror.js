@@ -124,15 +124,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       }
 
 
-      var _upsertQuery = {framework: options.framework};
+      var _upsertQuery = {
+        framework: options.framework,
+        port: options.port
+      };
+
       var _options = _.extend(options, {
         state: 'starting'
       });
-
-      // TODO: Should we just check port for all of the frameworks?
-      if (options.framework === 'cucumber') {
-        _upsertQuery.port = options.port;
-      }
 
       VelocityMirrors.upsert(_upsertQuery,
         _options);
