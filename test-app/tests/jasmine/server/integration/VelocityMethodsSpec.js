@@ -226,13 +226,13 @@ describe('Velocity Methods', function () {
       process.env.VELOCITY = this.original;
     });
 
-    it('returns false when environment variable is not set', function () {
+    it('returns true when environment variable is not set', function () {
       var actual;
 
       delete process.env.VELOCITY;
 
       actual = Meteor.call('velocity/isEnabled');
-      expect(actual).toBe(false);
+      expect(actual).toBe(true);
     });
 
     it('returns false when environment variable is set to falsy', function () {

@@ -115,14 +115,15 @@
        * @method velocity/isEnabled
        * @for Meteor.methods
        * @return {Boolean} true if VELOCITY environment variable is truthy.
-       *                   Default: false
+       *                   false if VELOCITY environment variable is falsy.
+       *                   Default: true
        */
       'velocity/isEnabled': function () {
         var type = typeof process.env.VELOCITY;
 
         switch (type) {
           case 'undefined':
-            return false;
+            return true;
           case 'string':
             if (process.env.VELOCITY.toLowerCase() === 'false' ||
                 parseInt(process.env.VELOCITY) === 0) {
