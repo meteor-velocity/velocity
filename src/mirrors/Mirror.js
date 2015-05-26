@@ -237,7 +237,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     var environment = _getEnvironmentVariables(options);
 
-    var mirrorChild = _getMirrorChild(environment.FRAMEWORK, options.port);
+    var mirrorChild = _getMirrorChild(environment.FRAMEWORK, environment.PORT);
     if (mirrorChild.isRunning()) {
       return;
     }
@@ -315,7 +315,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     console.log(('[velocity] You can see the mirror logs at: tail -f ' +
     files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
-      '.meteor', 'local', 'log', environment.FRAMEWORK + '.log'))).yellow);
+      '.meteor', 'local', 'log', environment.FRAMEWORK + '_' + environment.PORT + '.log'))).yellow);
 
     Meteor.call('velocity/mirrors/init', {
       framework: environment.FRAMEWORK,
