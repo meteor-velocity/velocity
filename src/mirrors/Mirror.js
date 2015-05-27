@@ -210,20 +210,43 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       nodes: 1
     }, options);
     DEBUG && console.log('[velocity]', options.nodes, 'mirror(s) requested');
-
     // only respect a provided port if a single mirror is requested
     if (options.port && options.nodes === 1) {
       _startMirror(options);
     } else {
-      var startWithFreePort = Meteor.bindEnvironment(function (err, port) {
+      _reuseMirrors();
+      _startUninitializedMirrorsWithFreePorts();
+    }
+
+    function _reuseMirrors() {
+      options.unitializedNodes = options.nodes;
+      var _reusableMirrorsForFramework = _.filter(Velocity.reusableMirrors, function(rmp) {
+        return rmp.framework === options.framework && rmp.reused === false;
+      });
+
+      _reusableMirrorsForFramework.forEach(function(rmff) {
+        rmff.reused = true;
+
+        options.port = rmff.port;
+        _startMirror(options);
+
+        options.unitializedNodes--;
+
+      });
+
+    }
+
+    function _startUninitializedMirrorsWithFreePorts() {
+      var startWithFreePort = Meteor.bindEnvironment(function(err, port) {
         options.port = port;
         _startMirror(options);
       });
 
-      for (var i = 0; i < options.nodes; i++) {
+      for (var i = 0; i < options.unitializedNodes; i++) {
         freeport(startWithFreePort);
       }
     }
+
   }
 
   function _startMirror (options) {

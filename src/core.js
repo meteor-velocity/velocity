@@ -30,15 +30,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _velocityStartupFunctions = [],
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$');
 
-  // Remove terminated mirrors from previous runs
-  // This is needed for `meteor --test` to work properly
-  VelocityMirrors.find({}).forEach(function (mirror) {
-    try {
-      process.kill(mirror.pid, 0);
-    } catch (error) {
-      VelocityMirrors.remove({pid: mirror.pid});
-    }
-  });
+
+  _removeTerminatedMirrors();
+
+  _setReusableMirrors();
 
   if (process.env.NODE_ENV === 'development' &&
     process.env.VELOCITY !== '0' &&
@@ -853,6 +848,26 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
   function _getTestFrameworkNames () {
     return _.pluck(_config, 'name');
+  }
+
+  function _removeTerminatedMirrors() {
+    // Remove terminated mirrors from previous runs
+    // This is needed for `meteor --test` to work properly
+    VelocityMirrors.find({}).forEach(function(mirror) {
+      try {
+        process.kill(mirror.pid, 0);
+      } catch (error) {
+        VelocityMirrors.remove({pid: mirror.pid});
+      }
+    });
+  }
+
+  function _setReusableMirrors() {
+    Velocity.reusableMirrors = [];
+    VelocityMirrors.find({}).forEach(function(mirror) {
+      mirror.reused = false;
+      Velocity.reusableMirrors.push(mirror)
+    })
   }
 
 })();
