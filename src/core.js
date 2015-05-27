@@ -560,7 +560,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityTestFiles.update({
         _id: options.featureId
       }, {
-        $set: {status: 'TODO'}
+        $set: {
+          status: 'TODO',
+          brokenPreviously: true
+        }
       });
 
     }
