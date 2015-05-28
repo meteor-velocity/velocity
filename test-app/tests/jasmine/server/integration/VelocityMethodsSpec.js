@@ -159,7 +159,162 @@ describe('Velocity Methods', function () {
     });
   });
 
+  //////////////////////////////////////////////////////////////////////
+  // Test Files
+  //
 
+  describe('velocity/returnTODOTestAndMarkItAsDOING', function() {
+    it('returns TODO test while marking it as DOING', function() {
+      var filesWithChangedStatus,
+        filesWithOriginalStatus,
+        framework = 'returnTodo',
+        originalStatus = 'TODO',
+        changedStatus = 'DOING';
+
+        var entry = {
+          targetFramework: framework,
+          status: originalStatus
+        };
+
+      var changedEntry = JSON.parse(JSON.stringify(entry));
+      changedEntry.status = changedStatus;
+
+      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      expect(filesWithOriginalStatus, 0);
+
+      VelocityTestFiles.insert(entry);
+
+      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      expect(filesWithOriginalStatus, 1);
+
+      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      expect(filesWithChangedStatus).toBe(0);
+
+      var _returnedFile = Meteor.call('velocity/returnTODOTestAndMarkItAsDOING', {framework: framework});
+
+      expect(_returnedFile).toBeDefined();
+      expect(_returnedFile.status).toBe(originalStatus);
+
+      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      expect(filesWithChangedStatus).toBe(1);
+
+
+      VelocityTestFiles.remove(changedEntry);
+    });
+  });
+
+
+  describe('velocity/featureTestDone', function() {
+    it('sets feature as done', function() {
+      var filesWithChangedStatus,
+        filesWithOriginalStatus,
+        framework = 'testDone',
+        originalStatus = 'DOING',
+        changedStatus = 'DONE',
+        featureId = 'testDoneFeatureId';
+
+      var entry = {
+        _id: featureId,
+        targetFramework: framework,
+        status: originalStatus
+      };
+
+      var changedEntry = JSON.parse(JSON.stringify(entry));
+      changedEntry.status = changedStatus;
+
+      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      expect(filesWithOriginalStatus, 0);
+
+      VelocityTestFiles.insert(entry);
+
+      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      expect(filesWithOriginalStatus, 1);
+
+      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      expect(filesWithChangedStatus).toBe(0);
+
+      Meteor.call('velocity/featureTestDone', {featureId: featureId});
+
+      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      expect(filesWithChangedStatus).toBe(1);
+
+
+      VelocityTestFiles.remove(changedEntry);
+
+
+    });
+  });
+
+  describe('velocity/featureTestFailed', function() {
+    it('sets feature as TODO', function() {
+      var filesWithChangedStatus,
+        filesWithOriginalStatus,
+        framework = 'testFailed',
+        originalStatus = 'DOING',
+        changedStatus = 'TODO',
+        featureId = 'testFailedFeatureId';
+
+      var entry = {
+        _id: featureId,
+        targetFramework: framework,
+        status: originalStatus
+      };
+
+      var changedEntry = JSON.parse(JSON.stringify(entry));
+      changedEntry.status = changedStatus;
+
+      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      expect(filesWithOriginalStatus, 0);
+
+      VelocityTestFiles.insert(entry);
+
+      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      expect(filesWithOriginalStatus, 1);
+
+      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      expect(filesWithChangedStatus).toBe(0);
+
+      Meteor.call('velocity/featureTestFailed', {featureId: featureId});
+
+      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      expect(filesWithChangedStatus).toBe(1);
+
+      VelocityTestFiles.remove(changedEntry);
+
+    });
+
+    it('sets feature as brokenPreviously', function() {
+      var filesBrokenPreviously,
+        framework = 'testFailed',
+        originalStatus = 'DOING',
+        featureId = 'testFailedFeatureId';
+
+      var entry = {
+        _id: featureId,
+        targetFramework: framework,
+        status: originalStatus
+      };
+
+      var changedEntry = JSON.parse(JSON.stringify(entry));
+      delete changedEntry.status;
+      changedEntry.brokenPreviously = true;
+
+      VelocityTestFiles.insert(entry);
+
+      filesBrokenPreviously = VelocityTestFiles.find(changedEntry).count();
+      expect(filesBrokenPreviously, 0);
+
+      Meteor.call('velocity/featureTestFailed', {featureId: featureId});
+
+      filesBrokenPreviously = VelocityTestFiles.find(changedEntry).count();
+      expect(filesBrokenPreviously).toBe(1);
+
+      VelocityTestFiles.remove(changedEntry);
+
+    });
+
+
+  });
 
   //////////////////////////////////////////////////////////////////////
   // Options
