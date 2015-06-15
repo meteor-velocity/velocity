@@ -260,7 +260,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     var environment = _getEnvironmentVariables(options);
 
-    var mirrorChild = _getMirrorChild(environment.FRAMEWORK, environment.PORT);
+    // append the port to the mirror log if there are multiple mirrors
+    var processName = environment.FRAMEWORK;
+    if (options.nodes > 1) {
+      processName = environment.FRAMEWORK + '_' + environment.PORT;
+    }
+
+    var mirrorChild = _getMirrorChild(environment.FRAMEWORK, processName);
     if (mirrorChild.isRunning()) {
       return;
     }
@@ -332,13 +338,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     );
     if (!isMeteorToolInstalled) {
       console.log(
-        '[velocity] This takes a few minutes the first time.'.yellow
+        '[velocity] *** Meteor Tools is installing ***',
+        '\nThis takes a few minutes the first time.'.yellow
       );
     }
 
     console.log(('[velocity] You can see the mirror logs at: tail -f ' +
     files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
-      '.meteor', 'local', 'log', environment.FRAMEWORK + '_' + environment.PORT + '.log'))).yellow);
+      '.meteor', 'local', 'log', processName + '.log'))).yellow);
 
     Meteor.call('velocity/mirrors/init', {
       framework: environment.FRAMEWORK,
@@ -351,8 +358,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     });
   }
 
-  function _getMirrorChild (framework, port) {
-    var _processName = framework + '_' + port;
+  function _getMirrorChild (framework, processName) {
+    var _processName = processName || framework;
     var mirrorChild = _mirrorChildProcesses[_processName];
     if (!mirrorChild) {
       mirrorChild = new sanjo.LongRunningChildProcess(_processName);
