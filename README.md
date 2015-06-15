@@ -3,6 +3,10 @@ Velocity
 
 Test runner (and community) for Meteor apps.  Under heavy development.
 
+Ask questions in chat [![Join the chat at https://gitter.im/meteor-velocity/velocity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/meteor-velocity/velocity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+We also test <img src="https://codeship.com/projects/ed973200-b7a3-0132-ec13-7eb16f937591/status?branch=develop" />
+
 ### What is Velocity?
 Head over to the [official homepage](http://velocity.meteor.com) 
 
@@ -43,13 +47,14 @@ Most of these frameworks have an example in the [velocity-examples](https://gith
 
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) - Write client and server unit and integration tests with Jasmine.
 * [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
-* [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) - Use Gherkin-syntax cucumber to 
-test your app. Includes PhantomJS and Selenium as well as SauceLabs support. 
-* [clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium
-* [nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration 
+* [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) - Use BDD Gherkin-syntax cucumber to test your app. Includes PhantomJS and Selenium as well as SauceLabs support. 
 * [rsbatech:robotframework](https://github.com/rjsmith/meteor-robotframework) - [Robot Framework](http://robotframework.org/) end to end test integration using Selenium and many other [test libraries](http://robotframework.org/#test-libraries)
 
 A lot more information on these frameworks can be found on the [Velocity website](http://velocity.meteor.com/) and in their respective repositories.
+
+*These frameworks are no longer maintained since Velocity v0.6.0*
+* *[clinical:nightwatch](https://github.com/awatson1978/clinical-nightwatch) - run acceptance tests with automated browsers using the Nightwatch bridge to Selenium*
+* *[nblazer:casperjs](https://github.com/blazer82/meteor-casperjs/) - [CasperJS](http://casperjs.org) end to end test integration*
 
 ### Reporters
 
@@ -75,7 +80,7 @@ We would love to add your framework to the list!  Take a look at how some of the
 
 Please see the [velocity-wiki](https://github.com/meteor-velocity/velocity/wiki/How-to-integrate-a-test-framework-with-Velocity) for basic instructions on making your test framework work with Velocity.
 
-Also, be sure to check out the documentation for the public API.  You can view them in the browser by cloning this repo and then running: `open docs/classes/Velocity.html`
+Also, be sure to check out the [documentation for the public API](http://meteor-velocity.github.io/velocity/).
  
 A few notes on being velocity-compatible:
 
@@ -162,11 +167,20 @@ We use:
 
 You can run the tests with: `./ci.sh`
 
-Add or edit tests in: `test-app/tests/`.
+Add or edit end to end tests in: `test-app/tests/`.
 
 ##### 4. Code conventions
 
-We JSHint to ensure a common code style. It's also part of our CI.
+We use JSHint to ensure a common code style. It's also part of our CI.
+
+```
+npm install jshint@2.5 -g
+```
+
+__Please also follow:__
+
+* The [Meteor Style Guide](https://github.com/meteor/meteor/wiki/Meteor-Style-Guide)
+* [Style guide](https://meteor.hackpad.com/Style-guide-for-cross-platform-server-side-development-YaSdh7tFxAt) for cross-platform server-side development
 
 ##### 5. Contribute and ask questions
 
@@ -204,10 +218,7 @@ We are collaborating with an all-star team on unifying the Meteor testing landsc
 * [Sam Hatoum](https://github.com/samhatoum) from [Xolv.io](http://xolv.io/), author of [The Meteor Testing Manual](https://www.meteortesting.com)
 * [Adrian Lanning](https://github.com/alanning) from [Share911](http://about.share911.com/), contributor to [all things Meteor](https://github.com/alanning?tab=repositories)
 * [Mike Risse](https://github.com/rissem) from [MadEye](https://madeye.io/), author of [mocha-web](https://github.com/mad-eye/meteor-mocha-web)
-* [Ronen Babayoff](https://github.com/ronen-lavaina) from LaVaina Inc, co-author of [Munit](https://github.com/spacejamio/meteor-munit)
-* [Abigail Watson](https://github.com/awatson1978) from [Pentasyllabic](http://www.pentasyllabic.com), author of [Meteor Cookbook](https://github.com/awatson1978/meteor-cookbook), [Selenium-Nightwatch](https://github.com/awatson1978/selenium-nightwatch/)
 * [Robert Dickert](https://github.com/rdickert) from [Meteor Boulder](http://www.meetup.com/Meteor-Boulder), contributor to [all things Meteor](https://github.com/rdickert?tab=repositories)
-* [Josh Owens](https://github.com/queso) from [Differential](http://differential.io/), author of [Testing with Meteor](http://testingmeteor.com/)
 * [Jonas Aschenbrenner](https://github.com/sanjo), velocity contributor, [Jasmine](https://github.com/Sanjo/meteor-jasmine) package
 * [Richard Smith](https://github.com/rjsmith) from [RSBA Technology Ltd](http://www.rsbatechnology.co.uk), author of [Meteor-RobotFramework](https://github.com/rjsmith/meteor-robotframework)
 

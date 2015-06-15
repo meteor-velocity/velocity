@@ -17,12 +17,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 // Init
 //
 
-  if (process.env.NODE_ENV !== 'development' ||
-    process.env.VELOCITY === '0' ||
-    process.env.IS_MIRROR) {
-    DEBUG && console.log('[velocity] ' + (process.env.IS_MIRROR ? 'Mirror detected - ' : '') + 'Not adding velocity core');
-    return;
-  }
   DEBUG && console.log('[velocity] adding velocity core');
   CONTINUOUS_INTEGRATION && console.log('[velocity] is in continuous integration mode');
 
@@ -36,31 +30,29 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _velocityStartupFunctions = [],
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$');
 
-  // Remove terminated mirrors from previous runs
-  // This is needed for `meteor --test` to work properly
-  VelocityMirrors.find({}).forEach(function (mirror) {
-    try {
-      process.kill(mirror.pid, 0);
-    } catch (error) {
-      VelocityMirrors.remove({pid: mirror.pid});
-    }
-  });
 
-  Meteor.startup(function initializeVelocity () {
-    DEBUG && console.log('[velocity] Server startup');
-    DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
-    DEBUG && console.log('[velocity] config =', JSON.stringify(_config, null, 2));
+  _removeTerminatedMirrors();
 
-    //kick-off everything
-    _reset(_config);
+  _setReusableMirrors();
 
-    if (!process.env.IS_MIRROR) {
+  if (process.env.NODE_ENV === 'development' &&
+    process.env.VELOCITY !== '0' &&
+    !process.env.IS_MIRROR
+  ) {
+    Meteor.startup(function initializeVelocity () {
+      DEBUG && console.log('[velocity] Server startup');
+      DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
+      DEBUG && console.log('[velocity] config =', JSON.stringify(_config, null, 2));
+
+      //kick-off everything
+      _resetAll();
+
       _initFileWatcher(_config, _triggerVelocityStartupFunctions);
-    }
 
-    _launchContinuousIntegration(_config);
+      _launchContinuousIntegration(_config);
 
-  });
+    });
+  }
 
 //////////////////////////////////////////////////////////////////////
 // Public Methods
@@ -69,8 +61,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   _.extend(Velocity, {
 
     /**
-     * Run code when Velocity is started. Velocity is considered started when the file watcher has
-     * completed the scan of the  file system
+     * Run code when Velocity is started.
+     *
+     * Velocity is considered started when the file watcher has
+     * completed the scan of the file system.
      *
      * @method startup
      * @return {function} A function to run on startup
@@ -86,10 +80,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     },
 
     /**
-     * Get application directory path.
+     * Get the application root path.
      *
      * @method getAppPath
-     * @return {String} app directory path
+     * @return {String} app root path
      */
     getAppPath: function () {
       var appPath = files.findAppDir();
@@ -140,7 +134,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * A collection of callbacks to be executed after all tests have completed
      * and the aggregate test results have been reported.
      *
-     * See {{#crossLink "Velocity/addPostProcessor:method"}}{{/crossLink}}
+     * See {{#crossLink 'Velocity/addPostProcessor:method'}}{{/crossLink}}
      *
      * @property postProcessors
      * @type Array
@@ -180,7 +174,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} [options.regex] The regular expression for test files
      *                    that should be assigned to the testing framework.
      *                    The path relative to the tests folder is matched
-     *                    against it. Default: "name/.+\.js$" (name is
+     *                    against it. Default: 'name/.+\.js$' (name is
      *                    the testing framework name).
      *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
      *                    will skip reports and logs for this framework.
@@ -201,8 +195,23 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         name: name,
         result: 'pending'
       });
-    }
+    },
 
+    /**
+     * Unregister a testing framework.  Mostly used for internal testing
+     * of core Velocity functions.
+     *
+     * @method unregisterTestingFramework
+     * @param {String} name Name of framework to unregister
+     */
+    unregisterTestingFramework: function (name) {
+      VelocityTestReports.remove({framework: name});
+      VelocityLogs.remove({framework: name});
+      VelocityAggregateReports.remove({name: name});
+      VelocityTestFiles.remove({targetFramework: name});
+
+      delete _config[name];
+    }
   });
 
 
@@ -227,7 +236,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} [options.regex] The regular expression for test files
      *                    that should be assigned to the testing framework.
      *                    The path relative to the tests folder is matched
-     *                    against it. Default: "name/.+\.js$" (name is
+     *                    against it. Default: 'name/.+\.js$' (name is
      *                    the testing framework name).
      *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
      *                    will skip reports and logs for this framework.
@@ -242,7 +251,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      */
     'velocity/register/framework': function (name, options) {
       options = options || {};
-      check(name, Match.Optional(String));
+      check(name, String);
       check(options, {
         disableAutoReset: Match.Optional(Boolean),
         regex: Match.Optional(RegExp),
@@ -252,101 +261,24 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _config[name] = _parseTestingFrameworkOptions(name, options);
 
       // make sure the appropriate aggregate records are added
-      _reset(_config);
+      _reset(name);
     },
 
 
     /**
-     * Re-init file watcher and clear all test results.
+     * Clear all test reports, aggregate reports, and logs.
      *
      * @method velocity/reset
      */
-    'velocity/reset': function () {
-      _reset(_config);
-    },
-
-    /**
-     * Clear all test results.
-     *
-     * @method velocity/reports/reset
-     * @param {Object} [options]
-     *   @param {String} [options.framework] The name of a specific framework
-     *                    to clear results for.  Ex. 'jasmine' or 'mocha'
-     *   @param {Array} [options.notIn] A list of test Ids which should be kept
-     *                                  (not cleared).  These Ids must match the
-     *                                  ones passed to `velocity/reports/submit`.
-     */
-    'velocity/reports/reset': function (options) {
-      options = options || {};
-      check(options, {
-        framework: Match.Optional(String),
-        notIn: Match.Optional([String])
-      });
-
-      var query = {};
-      if (options.framework) {
-        query.framework = options.framework;
-        VelocityAggregateReports.upsert({name: options.framework}, {$set: {result: 'pending'}});
-      }
-      if (options.notIn) {
-        query = _.assign(query, {_id: {$nin: options.notIn}});
-      }
-      VelocityTestReports.remove(query);
-
-      _updateAggregateReports();
+    'velocity/reset': function (name) {
+      check(name, String);
+      _reset(name);
     },
 
 
-    /**
-     * Clear all log entries.
-     *
-     * @method velocity/logs/reset
-     * @param {Object} [options]
-     *   @param {String} [options.framework] The name of a specific framework
-     *                                       to clear logs for.
-     */
-    'velocity/logs/reset': function (options) {
-      options = options || {};
-      check(options, {
-        framework: Match.Optional(String)
-      });
-
-      var query = {};
-      if (options.framework) {
-        query.framework = options.framework;
-      }
-      VelocityLogs.remove(query);
-    },
-
-
-    /**
-     * Log a message to the Velocity log store.  This provides a central
-     * location for different reporters to query for test framework log
-     * entries.
-     *
-     * @method velocity/logs/submit
-     * @param {Object} options
-     *   @param {String} options.framework The name of the test framework
-     *   @param {String} options.message The message to log
-     *   @param {String} [options.level] Log level.  Ex. 'error'. Default: 'info'
-     *   @param {Date} [options.timestamp]
-     */
-    'velocity/logs/submit': function (options) {
-      check(options, {
-        framework: String,
-        message: String,
-        level: Match.Optional(String),
-        timestamp: Match.Optional(Match.OneOf(Date, String))
-      });
-
-      VelocityLogs.insert({
-        timestamp: options.timestamp ? new Date(options.timestamp) : new Date(),
-        level: options.level || 'info',
-        message: options.message,
-        framework: options.framework
-      });
-    },
-
+    //////////////////////////////////////////////////////////////////////
+    // Reports
+    //
 
     /**
      * Record the results of an individual test run; a simple collector of
@@ -405,7 +337,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityTestReports.upsert(data.id, {$set: data});
 
       _updateAggregateReports();
-    },  // end postResult
+    },
 
 
     /**
@@ -424,7 +356,102 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityAggregateReports.upsert({'name': data.framework},
         {$set: {'result': 'completed'}});
       _updateAggregateReports();
-    },  // end completed
+    },
+
+
+    /**
+     * Clear test and aggregate reports, either for a specific framework or for
+     * all frameworks.
+     *
+     * @method velocity/reports/reset
+     * @param {Object} [options]
+     *   @param {String} [options.framework] The name of a specific framework
+     *                    to clear results for.  Ex. 'jasmine' or 'mocha'
+     *   @param {Array} [options.notIn] A list of test Ids which should be kept
+     *                                  (not cleared).  These Ids must match the
+     *                                  ones passed to `velocity/reports/submit`.
+     */
+    'velocity/reports/reset': function (options) {
+      var query = {};
+
+      options = options || {};
+      check(options, {
+        framework: Match.Optional(String),
+        notIn: Match.Optional([String])
+      });
+
+      if (options.framework) {
+        query.framework = options.framework;
+        VelocityAggregateReports.upsert({name: options.framework},
+          {$set: {result: 'pending'}});
+      }
+
+      if (options.notIn) {
+        query = _.assign(query, {_id: {$nin: options.notIn}});
+      }
+
+      VelocityTestReports.remove(query);
+
+      _updateAggregateReports();
+    },
+
+
+
+    //////////////////////////////////////////////////////////////////////
+    // Logs
+    //
+
+    /**
+     * Log a message to the Velocity log store.  This provides a central
+     * location for different reporters to query for test framework log
+     * entries.
+     *
+     * @method velocity/logs/submit
+     * @param {Object} options
+     *   @param {String} options.framework The name of the test framework
+     *   @param {String} options.message The message to log
+     *   @param {String} [options.level] Log level.  Ex. 'error'. Default: 'info'
+     *   @param {Date} [options.timestamp]
+     */
+    'velocity/logs/submit': function (options) {
+      check(options, {
+        framework: String,
+        message: String,
+        level: Match.Optional(String),
+        timestamp: Match.Optional(Match.OneOf(Date, String))
+      });
+
+      VelocityLogs.insert({
+        framework: options.framework,
+        message: options.message,
+        level: options.level || 'info',
+        timestamp: options.timestamp ? new Date(options.timestamp) : new Date()
+      });
+    },
+
+    /**
+     * Clear log entries, either for a specific framework or for
+     * all frameworks.
+     *
+     * @method velocity/logs/reset
+     * @param {Object} [options]
+     *   @param {String} [options.framework] The name of a specific framework
+     *                                       to clear logs for.  Ex. 'mocha'
+     */
+    'velocity/logs/reset': function (options) {
+      options = options || {};
+      check(options, {
+        framework: Match.Optional(String)
+      });
+
+      var query = {};
+      if (options.framework) {
+        query.framework = options.framework;
+      }
+      VelocityLogs.remove(query);
+    },
+
+
 
 
     /**
@@ -437,6 +464,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
      */
     'velocity/copySampleTests': function (options) {
+      var sampleTestGenerator,
+          sampleTests;
+
       options = options || {};
       check(options, {
         framework: String
@@ -444,23 +474,99 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
       this.unblock();
 
-      var sampleTestGenerator = _config[options.framework].sampleTestGenerator;
+      sampleTestGenerator = _config[options.framework].sampleTestGenerator;
       if (sampleTestGenerator) {
-        var sampleTests = sampleTestGenerator(options);
+        sampleTests = sampleTestGenerator(options);
 
         DEBUG && console.log('[velocity] found ', sampleTests.length,
           'sample test files for', options.framework);
 
         sampleTests.forEach(function (testFile) {
-          var fullTestPath = files.pathJoin(Velocity.getTestsPath(), testFile.path);
-          var testDir = files.pathDirname(fullTestPath);
+          var fullTestPath = files.pathJoin(Velocity.getTestsPath(), testFile.path),
+              testDir = files.pathDirname(fullTestPath);
+
           mkdirp(files.convertToOSPath(testDir));
           files.writeFile(fullTestPath, testFile.contents);
         });
       }
-    }  // end copySampleTests
+    },  // end copySampleTests
+
+    /**
+     * Finds a test file with TODO status
+     * changes the status to 'DOING', and returns it
+     *
+     * @method velocity/returnTODOTestAndMarkItAsDOING
+     *
+     * @param {Object} options
+     *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
+     */
+    'velocity/returnTODOTestAndMarkItAsDOING': function(options) {
+      check(options, {
+        framework: String
+      });
+
+      var _query = {
+        targetFramework: options.framework,
+        status: 'TODO'
+      };
+
+      var _update = {
+        $set: {status: 'DOING'}
+      };
 
 
+      var collectionObj = VelocityTestFiles.rawCollection();
+      var wrappedFunc = Meteor.wrapAsync(collectionObj.findAndModify,
+        collectionObj);
+      var _TODOtest = wrappedFunc(_query, {}, _update, {});
+
+      return _TODOtest;
+    },
+
+    /**
+     * Marks test file as DONE
+     *
+     * @method velocity/featureTestDone
+     *
+     * @param {Object} options
+     *   @param {String} options.featureId id of test
+     */
+    'velocity/featureTestDone': function (options) {
+      check(options, {
+        featureId: String
+      });
+
+      VelocityTestFiles.update({
+        _id: options.featureId
+      }, {
+        $set: {status: 'DONE'}
+      });
+
+    },
+
+    /**
+     * Marks test file as TODO
+     *
+     * @method velocity/featureTestFailed
+     *
+     * @param {Object} options
+     *   @param {String} options.featureId id of test
+     */
+    'velocity/featureTestFailed': function (options) {
+      check(options, {
+        featureId: String
+      });
+
+      VelocityTestFiles.update({
+        _id: options.featureId
+      }, {
+        $set: {
+          status: 'TODO',
+          brokenPreviously: true
+        }
+      });
+
+    }
 
   });  // end Meteor methods
 
@@ -511,24 +617,26 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * Initialize the directory/file watcher.
    *
    * @method _initFileWatcher
-   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
+   * @param {Object} config See {{#crossLink 'Velocity/registerTestingFramework:method'}}{{/crossLink}}
    * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
   function _initFileWatcher (config, callback) {
+    var paths,
+        packagesPath;
 
     VelocityTestFiles.remove({});
     VelocityFixtureFiles.remove({});
 
-    var paths = [Velocity.getTestsPath()];
+    paths = [Velocity.getTestsPath()];
+    packagesPath = Velocity.getPackagesPath();
 
-    var packagesPath = Velocity.getPackagesPath();
     if (VelocityInternals.isDirectory(packagesPath)) {
-      var packageNames = files.readdir(packagesPath);
-      var packageTestsPaths = _.chain(packageNames)
-        .filter(_isPackageWithTests)
-        .map(Velocity.getTestsPath)
-        .value();
+      var packageNames = files.readdir(packagesPath),
+          packageTestsPaths = _.chain(packageNames)
+            .filter(_isPackageWithTests)
+            .map(Velocity.getTestsPath)
+            .value();
       paths.push.apply(paths, packageTestsPaths);
     }
 
@@ -541,8 +649,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       persistent: true
     });
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
-
       var relativePath,
+          packageRelativePath,
           targetFramework,
           data;
 
@@ -564,9 +672,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
       DEBUG && console.log('[velocity] Search framework for path', relativePath);
 
-      var packageRelativePath = (relativePath.indexOf('packages') === 0) ?
+      packageRelativePath = (relativePath.indexOf('packages') === 0) ?
         relativePath.split('/').slice(2).join('/') :
         relativePath;
+
       // test against each test framework's regexp matcher, use first one that matches
       targetFramework = _.find(config, function (framework) {
         return framework._regexp.test(packageRelativePath);
@@ -602,48 +711,84 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
       filePath = files.convertToStandardPath(files.pathNormalize(filePath));
-      DEBUG && console.log('[velocity] File removed:', _getRelativePath(filePath));
+      DEBUG && console.log('[velocity] File removed:',
+        _getRelativePath(filePath));
+
       VelocityTestFiles.remove(filePath);
     }));
 
     _watcher.on('ready', Meteor.bindEnvironment(function () {
-      DEBUG && console.log('[velocity] File scan complete, now watching', Velocity.getTestsPath().substring(Velocity.getAppPath().length));
-      if (callback) {
-        callback();
-      }
+      DEBUG && console.log('[velocity] File scan complete, now watching',
+        Velocity.getTestsPath().substring(Velocity.getAppPath().length));
+
+      callback && callback();
     }));
 
   }  // end _initFileWatcher
+
 
   function _isPackageWithTests(packageName) {
     return packageName !== 'tests-proxy' &&
       VelocityInternals.isDirectory(Velocity.getTestsPath(packageName));
   }
 
+
   /**
-   * Re-init file watcher and clear all test results.
+   * Clear test reports, aggregate reports, and logs for a specific framework.
    *
    * @method _reset
-   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
+   * @param {String} name Framework to reset
    * @private
    */
-  function _reset (config) {
+  function _reset (name) {
+    DEBUG && console.log('[velocity] resetting', name);
+
+    VelocityLogs.remove({framework: name});
+    VelocityTestReports.remove({framework: name});
+    VelocityAggregateReports.remove({name: name});
+
+    VelocityAggregateReports.insert({
+      name: name,
+      result: 'pending'
+    });
+  }
+
+  /**
+   * Clear all test reports, aggregate reports, and logs.
+   *
+   * @method _reset
+   * @param {Object} config See {{#crossLink 'Velocity/registerTestingFramework:method'}}{{/crossLink}}
+   * @private
+   */
+  function _resetAll () {
+    var allFrameworks,
+        frameworksToIgnore;
 
     DEBUG && console.log('[velocity] resetting the world');
 
-    var frameworksWithDisableAutoReset = _(config).where({disableAutoReset: true}).pluck('name').value();
-    DEBUG && console.log('[velocity] frameworks with disable auto reset:', frameworksWithDisableAutoReset);
-    VelocityTestReports.remove({framework: {$nin: frameworksWithDisableAutoReset}});
-    VelocityLogs.remove({framework: {$nin: frameworksWithDisableAutoReset}});
+    allFrameworks = _getTestFrameworkNames();
+
+    // ignore frameworks that have opted-out
+    frameworksToIgnore = _(_config)
+      .where({disableAutoReset: true})
+      .pluck('name')
+      .value();
+
+    DEBUG && console.log('[velocity] frameworks with disable auto reset:',
+      frameworksToIgnore);
+
     VelocityAggregateReports.remove({});
-    _.forEach(_getTestFrameworkNames(), function (testFramework) {
+    VelocityLogs.remove({framework: {$nin: frameworksToIgnore}});
+    VelocityTestReports.remove({framework: {$nin: frameworksToIgnore}});
+
+    _.forEach(allFrameworks, function (testFramework) {
       VelocityAggregateReports.insert({
         name: testFramework,
         result: 'pending'
       });
     });
-
   }
+
 
   /**
    * If any one test has failed, mark the aggregate test result as failed.
@@ -652,45 +797,52 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * @private
    */
   function _updateAggregateReports () {
+    var aggregateResult,
+        completedFrameworksCount,
+        allFrameworks = _getTestFrameworkNames();
 
-    VelocityAggregateReports.upsert({name: 'aggregateResult'}, {$set: {result: 'pending'}});
-    VelocityAggregateReports.upsert({name: 'aggregateComplete'}, {$set: {result: 'pending'}});
+    VelocityAggregateReports.upsert({name: 'aggregateResult'},
+      {$set: {result: 'pending'}});
+    VelocityAggregateReports.upsert({name: 'aggregateComplete'},
+      {$set: {result: 'pending'}});
 
     // if all of our test reports have valid results
     if (!VelocityTestReports.findOne({result: ''})) {
 
-      // pessimistically set passed state, ensuring all other states take precedence in order below
-      var aggregateResult =
-            VelocityTestReports.findOne({result: 'failed'}) ||
-            VelocityTestReports.findOne({result: 'undefined'}) ||
-            VelocityTestReports.findOne({result: 'skipped'}) ||
-            VelocityTestReports.findOne({result: 'pending'}) ||
-            VelocityTestReports.findOne({result: 'passed'}) ||
-            {result: 'pending'};
+      // pessimistically set passed state, ensuring all other states
+      // take precedence in order below
+      aggregateResult =
+        VelocityTestReports.findOne({result: 'failed'}) ||
+        VelocityTestReports.findOne({result: 'undefined'}) ||
+        VelocityTestReports.findOne({result: 'skipped'}) ||
+        VelocityTestReports.findOne({result: 'pending'}) ||
+        VelocityTestReports.findOne({result: 'passed'}) ||
+        {result: 'pending'};
 
       // update the global status
-      VelocityAggregateReports.update({'name': 'aggregateResult'}, {$set: {result: aggregateResult.result}});
+      VelocityAggregateReports.update({name: 'aggregateResult'},
+        {$set: {result: aggregateResult.result}});
     }
 
-    // if all test frameworks have completed, upsert an aggregate completed record
-    var completedFrameworksCount = VelocityAggregateReports.find({
-      'name': {$in: _getTestFrameworkNames()},
-      'result': 'completed'
+
+    // Check if all test frameworks have completed successfully
+    completedFrameworksCount = VelocityAggregateReports.find({
+      name: {$in: allFrameworks},
+      result: 'completed'
     }).count();
 
-    var aggregateComplete = VelocityAggregateReports.findOne({'name': 'aggregateComplete'});
-    if (aggregateComplete) {
-      if ((aggregateComplete.result !== 'completed') && (_getTestFrameworkNames().length === completedFrameworksCount)) {
-        VelocityAggregateReports.update({'name': 'aggregateComplete'}, {$set: {'result': 'completed'}});
-        _.each(Velocity.postProcessors, function (processor) {
-          processor();
-        });
-      }
+    if (allFrameworks.length === completedFrameworksCount) {
+      VelocityAggregateReports.update({name: 'aggregateComplete'},
+        {$set: {'result': 'completed'}});
+      _.each(Velocity.postProcessors, function (processor) {
+        processor();
+      });
     }
   }
 
   function _getRelativePath (filePath) {
     var relativePath = filePath.substring(Velocity.getAppPath().length);
+
     if (relativePath[0] === '/') {
       relativePath = relativePath.substring(1);
     }
@@ -699,6 +851,26 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
   function _getTestFrameworkNames () {
     return _.pluck(_config, 'name');
+  }
+
+  function _removeTerminatedMirrors() {
+    // Remove terminated mirrors from previous runs
+    // This is needed for `meteor --test` to work properly
+    VelocityMirrors.find({}).forEach(function(mirror) {
+      try {
+        process.kill(mirror.pid, 0);
+      } catch (error) {
+        VelocityMirrors.remove({pid: mirror.pid});
+      }
+    });
+  }
+
+  function _setReusableMirrors() {
+    Velocity.reusableMirrors = [];
+    VelocityMirrors.find({}).forEach(function(mirror) {
+      mirror.reused = false;
+      Velocity.reusableMirrors.push(mirror);
+    });
   }
 
 })();

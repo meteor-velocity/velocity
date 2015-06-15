@@ -15,8 +15,6 @@ echo "Checking Yuidoc syntax"
 yuidoc --lint
 echo "Yuidoc checks were successful"
 
-echo "Testing app"
-
 echo "Killing node and phantomjs processes"
 pkill -9 phantomjs || true
 pkill -9 node || true
@@ -34,5 +32,7 @@ export JASMINE_CLIENT_INTEGRATION=0
 export JASMINE_SERVER_UNIT=0
 export JASMINE_SERVER_INTEGRATION=1
 #export VELOCITY_DEBUG=1
+
+echo "Running tests..."
 
 meteor --test

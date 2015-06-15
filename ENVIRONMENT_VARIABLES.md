@@ -1,5 +1,9 @@
 # Environment Variables
 
+### VELOCITY_CI
+
+Set to 1 when the app is started in CI mode. This is set automatically by our Meteor fork when you run `meteor --test`.
+
 ### VELOCITY_HUB
 
 Set to 1 when the app is a Velocity Hub

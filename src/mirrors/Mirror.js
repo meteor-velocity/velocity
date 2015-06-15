@@ -9,13 +9,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   'use strict';
 
-  if (process.env.NODE_ENV !== 'development' ||
-    process.env.IS_MIRROR) {
-    DEBUG && console.log('[velocity] Not adding mirror-registry because NODE_ENV is',
-      process.env.NODE_ENV, ' and IS_MIRROR is', process.env.IS_MIRROR);
-    return;
-  }
-
   var _ = Npm.require('lodash'),
       url = Npm.require('url'),
       mongodbUri = Npm.require('mongodb-uri'),
@@ -57,17 +50,17 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
      * @param {String} [options.testsPath]      The path to tests for this framework.
-     *                                          For example "jasmine/server/unit".
+     *                                          For example 'jasmine/server/unit'.
      *                                          Don't include a leading or trailing slash.
      * @param {String} [options.args]           Additional arguments that the mirror is called with
      *                                          It accepts all the options that are available for `meteor run`.
-     * @param {String} [options.env]            Additional environment variables that the mirror is called with.
-     * @param {String} [options.port]           String use a specific port
+     * @param {Object} [options.env]            Additional environment variables that the mirror is called with.
+     * @param {Number} [options.port]           Use a specific port.  Default is random, free port.
      * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the
      *                                          VelocityMirrors collection. eg. `/?jasmine=true`
-     * @param {String} [options.nodes]          The number of mirrors required. This is used by
+     * @param {Number} [options.nodes]          The number of mirrors required. This is used by
      *                                          distributable frameworks. Default is 1
-     * @param {String} [options.handshake]      Specifies whether or not this mirror should perform
+     * @param {Boolean} [options.handshake]     Specifies whether or not this mirror should perform
      *                                          a DDP handshake with the parent. Distributable
      *                                          frameworks can use this to get mirrors to behave
      *                                          like workers. The default is true
@@ -97,9 +90,9 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @method velocity/mirrors/init
      * @param {Object} options
-     *   @param {Number} options.port The port this mirror is running on
      *   @param {String} options.framework The name of the test framework
      *                                     making the request
+     *   @param {Number} options.port The port this mirror is running on
      *   @param {String} options.mongoUrl The mongo url this mirror is using
      *   @param {String} options.host The root url of this mirror without any
      *                        additional paths. Used for making DDP connections
@@ -110,15 +103,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *                           collection. To be used by test frameworks to
      *                           recognize when they are executing in a mirror.
      *                           eg. `/?jasmine=true`
-     * @param {Object} extra Any additional metadata the implementing mirror
-     *                       would like to store in the Velocity mirrors
-     *                       collection. This is optional.
+     * @param {Object} [extra] Any additional metadata the implementing mirror
+     *                         would like to store in the Velocity mirrors
+     *                         collection.
      */
     'velocity/mirrors/init': function (options, extra) {
       check(options, {
+        framework: String,
         port: Number,
         mongoUrl: String,
-        framework: String,
         host: String,
         rootUrl: String,
         rootUrlPath: String,
@@ -130,10 +123,18 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         _.extend(options, extra);
       }
 
-      VelocityMirrors.upsert({framework: options.framework},
-        _.extend(options, {
-          state: 'starting'
-        }));
+
+      var _upsertQuery = {
+        framework: options.framework,
+        port: options.port
+      };
+
+      var _options = _.extend(options, {
+        state: 'starting'
+      });
+
+      VelocityMirrors.upsert(_upsertQuery,
+        _options);
     },
 
     /**
@@ -141,17 +142,16 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      *
      * @method velocity/mirrors/register
      * @param {Object} options
-     *   @param {Number} options.port The port this mirror is running on
      *   @param {String} options.framework The name of the test framework
      *                                     making the request
      *   @param {String} options.host The root url of this mirror without any
-     *                        additional paths. Used for making DDP connections
+     *                                additional paths. Must include port. Used
+     *                                for making DDP connections
      */
     'velocity/mirrors/register': function (options) {
       check(options, Match.ObjectIncluding({
         framework: String,
-        host: String,
-        port: Match.OneOf(Number, String)
+        host: String
       }));
 
       DEBUG && console.log('[velocity] Mirror registered. Handshaking with mirror...');
@@ -171,22 +171,23 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
           DEBUG && console.log('[velocity] Parent Handshake response', e, r);
         });
         mirrorConnection.disconnect();
-        // TODO: This does not support starting multiple mirror for one framework
-        VelocityMirrors.update({
-          framework: options.framework
-        }, {
+
+        var _updateQuery = {
+          framework: options.framework,
+          port: parseInt(options.port)
+        };
+        VelocityMirrors.update(_updateQuery, {
           $set: {
             state: 'ready',
             lastModified: Date.now()
           }
         });
-      };
 
+      };
     },
 
     /**
-     * Exposes the IS_MIRROR flag to code that is *not* running in a mirror
-     * (ie. the velocity core process that kicks off the mirrors).
+     * Exposes the IS_MIRROR flag.
      *
      * @method velocity/isMirror
      * @for Meteor.methods
@@ -209,23 +210,49 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       nodes: 1
     }, options);
     DEBUG && console.log('[velocity]', options.nodes, 'mirror(s) requested');
-
     // only respect a provided port if a single mirror is requested
     if (options.port && options.nodes === 1) {
       _startMirror(options);
     } else {
-      var startWithFreePort = Meteor.bindEnvironment(function (err, port) {
+      _reuseMirrors();
+      _startUninitializedMirrorsWithFreePorts();
+    }
+
+    function _reuseMirrors() {
+      options.unitializedNodes = options.nodes;
+      var _reusableMirrorsForFramework = _.filter(Velocity.reusableMirrors, function(rmp) {
+        return rmp.framework === options.framework && rmp.reused === false;
+      });
+
+      _reusableMirrorsForFramework.forEach(function(rmff) {
+        rmff.reused = true;
+
+        options.port = rmff.port;
+        _startMirror(options);
+
+        options.unitializedNodes--;
+
+      });
+
+    }
+
+    function _startUninitializedMirrorsWithFreePorts() {
+      var startWithFreePort = Meteor.bindEnvironment(function(err, port) {
         options.port = port;
         _startMirror(options);
       });
 
-      for (var i = 0; i < options.nodes; i++) {
+      for (var i = 0; i < options.unitializedNodes; i++) {
         freeport(startWithFreePort);
       }
     }
+
   }
 
   function _startMirror (options) {
+
+    // TODO, options is passed as a reference, maybe we should pass a copy instead
+
     options.handshake = options.handshake === undefined ? true : options.handshake;
     options.rootUrlPath = (options.rootUrlPath || '');
     options.host = _getMirrorUrl(options.port);
@@ -233,7 +260,13 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     var environment = _getEnvironmentVariables(options);
 
-    var mirrorChild = _getMirrorChild(environment.FRAMEWORK);
+    // append the port to the mirror log if there are multiple mirrors
+    var processName = environment.FRAMEWORK;
+    if (options.nodes > 1) {
+      processName = environment.FRAMEWORK + '_' + environment.PORT;
+    }
+
+    var mirrorChild = _getMirrorChild(environment.FRAMEWORK, processName);
     if (mirrorChild.isRunning()) {
       return;
     }
@@ -296,7 +329,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     console.log(('[velocity] ' +
       environment.FRAMEWORK + ' is starting a mirror at ' +
-      options.rootUrl + '.'
+      environment.ROOT_URL + '.'
     ).yellow);
 
     var isMeteorToolInstalled = MeteorFilesHelpers.isPackageInstalled(
@@ -305,13 +338,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     );
     if (!isMeteorToolInstalled) {
       console.log(
-        '[velocity] This takes a few minutes the first time.'.yellow
+        '[velocity] *** Meteor Tools is installing ***',
+        '\nThis takes a few minutes the first time.'.yellow
       );
     }
 
     console.log(('[velocity] You can see the mirror logs at: tail -f ' +
     files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
-      '.meteor', 'local', 'log', environment.FRAMEWORK + '.log'))).yellow);
+      '.meteor', 'local', 'log', processName + '.log'))).yellow);
 
     Meteor.call('velocity/mirrors/init', {
       framework: environment.FRAMEWORK,
@@ -324,11 +358,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     });
   }
 
-  function _getMirrorChild (framework) {
-    var mirrorChild = _mirrorChildProcesses[framework];
+  function _getMirrorChild (framework, processName) {
+    var _processName = processName || framework;
+    var mirrorChild = _mirrorChildProcesses[_processName];
     if (!mirrorChild) {
-      mirrorChild = new sanjo.LongRunningChildProcess(framework);
-      _mirrorChildProcesses[framework] = mirrorChild;
+      mirrorChild = new sanjo.LongRunningChildProcess(_processName);
+      _mirrorChildProcesses[_processName] = mirrorChild;
     }
     return mirrorChild;
   }
@@ -374,8 +409,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    *   @param {String} options.framework The name of the test framework
    *                                     making the request
    *   @param {Number} options.port The port this mirror is running on
-   *   @param {String} options.rootUrl The root url of this mirror, which also
-   *                           includes the path and params
    *   @param {String} options.host The root url of this mirror without any
    *                        additional paths. Used for making DDP connections
    *   @param {String} options.rootUrl The root url of this mirror, which also
@@ -385,7 +418,14 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    *                           collection. To be used by test frameworks to
    *                           recognize when they are executing in a mirror.
    *                           eg. `/?jasmine=true`
-   * @return {String} Mirror URL
+   *   @param {Boolean} options.handshake Specifies whether or not this mirror
+   *                                      should perform a DDP handshake with
+   *                                      the parent. Distributable frameworks
+   *                                      can use this to get mirrors to behave
+   *                                      like workers.
+   *   @param {Object} [options.env] Additional environment variables that the
+   *                                 mirror is called with.
+   * @return {Object} environment variables
    * @private
    */
   function _getEnvironmentVariables (options) {

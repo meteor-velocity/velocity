@@ -18,6 +18,12 @@
     var cwd = require('os').tmpdir(),
         meteor;
 
+    process.on('exit', function () {
+      if (meteor) {
+        meteor.kill('SIGINT');
+      }
+    });
+
     console.log(cwd);
 
     this.Given(/^I deleted the folder called "([^"]*)"$/, function (folder, callback) {
@@ -82,6 +88,12 @@
 
     this.Given(/^I started meteor$/, function (callback) {
 
+      if (meteor) {
+        // Skip if meteor is already started
+        callback();
+        return;
+      }
+
       var toOmit = [
         'ROOT_URL',
         'PORT',
@@ -103,7 +115,6 @@
       meteor = spawn(command, ['-p', '3030'], {
         cwd: cwd,
         stdio: 'pipe',
-        detached: true,
         env: currentEnv
       });
 

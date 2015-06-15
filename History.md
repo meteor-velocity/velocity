@@ -1,4 +1,8 @@
-## v0.6.4 - v0.6.4
+## v0.7.0
+
+* Parallel execution support
+
+## v0.6.4
 
 * Fix for windows paths
 
