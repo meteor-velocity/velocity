@@ -30,15 +30,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       _velocityStartupFunctions = [],
       FIXTURE_REG_EXP = new RegExp('-fixture.(js|coffee)$');
 
-  // Remove terminated mirrors from previous runs
-  // This is needed for `meteor --test` to work properly
-  VelocityMirrors.find({}).forEach(function (mirror) {
-    try {
-      process.kill(mirror.pid, 0);
-    } catch (error) {
-      VelocityMirrors.remove({pid: mirror.pid});
-    }
-  });
+
+  _removeTerminatedMirrors();
+
+  _setReusableMirrors();
 
   if (process.env.NODE_ENV === 'development' &&
     process.env.VELOCITY !== '0' &&
@@ -139,7 +134,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * A collection of callbacks to be executed after all tests have completed
      * and the aggregate test results have been reported.
      *
-     * See {{#crossLink "Velocity/addPostProcessor:method"}}{{/crossLink}}
+     * See {{#crossLink 'Velocity/addPostProcessor:method'}}{{/crossLink}}
      *
      * @property postProcessors
      * @type Array
@@ -179,7 +174,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} [options.regex] The regular expression for test files
      *                    that should be assigned to the testing framework.
      *                    The path relative to the tests folder is matched
-     *                    against it. Default: "name/.+\.js$" (name is
+     *                    against it. Default: 'name/.+\.js$' (name is
      *                    the testing framework name).
      *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
      *                    will skip reports and logs for this framework.
@@ -241,7 +236,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} [options.regex] The regular expression for test files
      *                    that should be assigned to the testing framework.
      *                    The path relative to the tests folder is matched
-     *                    against it. Default: "name/.+\.js$" (name is
+     *                    against it. Default: 'name/.+\.js$' (name is
      *                    the testing framework name).
      *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
      *                    will skip reports and logs for this framework.
@@ -494,9 +489,84 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
           files.writeFile(fullTestPath, testFile.contents);
         });
       }
-    }  // end copySampleTests
+    },  // end copySampleTests
+
+    /**
+     * Finds a test file with TODO status
+     * changes the status to 'DOING', and returns it
+     *
+     * @method velocity/returnTODOTestAndMarkItAsDOING
+     *
+     * @param {Object} options
+     *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
+     */
+    'velocity/returnTODOTestAndMarkItAsDOING': function(options) {
+      check(options, {
+        framework: String
+      });
+
+      var _query = {
+        targetFramework: options.framework,
+        status: 'TODO'
+      };
+
+      var _update = {
+        $set: {status: 'DOING'}
+      };
 
 
+      var collectionObj = VelocityTestFiles.rawCollection();
+      var wrappedFunc = Meteor.wrapAsync(collectionObj.findAndModify,
+        collectionObj);
+      var _TODOtest = wrappedFunc(_query, {}, _update, {});
+
+      return _TODOtest;
+    },
+
+    /**
+     * Marks test file as DONE
+     *
+     * @method velocity/featureTestDone
+     *
+     * @param {Object} options
+     *   @param {String} options.featureId id of test
+     */
+    'velocity/featureTestDone': function (options) {
+      check(options, {
+        featureId: String
+      });
+
+      VelocityTestFiles.update({
+        _id: options.featureId
+      }, {
+        $set: {status: 'DONE'}
+      });
+
+    },
+
+    /**
+     * Marks test file as TODO
+     *
+     * @method velocity/featureTestFailed
+     *
+     * @param {Object} options
+     *   @param {String} options.featureId id of test
+     */
+    'velocity/featureTestFailed': function (options) {
+      check(options, {
+        featureId: String
+      });
+
+      VelocityTestFiles.update({
+        _id: options.featureId
+      }, {
+        $set: {
+          status: 'TODO',
+          brokenPreviously: true
+        }
+      });
+
+    }
 
   });  // end Meteor methods
 
@@ -547,7 +617,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * Initialize the directory/file watcher.
    *
    * @method _initFileWatcher
-   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
+   * @param {Object} config See {{#crossLink 'Velocity/registerTestingFramework:method'}}{{/crossLink}}
    * @param {function} callback  Called after the watcher completes its first scan and is ready
    * @private
    */
@@ -687,7 +757,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
    * Clear all test reports, aggregate reports, and logs.
    *
    * @method _reset
-   * @param {Object} config See {{#crossLink "Velocity/registerTestingFramework:method"}}{{/crossLink}}
+   * @param {Object} config See {{#crossLink 'Velocity/registerTestingFramework:method'}}{{/crossLink}}
    * @private
    */
   function _resetAll () {
@@ -781,6 +851,26 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
   function _getTestFrameworkNames () {
     return _.pluck(_config, 'name');
+  }
+
+  function _removeTerminatedMirrors() {
+    // Remove terminated mirrors from previous runs
+    // This is needed for `meteor --test` to work properly
+    VelocityMirrors.find({}).forEach(function(mirror) {
+      try {
+        process.kill(mirror.pid, 0);
+      } catch (error) {
+        VelocityMirrors.remove({pid: mirror.pid});
+      }
+    });
+  }
+
+  function _setReusableMirrors() {
+    Velocity.reusableMirrors = [];
+    VelocityMirrors.find({}).forEach(function(mirror) {
+      mirror.reused = false;
+      Velocity.reusableMirrors.push(mirror)
+    })
   }
 
 })();

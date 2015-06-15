@@ -50,7 +50,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
      * @param {Object} options                  Options for the mirror.
      * @param {String} options.framework        The name of the calling framework
      * @param {String} [options.testsPath]      The path to tests for this framework.
-     *                                          For example "jasmine/server/unit".
+     *                                          For example 'jasmine/server/unit'.
      *                                          Don't include a leading or trailing slash.
      * @param {String} [options.args]           Additional arguments that the mirror is called with
      *                                          It accepts all the options that are available for `meteor run`.
@@ -123,10 +123,18 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
         _.extend(options, extra);
       }
 
-      VelocityMirrors.upsert({framework: options.framework},
-        _.extend(options, {
-          state: 'starting'
-        }));
+
+      var _upsertQuery = {
+        framework: options.framework,
+        port: options.port
+      };
+
+      var _options = _.extend(options, {
+        state: 'starting'
+      });
+
+      VelocityMirrors.upsert(_upsertQuery,
+        _options);
     },
 
     /**
@@ -163,15 +171,18 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
           DEBUG && console.log('[velocity] Parent Handshake response', e, r);
         });
         mirrorConnection.disconnect();
-        // TODO: This does not support starting multiple mirror for one framework
-        VelocityMirrors.update({
-          framework: options.framework
-        }, {
+
+        var _updateQuery = {
+          framework: options.framework,
+          port: parseInt(options.port)
+        };
+        VelocityMirrors.update(_updateQuery, {
           $set: {
             state: 'ready',
             lastModified: Date.now()
           }
         });
+
       };
     },
 
@@ -199,23 +210,49 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
       nodes: 1
     }, options);
     DEBUG && console.log('[velocity]', options.nodes, 'mirror(s) requested');
-
     // only respect a provided port if a single mirror is requested
     if (options.port && options.nodes === 1) {
       _startMirror(options);
     } else {
-      var startWithFreePort = Meteor.bindEnvironment(function (err, port) {
+      _reuseMirrors();
+      _startUninitializedMirrorsWithFreePorts();
+    }
+
+    function _reuseMirrors() {
+      options.unitializedNodes = options.nodes;
+      var _reusableMirrorsForFramework = _.filter(Velocity.reusableMirrors, function(rmp) {
+        return rmp.framework === options.framework && rmp.reused === false;
+      });
+
+      _reusableMirrorsForFramework.forEach(function(rmff) {
+        rmff.reused = true;
+
+        options.port = rmff.port;
+        _startMirror(options);
+
+        options.unitializedNodes--;
+
+      });
+
+    }
+
+    function _startUninitializedMirrorsWithFreePorts() {
+      var startWithFreePort = Meteor.bindEnvironment(function(err, port) {
         options.port = port;
         _startMirror(options);
       });
 
-      for (var i = 0; i < options.nodes; i++) {
+      for (var i = 0; i < options.unitializedNodes; i++) {
         freeport(startWithFreePort);
       }
     }
+
   }
 
   function _startMirror (options) {
+
+    // TODO, options is passed as a reference, maybe we should pass a copy instead
+
     options.handshake = options.handshake === undefined ? true : options.handshake;
     options.rootUrlPath = (options.rootUrlPath || '');
     options.host = _getMirrorUrl(options.port);
@@ -223,7 +260,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     var environment = _getEnvironmentVariables(options);
 
-    var mirrorChild = _getMirrorChild(environment.FRAMEWORK);
+    var mirrorChild = _getMirrorChild(environment.FRAMEWORK, environment.PORT);
     if (mirrorChild.isRunning()) {
       return;
     }
@@ -286,7 +323,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     console.log(('[velocity] ' +
       environment.FRAMEWORK + ' is starting a mirror at ' +
-      options.rootUrl + '.'
+      environment.ROOT_URL + '.'
     ).yellow);
 
     var isMeteorToolInstalled = MeteorFilesHelpers.isPackageInstalled(
@@ -301,7 +338,7 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
     console.log(('[velocity] You can see the mirror logs at: tail -f ' +
     files.convertToOSPath(files.pathJoin(Velocity.getAppPath(),
-      '.meteor', 'local', 'log', environment.FRAMEWORK + '.log'))).yellow);
+      '.meteor', 'local', 'log', environment.FRAMEWORK + '_' + environment.PORT + '.log'))).yellow);
 
     Meteor.call('velocity/mirrors/init', {
       framework: environment.FRAMEWORK,
@@ -314,11 +351,12 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     });
   }
 
-  function _getMirrorChild (framework) {
-    var mirrorChild = _mirrorChildProcesses[framework];
+  function _getMirrorChild (framework, port) {
+    var _processName = framework + '_' + port;
+    var mirrorChild = _mirrorChildProcesses[_processName];
     if (!mirrorChild) {
-      mirrorChild = new sanjo.LongRunningChildProcess(framework);
-      _mirrorChildProcesses[framework] = mirrorChild;
+      mirrorChild = new sanjo.LongRunningChildProcess(_processName);
+      _mirrorChildProcesses[_processName] = mirrorChild;
     }
     return mirrorChild;
   }
