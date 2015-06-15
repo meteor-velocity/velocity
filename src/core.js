@@ -869,8 +869,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     Velocity.reusableMirrors = [];
     VelocityMirrors.find({}).forEach(function(mirror) {
       mirror.reused = false;
-      Velocity.reusableMirrors.push(mirror)
-    })
+      Velocity.reusableMirrors.push(mirror);
+    });
   }
 
 })();
