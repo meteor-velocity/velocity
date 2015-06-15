@@ -11,7 +11,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   // between this line and the velocity/parentHandshake, is the time the mirror
   // starts initializing and is ready
-  console.log('[velocity] Starting mirror on port', process.env.MIRROR_PORT);
 
   Meteor.methods({
 
