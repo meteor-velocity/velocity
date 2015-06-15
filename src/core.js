@@ -383,7 +383,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       if (options.framework) {
         query.framework = options.framework;
         VelocityAggregateReports.upsert({name: options.framework},
-                                        {$set: {result: 'pending'}});
+          {$set: {result: 'pending'}});
       }
 
       if (options.notIn) {
@@ -479,7 +479,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         sampleTests = sampleTestGenerator(options);
 
         DEBUG && console.log('[velocity] found ', sampleTests.length,
-                             'sample test files for', options.framework);
+          'sample test files for', options.framework);
 
         sampleTests.forEach(function (testFile) {
           var fullTestPath = files.pathJoin(Velocity.getTestsPath(), testFile.path),
@@ -634,9 +634,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     if (VelocityInternals.isDirectory(packagesPath)) {
       var packageNames = files.readdir(packagesPath),
           packageTestsPaths = _.chain(packageNames)
-                               .filter(_isPackageWithTests)
-                               .map(Velocity.getTestsPath)
-                               .value();
+            .filter(_isPackageWithTests)
+            .map(Velocity.getTestsPath)
+            .value();
       paths.push.apply(paths, packageTestsPaths);
     }
 
@@ -673,13 +673,13 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       DEBUG && console.log('[velocity] Search framework for path', relativePath);
 
       packageRelativePath = (relativePath.indexOf('packages') === 0) ?
-                             relativePath.split('/').slice(2).join('/') :
-                             relativePath;
+        relativePath.split('/').slice(2).join('/') :
+        relativePath;
 
       // test against each test framework's regexp matcher, use first one that matches
       targetFramework = _.find(config, function (framework) {
-                            return framework._regexp.test(packageRelativePath);
-                          });
+        return framework._regexp.test(packageRelativePath);
+      });
 
       if (targetFramework) {
         DEBUG && console.log('[velocity] Target framework for', relativePath, 'is', targetFramework.name);
@@ -712,7 +712,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
       filePath = files.convertToStandardPath(files.pathNormalize(filePath));
       DEBUG && console.log('[velocity] File removed:',
-                           _getRelativePath(filePath));
+        _getRelativePath(filePath));
 
       VelocityTestFiles.remove(filePath);
     }));
@@ -770,12 +770,12 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     // ignore frameworks that have opted-out
     frameworksToIgnore = _(_config)
-                           .where({disableAutoReset: true})
-                           .pluck('name')
-                           .value();
+      .where({disableAutoReset: true})
+      .pluck('name')
+      .value();
 
     DEBUG && console.log('[velocity] frameworks with disable auto reset:',
-                         frameworksToIgnore);
+      frameworksToIgnore);
 
     VelocityAggregateReports.remove({});
     VelocityLogs.remove({framework: {$nin: frameworksToIgnore}});
@@ -802,9 +802,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         allFrameworks = _getTestFrameworkNames();
 
     VelocityAggregateReports.upsert({name: 'aggregateResult'},
-                                    {$set: {result: 'pending'}});
+      {$set: {result: 'pending'}});
     VelocityAggregateReports.upsert({name: 'aggregateComplete'},
-                                    {$set: {result: 'pending'}});
+      {$set: {result: 'pending'}});
 
     // if all of our test reports have valid results
     if (!VelocityTestReports.findOne({result: ''})) {
@@ -821,19 +821,19 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
       // update the global status
       VelocityAggregateReports.update({name: 'aggregateResult'},
-                                      {$set: {result: aggregateResult.result}});
+        {$set: {result: aggregateResult.result}});
     }
 
 
     // Check if all test frameworks have completed successfully
     completedFrameworksCount = VelocityAggregateReports.find({
-                                   name: {$in: allFrameworks},
-                                   result: 'completed'
-                                 }).count();
+      name: {$in: allFrameworks},
+      result: 'completed'
+    }).count();
 
     if (allFrameworks.length === completedFrameworksCount) {
       VelocityAggregateReports.update({name: 'aggregateComplete'},
-                                      {$set: {'result': 'completed'}});
+        {$set: {'result': 'completed'}});
       _.each(Velocity.postProcessors, function (processor) {
         processor();
       });

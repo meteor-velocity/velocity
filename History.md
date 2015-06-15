@@ -2,6 +2,10 @@
 
 * Parallel execution support
 
+## v0.6.4
+
+* Fix for windows paths
+
 ## v0.6.3
 
 * Don't print errors when a test frameworks hasn't implemented the experimental lifecycle hooks.
