@@ -1,3 +1,7 @@
+## v0.7.1
+
+* Added Function.bind polyfill for PhantomJS
+
 ## v0.7.0
 
 * Parallel execution support
