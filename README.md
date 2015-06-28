@@ -165,7 +165,8 @@ We use:
 * [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) for end-to-end tests
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) for integration and unit tests
 
-You can run the tests with: `./ci.sh`
+You can run the tests with `./ci.sh`.
+You need to install JSHint (`npm install jshint@2.5 -g`) and Yuidoc (`npm install yuidocjs -g`) before.
 
 Add or edit end to end tests in: `test-app/tests/`.
 
