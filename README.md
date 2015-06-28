@@ -165,7 +165,8 @@ We use:
 * [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) for end-to-end tests
 * [sanjo:jasmine](https://github.com/Sanjo/meteor-jasmine) for integration and unit tests
 
-You can run the tests with: `./ci.sh`
+You can run the tests with `./ci.sh`.
+You need to install JSHint (`npm install jshint@2.5 -g`) and Yuidoc (`npm install yuidocjs -g`) before.
 
 Add or edit end to end tests in: `test-app/tests/`.
 
@@ -196,7 +197,7 @@ Make sure that you follow the [Semver](http://semver.org/) conventions for incre
 
 1. Pull the latest changes from the branch `develop`
 1. Start a release with: `git flow release start X.X.X`
-3. Update History.md with summary ofchanges
+3. Update History.md with summary of changes
 4. Bump version numbers in package.js and yuidoc.json
 5. Publish to Meteor with: `meteor publish`
 6. Commit release changes with the commit message "Release of X.X.X".

@@ -4,7 +4,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.7.0',
+  version: '0.7.1',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
@@ -28,6 +28,7 @@ Package.on_use(function (api) {
   api.use('webapp');
   api.use('mongo');
   api.use('check');
+  api.use('underscore'); // Used for the Function.bind polyfill
   api.use('velocity:chokidar@1.0.1_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_7');
   api.use('sanjo:long-running-child-process@1.0.3', 'server');
@@ -42,6 +43,7 @@ Package.on_use(function (api) {
   api.export('VelocityMirrors', BOTH);
   api.export('VelocityOptions', BOTH);
 
+  api.add_files('src/polyfills.js', BOTH);
   api.add_files('src/globals.js', BOTH);
   api.add_files('src/collections.js', BOTH);
   api.add_files('src/helpers.js', SERVER);
