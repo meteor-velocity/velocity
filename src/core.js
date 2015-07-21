@@ -208,7 +208,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityTestReports.remove({framework: name});
       VelocityLogs.remove({framework: name});
       VelocityAggregateReports.remove({name: name});
-      VelocityTestFiles.remove({targetFramework: name});
+      VelocityTestFiles.update({}, {$pull: {targetFramework: name}});
+      VelocityTestFiles.remove({targetFramework: []});
 
       delete _config[name];
     }
@@ -651,6 +652,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
       var relativePath,
           packageRelativePath,
+          matchedFrameworks,
           targetFramework,
           data;
 
@@ -676,26 +678,27 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         relativePath.split('/').slice(2).join('/') :
         relativePath;
 
-      // test against each test framework's regexp matcher, use first one that matches
-      targetFramework = _.find(config, function (framework) {
+      // test against each test framework's regexp matcher and format matches
+      matchedFrameworks = _.filter(config, function (framework) {
         return framework._regexp.test(packageRelativePath);
       });
+      targetFramework = _.pluck(matchedFrameworks, 'name');
 
       if (targetFramework) {
-        DEBUG && console.log('[velocity] Target framework for', relativePath, 'is', targetFramework.name);
+        DEBUG && console.log('[velocity] Target frameworks for', relativePath, 'are', targetFramework);
 
         data = {
           _id: filePath,
           name: files.pathBasename(filePath),
           absolutePath: filePath,
           relativePath: relativePath,
-          targetFramework: targetFramework.name,
+          targetFramework: targetFramework,
           lastModified: Date.now()
         };
 
         VelocityTestFiles.insert(data);
       } else {
-        DEBUG && console.log('[velocity] No framework registered for', relativePath);
+        DEBUG && console.log('[velocity] No frameworks registered for', relativePath);
       }
     }));  // end watcher.on 'add'
 
