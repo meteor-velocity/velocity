@@ -208,8 +208,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityTestReports.remove({framework: name});
       VelocityLogs.remove({framework: name});
       VelocityAggregateReports.remove({name: name});
-      VelocityTestFiles.update({}, {$pull: {targetFramework: name}});
-      VelocityTestFiles.remove({targetFramework: []});
+      VelocityTestFiles.remove({targetFramework: name});
 
       delete _config[name];
     }
@@ -652,9 +651,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     _watcher.on('add', Meteor.bindEnvironment(function (filePath) {
       var relativePath,
           packageRelativePath,
-          matchedFrameworks,
-          targetFramework,
-          data;
+          matchedFrameworks;
 
       filePath = files.convertToStandardPath(files.pathNormalize(filePath));
       relativePath = _getRelativePath(filePath);
@@ -678,25 +675,22 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         relativePath.split('/').slice(2).join('/') :
         relativePath;
 
-      // test against each test framework's regexp matcher and format matches
       matchedFrameworks = _.filter(config, function (framework) {
         return framework._regexp.test(packageRelativePath);
       });
-      targetFramework = _.pluck(matchedFrameworks, 'name');
 
-      if (targetFramework) {
-        DEBUG && console.log('[velocity] Target frameworks for', relativePath, 'are', targetFramework);
+      if (matchedFrameworks.length) {
+        DEBUG && console.log('[velocity] Target frameworks for', relativePath, 'are', _.pluck(matchedFrameworks, 'name'));
 
-        data = {
-          _id: filePath,
-          name: files.pathBasename(filePath),
-          absolutePath: filePath,
-          relativePath: relativePath,
-          targetFramework: targetFramework,
-          lastModified: Date.now()
-        };
-
-        VelocityTestFiles.insert(data);
+        matchedFrameworks.forEach(function (framework) {
+          VelocityTestFiles.insert({
+            name: files.pathBasename(filePath),
+            absolutePath: filePath,
+            relativePath: relativePath,
+            targetFramework: framework.name,
+            lastModified: Date.now()
+          });
+        });
       } else {
         DEBUG && console.log('[velocity] No frameworks registered for', relativePath);
       }
