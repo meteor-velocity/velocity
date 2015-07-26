@@ -179,7 +179,11 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
      *                    will skip reports and logs for this framework.
      *                    It is up to the framework to clean up its ****!
-     *   @param {Function} [options.sampleTestGenerator] sampleTestGenerator
+     *
+     *   @param {Array|Function} [options.exampleFiles] An array or a function that returns such an array:
+     *                      path - String - relative path to place file (from project root)
+     *                      contents - String - contents to put in the file
+     *   @param {Function} [options.sampleTestGenerator] @deprecated sampleTestGenerator
      *                    returns an array of fileObjects with the following
      *                    fields:
      *                      path - String - relative path to place test files
@@ -241,7 +245,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      *   @param {String} [options.disableAutoReset]   Velocity's reset cycle
      *                    will skip reports and logs for this framework.
      *                    It is up to the framework to clean up its ****!
-     *   @param {Function} [options.sampleTestGenerator] sampleTestGenerator
+     *   @param {Array|Function} [options.exampleFiles] An array or a function that returns such an array:
+     *                      path - String - relative path to place file (from project root)
+     *                      contents - String - contents to put in the file
+     *   @param {Function} [options.sampleTestGenerator] @deprecated sampleTestGenerator
      *                    returns an array of fileObjects with the following
      *                    fields:
      *                      path - String - relative path to place test files
@@ -255,6 +262,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       check(options, {
         disableAutoReset: Match.Optional(Boolean),
         regex: Match.Optional(RegExp),
+        exampleFiles: Match.Optional(Match.OneOf([{path: String, content: String}], Function)),
         sampleTestGenerator: Match.Optional(Function)
       });
 
@@ -451,13 +459,48 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       VelocityLogs.remove(query);
     },
 
+    /**
+     * Copy example files to the user's application.
+     *
+     * @method velocity/copyExampleFiles
+     *
+     * @param {Object} options
+     *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
+     */
+    'velocity/copyExampleFiles': function (options) {
+      options = options || {};
+      check(options, {
+        framework: String
+      });
 
+      this.unblock();
 
+      var exampleFiles = _config[options.framework].exampleFiles;
+      if (_.isFunction(exampleFiles)) {
+        exampleFiles = exampleFiles(options);
+      }
+      if (exampleFiles) {
+        DEBUG && console.log('[velocity] found ', exampleFiles.length,
+          'example files for', options.framework);
+
+        exampleFiles.forEach(function (exampleFile) {
+          var destinationPath = files.pathJoin(Velocity.getAppPath(), exampleFile.path);
+          // We better not overwrite existing files from the user
+          if (files.exists(destinationPath)) {
+            console.log('[velocity] Did not copy example file "' + exampleFile.path + '" because it already exists.');
+          } else {
+            mkdirp(files.pathDirname(files.convertToOSPath(destinationPath)));
+            files.writeFile(destinationPath, exampleFile.contents);
+          }
+        });
+      }
+    },  // end copyExampleFiles
 
     /**
      * Copy sample tests from frameworks `sample-tests` directories
      * to the user's application's `tests` directory.
      *
+     * @deprecated
      * @method velocity/copySampleTests
      *
      * @param {Object} options
@@ -473,6 +516,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       });
 
       this.unblock();
+
+      Meteor.call('velocity/copyExampleFiles', options);
 
       sampleTestGenerator = _config[options.framework].sampleTestGenerator;
       if (sampleTestGenerator) {
