@@ -1,3 +1,8 @@
+## v0.8.0
+
+* Support for remote databases and multiple apps running at the same time
+  ([Documentation](https://velocity.readme.io/docs/use-different-mongodb-server))
+
 ## v0.7.1
 
 * Added Function.bind polyfill for PhantomJS
