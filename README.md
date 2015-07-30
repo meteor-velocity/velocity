@@ -1,7 +1,7 @@
 Velocity
 ========
 
-Test runner (and community) for Meteor apps.  Under heavy development.
+Test runner (and community) for Meteor apps.
 
 Ask questions in chat [![Join the chat at https://gitter.im/meteor-velocity/velocity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/meteor-velocity/velocity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -49,6 +49,7 @@ Most of these frameworks have an example in the [velocity-examples](https://gith
 * [mike:mocha](https://github.com/mad-eye/meteor-mocha-web) - A Velocity version of mocha-web. Runs mocha tests in the Meteor context which is great for integration testing.
 * [xolvio:cucumber](https://github.com/xolvio/meteor-cucumber) - Use BDD Gherkin-syntax cucumber to test your app. Includes PhantomJS and Selenium as well as SauceLabs support. 
 * [rsbatech:robotframework](https://github.com/rjsmith/meteor-robotframework) - [Robot Framework](http://robotframework.org/) end to end test integration using Selenium and many other [test libraries](http://robotframework.org/#test-libraries)
+* [storeness:dredd](https://github.com/storeness/meteor-dredd) - [Dredd](https://github.com/apiaryio/dredd) HTTP API testing and validating of API Blueprint docs against your backend integration.
 
 A lot more information on these frameworks can be found on the [Velocity website](http://velocity.meteor.com/) and in their respective repositories.
 

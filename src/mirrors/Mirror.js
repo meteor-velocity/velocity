@@ -377,8 +377,8 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
    * @private
    */
   function _getMongoUrl (database) {
-    var parts = mongodbUri.parse(process.env.MONGO_URL);
-    parts.database = database;
+    var parts = mongodbUri.parse(process.env.VELOCITY_MONGO_URL || process.env.MONGO_URL);
+    parts.database += '-' + database;
     return mongodbUri.format(parts);
   }
 
