@@ -13,55 +13,64 @@
  * @class Collections
  */
 
+var collectionOptions = {};
+
+if (Meteor.isServer) {
+  var velocityMongoUrl = process.env.VELOCITY_MONGO_URL;
+  if (velocityMongoUrl) {
+    collectionOptions._driver = new MongoInternals.RemoteCollectionDriver(velocityMongoUrl);
+  }
+}
+
 /**
  * TODO: Needs description and example records
  *
  * @property VelocityTestFiles
  * @type Mongo.Collection
  */
-VelocityTestFiles = new Mongo.Collection('velocityTestFiles');
+VelocityTestFiles = new Mongo.Collection('velocityTestFiles', collectionOptions);
 /**
  * TODO: Needs description and example records
  *
  * @property VelocityFixtureFiles
  * @type Mongo.Collection
  */
-VelocityFixtureFiles = new Mongo.Collection('velocityFixtureFiles');
+VelocityFixtureFiles = new Mongo.Collection('velocityFixtureFiles', collectionOptions);
 /**
  * TODO: Needs description and example records
  *
  * @property VelocityTestReports
  * @type Mongo.Collection
  */
-VelocityTestReports = new Mongo.Collection('velocityTestReports');
+VelocityTestReports = new Mongo.Collection('velocityTestReports', collectionOptions);
 /**
  * TODO: Needs description and example records
  *
  * @property VelocityAggregateReports
  * @type Mongo.Collection
  */
-VelocityAggregateReports = new Mongo.Collection('velocityAggregateReports');
+VelocityAggregateReports = new Mongo.Collection('velocityAggregateReports', collectionOptions);
 /**
  * TODO: Needs description and example records
  *
  * @property VelocityLogs
  * @type Mongo.Collection
  */
-VelocityLogs = new Mongo.Collection('velocityLogs');
+VelocityLogs = new Mongo.Collection('velocityLogs', collectionOptions);
 /**
  * TODO: Needs description and example records
  *
  * @property VelocityMirrors
  * @type Mongo.Collection
  */
-VelocityMirrors = new Mongo.Collection('velocityMirrors');
+VelocityMirrors = new Mongo.Collection('velocityMirrors', collectionOptions);
 /**
  * TODO: Needs description and example records
  *
  * @property VelocityOptions
  * @type Mongo.Collection
  */
-VelocityOptions = new Mongo.Collection('velocityOptions');
+VelocityOptions = new Mongo.Collection('velocityOptions', collectionOptions);
 
 
 (function () {
