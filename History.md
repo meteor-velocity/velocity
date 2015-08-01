@@ -1,3 +1,7 @@
+## v0.9.0
+
+* Source maps support for client stack traces
+
 ## v0.8.0
 
 * Support for remote databases and multiple apps running at the same time
