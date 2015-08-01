@@ -1,3 +1,7 @@
+## v0.9.1
+
+* Source maps support for server stack traces
+
 ## v0.9.0
 
 * Source maps support for client stack traces

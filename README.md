@@ -5,26 +5,26 @@ Test runner (and community) for Meteor apps.
 
 Ask questions in chat [![Join the chat at https://gitter.im/meteor-velocity/velocity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/meteor-velocity/velocity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-We also test <img src="https://codeship.com/projects/ed973200-b7a3-0132-ec13-7eb16f937591/status?branch=develop" />
+We also test with ![CodeShip](https://codeship.com/projects/ed973200-b7a3-0132-ec13-7eb16f937591/status?branch=develop).
 
 ### What is Velocity?
-Head over to the [official homepage](http://velocity.meteor.com) 
+Head over to the [official homepage](http://velocity.meteor.com).
 
-Find out more by watching the [Intro to Velocity](http://youtu.be/kwFv1mXrLWE?t=40m51s) talk that
- Robert, Sam, and Mike did at the June 2014 Meteor Devshop!
+Find out more by watching the [Intro to Velocity](https://www.youtube.com/watch?v=eqzJ6KAjlUI)
+talk that Robert, Sam, and Mike did at the June 2014 Meteor Devshop!
 
-Read more in the [free chapter on Velocity in The Meteor Testing Manual](http://www.meteortesting.com/chapter/velocity)
+Read more in the [free chapter on Velocity in The Meteor Testing Manual](http://www.meteortesting.com/chapter/velocity).
 
 ### Getting Started
 
-The Velocity package itself is not something that you include, rather you use Velocity-compatible
+The Velocity package itself is not something that you include; rather, you use a Velocity-compatible
 framework. 
 
 To see frameworks in action, have a look at the [velocity-examples](https://github.com/meteor-velocity/velocity-examples) repository.
  
 ### Troubleshooting
 
-Sometimes things break and its useful to get more debugging info.  Most of the test frameworks 
+Sometimes things break and it's useful to get more debugging info.  Most of the test frameworks 
 support some kind of debugging environment variable flag.  You can usually see a lot more details
 about what's happening if you run your app with this command:
 
