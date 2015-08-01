@@ -24,12 +24,10 @@ To see frameworks in action, have a look at the [velocity-examples](https://gith
  
 ### Troubleshooting
 
-Sometimes things break and it's useful to get more debugging info.  Most of the test frameworks 
-support some kind of debugging environment variable flag.  You can usually see a lot more details
-about what's happening if you run your app with this command:
+Sometimes things break and it's useful to get more debugging info:
 
 ```bash
-$ DEBUG=1 JASMINE_DEBUG=1 VELOCITY_DEBUG=1 VELOCITY_DEBUG_MIRROR=1 meteor
+$ VELOCITY_DEBUG=1 meteor
 ```
 
 ### Reporting bugs
