@@ -324,16 +324,19 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       if (targetFramework) {
         DEBUG && console.log('[velocity] Target framework for', relativePath, 'is', targetFramework.name);
 
-        data = {
+        var testFile = new Velocity.Models.TestFile({
+          // TODO: Don't use filePath for _id (backward incompatible). Need to check frameworks first.
           _id: filePath,
           name: files.pathBasename(filePath),
           absolutePath: filePath,
           relativePath: relativePath,
           targetFramework: targetFramework.name,
           lastModified: Date.now()
-        };
-
-        Velocity.Collections.TestFiles.insert(data);
+        });
+        if (!testFile.validateAll()) {
+          testFile.throwValidationException();
+        }
+        testFile.save();
       } else {
         DEBUG && console.log('[velocity] No framework registered for', relativePath);
       }
@@ -346,7 +349,11 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       // we don't have to worry about inadvertently updating records for files
       // we don't care about.
       filePath = files.convertToStandardPath(files.pathNormalize(filePath));
-      Velocity.Collections.TestFiles.update(filePath, {$set: {lastModified: Date.now()}});
+      Velocity.Collections.TestFiles.update(
+        {absolutePath: filePath},
+        {$set: {lastModified: Date.now()}},
+        {multi: true}
+      );
     }));
 
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
@@ -354,7 +361,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       DEBUG && console.log('[velocity] File removed:',
         _getRelativePath(filePath));
 
-      Velocity.Collections.TestFiles.remove(filePath);
+      Velocity.Collections.TestFiles.remove(
+        {absolutePath: filePath},
+        {multi: true}
+      );
     }));
 
     _watcher.on('ready', Meteor.bindEnvironment(function () {

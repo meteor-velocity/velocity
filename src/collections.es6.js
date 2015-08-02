@@ -1,25 +1,10 @@
 /* globals
- VelocityTestFiles: true,
  VelocityFixtureFiles: true,
  VelocityAggregateReports: true,
  VelocityLogs: true,
  VelocityMirrors: true,
  VelocityOptions: true
  */
-
-/**
- * TODO: Needs description and example records
- *
- * @property Velocity.Collections.TestFiles
- * @type Mongo.Collection
- */
-Velocity.Collections.TestFiles = VelocityInternals.createCollection('velocityTestFiles');
-/**
- * @type Mongo.Collection
- * @deprecated Use `Velocity.Collections.TestFiles`
- */
-VelocityTestFiles = Velocity.Collections.TestFiles;
-
 
 /**
  * TODO: Needs description and example records

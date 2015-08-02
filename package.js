@@ -51,6 +51,7 @@ Package.on_use(function (api) {
 
   api.add_files('src/createCollection.es6.js', BOTH);
   api.add_files('src/collections.es6.js', BOTH);
+  api.add_files('src/models/TestFile.es6.js', BOTH);
   api.add_files('src/models/TestReport.es6.js', BOTH);
 
   api.add_files('src/helpers.es6.js', SERVER);
