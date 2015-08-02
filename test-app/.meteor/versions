@@ -13,6 +13,7 @@ deps@1.0.7
 ejson@1.0.6
 fastclick@1.0.3
 geojson-utils@1.0.3
+grigio:babel@0.1.6
 html-tools@1.0.4
 htmljs@1.0.4
 http@1.1.0
@@ -54,11 +55,12 @@ ui@1.0.6
 underscore@1.0.3
 url@1.0.4
 velocity:chokidar@1.0.1_1
-velocity:core@0.8.0
-velocity:html-reporter@0.6.2
+velocity:core@0.9.1
+velocity:html-reporter@0.7.3
 velocity:meteor-internals@1.1.0_7
 velocity:meteor-stubs@1.1.0
 velocity:shim@0.1.0
+velocity:source-map-support@0.3.2_1
 webapp@1.2.0
 webapp-hashing@1.0.3
 xolvio:cucumber@0.8.1

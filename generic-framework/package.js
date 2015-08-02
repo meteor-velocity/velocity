@@ -15,6 +15,7 @@
   Package.onUse(function (api) {
 
     api.use([
+      'grigio:babel@0.1.6',
       'underscore@1.0.2',
       'velocity:core',
       'velocity:shim@0.1.0'
@@ -27,7 +28,7 @@
       'sample-tests/sample.js'
     ], 'server', {isAsset: true});
 
-    api.addFiles(['server.js'], 'server');
+    api.addFiles(['server.es6.js'], 'server');
 
   });
 

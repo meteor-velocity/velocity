@@ -25,6 +25,7 @@ Package.on_use(function (api) {
       BOTH = [CLIENT, SERVER];
 
   api.versionsFrom('METEOR@1.1.0.2');
+  api.use('grigio:babel@0.1.6');
   api.use('webapp');
   api.use('mongo');
   api.use('check');
@@ -44,15 +45,15 @@ Package.on_use(function (api) {
   api.export('VelocityMirrors', BOTH);
   api.export('VelocityOptions', BOTH);
 
-  api.add_files('src/source_map_support.js', BOTH);
-  api.add_files('src/polyfills.js', BOTH);
-  api.add_files('src/globals.js', BOTH);
-  api.add_files('src/collections.js', BOTH);
-  api.add_files('src/helpers.js', SERVER);
-  api.add_files('src/core.js', SERVER);
-  api.add_files('src/core-shared.js', BOTH);
+  api.add_files('src/source_map_support.es6.js', BOTH);
+  api.add_files('src/polyfills.es6.js', BOTH);
+  api.add_files('src/globals.es6.js', BOTH);
+  api.add_files('src/collections.es6.js', BOTH);
+  api.add_files('src/helpers.es6.js', SERVER);
+  api.add_files('src/core.es6.js', SERVER);
+  api.add_files('src/core-shared.es6.js', BOTH);
 
-  api.add_files('src/mirrors/Mirror.js', SERVER);
-  api.add_files('src/mirrors/mirrorRegistrar.js', SERVER);
+  api.add_files('src/mirrors/Mirror.es6.js', SERVER);
+  api.add_files('src/mirrors/mirrorRegistrar.es6.js', SERVER);
 
 });
