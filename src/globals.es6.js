@@ -17,9 +17,15 @@
 Velocity = {
   /**
    * @class Velocity.Collections
+   * @namespace Velocity
    */
   Collections: {},
-  Methods: {}
+  /**
+   * @class Velocity.Methods
+   * @namespace Velocity
+   */
+  Methods: {},
+  Models: {}
 };
 
 VelocityInternals = {};

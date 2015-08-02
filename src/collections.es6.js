@@ -1,21 +1,11 @@
-/* global
+/* globals
  VelocityTestFiles: true,
  VelocityFixtureFiles: true,
- VelocityTestReports: true,
  VelocityAggregateReports: true,
  VelocityLogs: true,
  VelocityMirrors: true,
  VelocityOptions: true
  */
-
-var collectionOptions = {};
-
-if (Meteor.isServer) {
-  var velocityMongoUrl = process.env.VELOCITY_MONGO_URL;
-  if (velocityMongoUrl) {
-    collectionOptions._driver = new MongoInternals.RemoteCollectionDriver(velocityMongoUrl);
-  }
-}
 
 /**
  * TODO: Needs description and example records
@@ -38,7 +28,7 @@ VelocityTestFiles = Velocity.Collections.TestFiles;
  * @property Velocity.Collections.FixtureFiles
  * @type Mongo.Collection
  */
-Velocity.Collections.FixtureFiles = new Mongo.Collection('velocityFixtureFiles', collectionOptions);
+Velocity.Collections.FixtureFiles = VelocityInternals.createCollection('velocityFixtureFiles');
 /**
  * @property VelocityFixtureFiles
  * @type Mongo.Collection
@@ -50,25 +40,10 @@ VelocityFixtureFiles = Velocity.Collections.FixtureFiles;
 /**
  * TODO: Needs description and example records
  *
- * @property Velocity.Collections.TestReports
- * @type Mongo.Collection
- */
-Velocity.Collections.TestReports = new Mongo.Collection('velocityTestReports', collectionOptions);
-/**
- * @property VelocityTestReports
- * @type Mongo.Collection
- * @deprecated Use `Velocity.Collections.TestReports`
- */
-VelocityTestReports = Velocity.Collections.TestReports;
-
-
-/**
- * TODO: Needs description and example records
- *
  * @property Velocity.Collections.AggregateReports
  * @type Mongo.Collection
  */
-Velocity.Collections.AggregateReports = new Mongo.Collection('velocityAggregateReports', collectionOptions);
+Velocity.Collections.AggregateReports = VelocityInternals.createCollection('velocityAggregateReports');
 /**
  * TODO: Needs description and example records
  *
@@ -85,7 +60,7 @@ VelocityAggregateReports = Velocity.Collections.AggregateReports;
  * @property Velocity.Collections.Logs
  * @type Mongo.Collection
  */
-Velocity.Collections.Logs = new Mongo.Collection('velocityLogs', collectionOptions);
+Velocity.Collections.Logs = VelocityInternals.createCollection('velocityLogs');
 /**
  * @property VelocityLogs
  * @type Mongo.Collection
@@ -100,7 +75,7 @@ VelocityLogs = Velocity.Collections.Logs;
  * @property Velocity.Collections.Mirrors
  * @type Mongo.Collection
  */
-Velocity.Collections.Mirrors = new Mongo.Collection('velocityMirrors', collectionOptions);
+Velocity.Collections.Mirrors = VelocityInternals.createCollection('velocityMirrors');
 /**
  * @property VelocityMirrors
  * @type Mongo.Collection
@@ -115,7 +90,7 @@ VelocityMirrors = Velocity.Collections.Mirrors;
  * @property Velocity.Collections.Options
  * @type Mongo.Collection
  */
-Velocity.Collections.Options = new Mongo.Collection('velocityOptions', collectionOptions);
+Velocity.Collections.Options = VelocityInternals.createCollection('velocityOptions');
 /**
  * @property VelocityOptions
  * @type Mongo.Collection

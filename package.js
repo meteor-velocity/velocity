@@ -9,7 +9,6 @@ Package.describe({
 });
 
 Npm.depends({
-  'lodash': '2.4.1',
   'fs-extra': '0.18.0',
   'freeport':'1.0.4',
   'mongodb-uri': '0.9.7',
@@ -28,7 +27,9 @@ Package.on_use(function (api) {
   api.use('webapp');
   api.use('mongo');
   api.use('check');
-  api.use('underscore'); // Used for the Function.bind polyfill
+  api.use('stevezhu:lodash@3.10.0');
+  api.use('jagi:astronomy@0.12.1');
+  api.use('jagi:astronomy-validators@0.10.8');
   api.use('velocity:chokidar@1.0.1_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_7');
   api.use('velocity:source-map-support@0.3.2_1');
@@ -47,7 +48,11 @@ Package.on_use(function (api) {
   api.add_files('src/source_map_support.es6.js', BOTH);
   api.add_files('src/polyfills.es6.js', BOTH);
   api.add_files('src/globals.es6.js', BOTH);
+
+  api.add_files('src/createCollection.es6.js', BOTH);
   api.add_files('src/collections.es6.js', BOTH);
+  api.add_files('src/models/TestReport.es6.js', BOTH);
+
   api.add_files('src/helpers.es6.js', SERVER);
 
   // Methods

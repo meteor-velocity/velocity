@@ -1,7 +1,6 @@
-/* globals DEBUG: true, _: true */
+/* globals DEBUG: true */
 
 var DEBUG = !!process.env.VELOCITY_DEBUG;
-var _ = Npm.require('lodash');
 var url = Npm.require('url');
 var mongodbUri = Npm.require('mongodb-uri');
 var freeport = Npm.require('freeport');

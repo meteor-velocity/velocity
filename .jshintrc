@@ -1,7 +1,7 @@
 {
   "node": true,
   "browser": false,
-  "esnext": false,
+  "esnext": true,
   "bitwise": true,
   "camelcase": false,
   "curly": true,
@@ -61,7 +61,9 @@
     "sanjo": false,
     "VelocityMeteorInternals": false,
     "MeteorFilesHelpers": false,
-    "chokidar": false
+    "chokidar": false,
+    "Astro": false,
+    "Validators": false
   },
   // Deactivate https://jslinterrors.com/expected-an-assignment-or-function-call
   "-W030": true

@@ -18,6 +18,9 @@ html-tools@1.0.4
 htmljs@1.0.4
 http@1.1.0
 id-map@1.0.3
+jagi:astronomy@0.12.1
+jagi:astronomy-validators@0.10.8
+jagi:reactive-map@0.2.2
 jquery@1.11.3_2
 json@1.0.3
 launch-screen@1.0.2
@@ -49,6 +52,7 @@ sanjo:meteor-version@1.0.0
 session@1.1.0
 spacebars@1.0.6
 spacebars-compiler@1.0.6
+stevezhu:lodash@3.10.0
 templating@1.1.1
 tracker@1.0.7
 ui@1.0.6

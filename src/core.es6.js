@@ -20,7 +20,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   DEBUG && console.log('[velocity] adding velocity core');
   CONTINUOUS_INTEGRATION && console.log('[velocity] is in continuous integration mode');
 
-  var _ = Npm.require('lodash');
   var files = VelocityMeteorInternals.files;
   VelocityInternals.frameworkConfigs = {};
   var _watcher;
