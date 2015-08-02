@@ -3,6 +3,7 @@
  * all frameworks.
  *
  * @method velocity/logs/reset
+ * @for Velocity.Methods
  * @param {Object} [options]
  *   @param {String} [options.framework] The name of a specific framework
  *                                       to clear logs for.  Ex. 'mocha'

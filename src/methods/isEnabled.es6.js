@@ -2,7 +2,7 @@
  * Exposes the VELOCITY environment variable.
  *
  * @method velocity/isEnabled
- * @for Meteor.methods
+ * @for Velocity.Methods
  * @return {Boolean} true if VELOCITY environment variable is truthy.
  *                   false if VELOCITY environment variable is falsy.
  *                   Default: true

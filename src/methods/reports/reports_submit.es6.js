@@ -12,6 +12,7 @@
  * used is up to the specific test reporter that the user has installed.
  *
  * @method velocity/reports/submit
+ * @for Velocity.Methods
  * @param {Velocity.Models.TestReport} data
  */
 Velocity.Methods['velocity/reports/submit'] = function (data) {

@@ -2,6 +2,7 @@
  * Registers a testing framework plugin via a Meteor method.
  *
  * @method velocity/register/framework
+ * @for Velocity.Methods
  * @param {String} name The name of the testing framework.
  * @param {Object} [options] Options for the testing framework.
  *   @param {String} [options.regex] The regular expression for test files

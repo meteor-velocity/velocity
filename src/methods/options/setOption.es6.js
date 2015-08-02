@@ -2,7 +2,7 @@
  * Set an option.
  *
  * @method velocity/setOption
- * @for Meteor.methods
+ * @for Velocity.Methods
  * @param {String} name The name of the option.
  * @param {*} value The value of the option.
  */

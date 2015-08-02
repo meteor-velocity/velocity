@@ -3,6 +3,7 @@
  * all frameworks.
  *
  * @method velocity/reports/reset
+ * @for Velocity.Methods
  * @param {Object} [options]
  *   @param {String} [options.framework] The name of a specific framework
  *                    to clear results for.  Ex. 'jasmine' or 'mocha'

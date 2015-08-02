@@ -3,7 +3,7 @@
  * changes the status to 'DOING', and returns it
  *
  * @method velocity/returnTODOTestAndMarkItAsDOING
- *
+ * @for Velocity.Methods
  * @param {Object} options
  *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
  */

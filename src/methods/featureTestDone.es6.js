@@ -2,7 +2,7 @@
  * Marks test file as DONE
  *
  * @method velocity/featureTestDone
- *
+ * @for Velocity.Methods
  * @param {Object} options
  *   @param {String} options.featureId id of test
  */

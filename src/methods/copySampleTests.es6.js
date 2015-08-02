@@ -7,7 +7,7 @@ var mkdirp = Meteor.wrapAsync(fs.mkdirp, fs);
  * to the user's application's `tests` directory.
  *
  * @method velocity/copySampleTests
- *
+ * @for Velocity.Methods
  * @param {Object} options
  *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
  */

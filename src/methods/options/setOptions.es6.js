@@ -2,6 +2,7 @@
  * Set multiple options.
  *
  * @method velocity/setOptions
+ * @for Velocity.Methods
  * @param options Hash with options (name: value).
  */
 Velocity.Methods['velocity/setOptions'] = function (options) {

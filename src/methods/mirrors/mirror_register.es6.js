@@ -2,6 +2,7 @@
  * Lets Velocity know the mirror has started successfully
  *
  * @method velocity/mirrors/register
+ * @for Velocity.Methods
  * @param {Object} options
  *   @param {String} options.framework The name of the test framework
  *                                     making the request

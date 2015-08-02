@@ -4,6 +4,7 @@
  * entries.
  *
  * @method velocity/logs/submit
+ * @for Velocity.Methods
  * @param {Object} options
  *   @param {String} options.framework The name of the test framework
  *   @param {String} options.message The message to log

@@ -2,6 +2,7 @@
  * Get an option
  *
  * @method velocity/getOption
+ * @for Velocity.Methods
  * @param {String} name The name of the option.
  * @return {*} The value of the option or null.
  */

@@ -3,6 +3,7 @@
  * their current test runs. Velocity uses this flag when running in CI mode.
  *
  * @method velocity/reports/completed
+ * @for Velocity.Methods
  * @param {Object} data
  *   @param {String} data.framework Name of a test framework.  Ex. 'jasmine'
  */

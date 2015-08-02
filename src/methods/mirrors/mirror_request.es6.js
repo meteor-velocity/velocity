@@ -28,7 +28,7 @@ Velocity.mirrorMeteorToolRelease =
  * This method will update the `Velocity.Collections.Mirrors` collection with once the mirror is ready.
  *
  * @method velocity/mirrors/request
- * @for Meteor.methods
+ * @for Velocity.Methods
  * @param {Object} options                  Options for the mirror.
  * @param {String} options.framework        The name of the calling framework
  * @param {String} [options.testsPath]      The path to tests for this framework.

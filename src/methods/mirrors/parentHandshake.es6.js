@@ -3,7 +3,7 @@
  * to inform the user when there may be delays
  *
  * @method velocity/parentHandshake
- * @for Meteor.methods
+ * @for Velocity.Methods
  */
 Velocity.Methods['velocity/parentHandshake'] = function () {
   console.log('[velocity] Established connection with Velocity.');
