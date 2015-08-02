@@ -14,6 +14,8 @@
  *
  * @class Velocity
  */
-Velocity = {};
+Velocity = {
+  methods: {}
+};
 
 VelocityInternals = {};

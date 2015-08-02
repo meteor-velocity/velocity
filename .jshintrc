@@ -59,5 +59,7 @@
     "sanjo": false,
     "VelocityMeteorInternals": false,
     "MeteorFilesHelpers": false
-  }
+  },
+  // Deactivate https://jslinterrors.com/expected-an-assignment-or-function-call
+  "-W030": true
 }

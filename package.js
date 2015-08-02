@@ -50,10 +50,32 @@ Package.on_use(function (api) {
   api.add_files('src/globals.es6.js', BOTH);
   api.add_files('src/collections.es6.js', BOTH);
   api.add_files('src/helpers.es6.js', SERVER);
+
+  // Methods
+  api.add_files('src/methods/logs/logs_reset.es6.js', SERVER);
+  api.add_files('src/methods/logs/logs_submit.es6.js', SERVER);
+  api.add_files('src/methods/mirrors/mirror_init.es6.js', SERVER);
+  api.add_files('src/methods/mirrors/mirror_register.es6.js', SERVER);
+  api.add_files('src/methods/mirrors/mirror_request.es6.js', SERVER);
+  api.add_files('src/methods/mirrors/parentHandshake.es6.js', SERVER);
+  api.add_files('src/methods/options/getOption.es6.js', BOTH);
+  api.add_files('src/methods/options/setOption.es6.js', BOTH);
+  api.add_files('src/methods/options/setOptions.es6.js', BOTH);
+  api.add_files('src/methods/reports/reports_completed.es6.js', SERVER);
+  api.add_files('src/methods/reports/reports_reset.es6.js', SERVER);
+  api.add_files('src/methods/reports/reports_submit.es6.js', SERVER);
+  api.add_files('src/methods/copySampleTests.es6.js', SERVER);
+  api.add_files('src/methods/featureTestDone.es6.js', SERVER);
+  api.add_files('src/methods/featureTestFailed.es6.js', SERVER);
+  api.add_files('src/methods/isEnabled.es6.js', SERVER);
+  api.add_files('src/methods/isMirror.es6.js', SERVER);
+  api.add_files('src/methods/register_framework.es6.js', SERVER);
+  api.add_files('src/methods/reset.es6.js', SERVER);
+  api.add_files('src/methods/returnTODOTestAndMarkItAsDOING.es6.js', SERVER);
+  api.add_files('src/methods.es6.js', BOTH);
+
   api.add_files('src/core.es6.js', SERVER);
   api.add_files('src/core-shared.es6.js', BOTH);
-
-  api.add_files('src/mirrors/Mirror.es6.js', SERVER);
   api.add_files('src/mirrors/mirrorRegistrar.es6.js', SERVER);
 
 });
