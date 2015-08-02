@@ -9,7 +9,6 @@
  */
 Velocity.Collections.TestReports = VelocityInternals.createCollection('velocityTestReports');
 /**
- * @class VelocityTestReports
  * @type Mongo.Collection
  * @deprecated Use `Velocity.Collections.TestReports`
  */

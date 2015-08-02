@@ -15,7 +15,6 @@
  */
 Velocity.Collections.TestFiles = new Mongo.Collection('velocityTestFiles', collectionOptions);
 /**
- * @property VelocityTestFiles
  * @type Mongo.Collection
  * @deprecated Use `Velocity.Collections.TestFiles`
  */
@@ -30,7 +29,6 @@ VelocityTestFiles = Velocity.Collections.TestFiles;
  */
 Velocity.Collections.FixtureFiles = VelocityInternals.createCollection('velocityFixtureFiles');
 /**
- * @property VelocityFixtureFiles
  * @type Mongo.Collection
  * @deprecated Use `Velocity.Collections.FixtureFiles`
  */
@@ -45,9 +43,6 @@ VelocityFixtureFiles = Velocity.Collections.FixtureFiles;
  */
 Velocity.Collections.AggregateReports = VelocityInternals.createCollection('velocityAggregateReports');
 /**
- * TODO: Needs description and example records
- *
- * @property VelocityAggregateReports
  * @type Mongo.Collection
  * @deprecated Use `Velocity.Collections.AggregateReports`
  */
@@ -62,7 +57,6 @@ VelocityAggregateReports = Velocity.Collections.AggregateReports;
  */
 Velocity.Collections.Logs = VelocityInternals.createCollection('velocityLogs');
 /**
- * @property VelocityLogs
  * @type Mongo.Collection
  * @deprecated Use `Velocity.Collections.Logs`
  */
@@ -77,7 +71,6 @@ VelocityLogs = Velocity.Collections.Logs;
  */
 Velocity.Collections.Mirrors = VelocityInternals.createCollection('velocityMirrors');
 /**
- * @property VelocityMirrors
  * @type Mongo.Collection
  * @deprecated Use `Velocity.Collections.Mirrors`
  */
@@ -92,7 +85,6 @@ VelocityMirrors = Velocity.Collections.Mirrors;
  */
 Velocity.Collections.Options = VelocityInternals.createCollection('velocityOptions');
 /**
- * @property VelocityOptions
  * @type Mongo.Collection
  * @deprecated Use `Velocity.Collections.Options`
  */
