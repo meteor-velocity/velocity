@@ -22,7 +22,7 @@
  *                         would like to store in the Velocity mirrors
  *                         collection.
  */
-Velocity.methods['velocity/mirrors/init'] = function (options, extra) {
+Velocity.Methods['velocity/mirrors/init'] = function (options, extra) {
   check(options, {
     framework: String,
     port: Number,

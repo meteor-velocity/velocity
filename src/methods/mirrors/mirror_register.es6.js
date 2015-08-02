@@ -9,7 +9,7 @@
  *                                additional paths. Must include port. Used
  *                                for making DDP connections
  */
-Velocity.methods['velocity/mirrors/register'] = function (options) {
+Velocity.Methods['velocity/mirrors/register'] = function (options) {
   check(options, Match.ObjectIncluding({
     framework: String,
     host: String

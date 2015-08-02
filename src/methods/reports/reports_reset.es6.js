@@ -10,7 +10,7 @@
  *                                  (not cleared).  These Ids must match the
  *                                  ones passed to `velocity/reports/submit`.
  */
-Velocity.methods['velocity/reports/reset'] = function (options) {
+Velocity.Methods['velocity/reports/reset'] = function (options) {
   var query = {};
 
   options = options || {};

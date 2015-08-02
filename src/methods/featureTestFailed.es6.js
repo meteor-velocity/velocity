@@ -6,7 +6,7 @@
  * @param {Object} options
  *   @param {String} options.featureId id of test
  */
-Velocity.methods['velocity/featureTestFailed'] = function (options) {
+Velocity.Methods['velocity/featureTestFailed'] = function (options) {
   check(options, {
     featureId: String
   });

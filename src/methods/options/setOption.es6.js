@@ -6,7 +6,7 @@
  * @param {String} name The name of the option.
  * @param {*} value The value of the option.
  */
-Velocity.methods['velocity/setOption'] = function (name, value) {
+Velocity.Methods['velocity/setOption'] = function (name, value) {
   check(name, String);
   check(value, Match.Any);
 

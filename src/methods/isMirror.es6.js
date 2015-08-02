@@ -5,6 +5,6 @@
  * @for Meteor.methods
  * @return {Boolean} true if currently running in mirror
  */
-Velocity.methods['velocity/isMirror'] = function () {
+Velocity.Methods['velocity/isMirror'] = function () {
   return !!process.env.IS_MIRROR;
 };

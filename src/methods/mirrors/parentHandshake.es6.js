@@ -5,6 +5,6 @@
  * @method velocity/parentHandshake
  * @for Meteor.methods
  */
-Velocity.methods['velocity/parentHandshake'] = function () {
+Velocity.Methods['velocity/parentHandshake'] = function () {
   console.log('[velocity] Established connection with Velocity.');
 };

@@ -3,7 +3,7 @@
  *
  * @method velocity/reset
  */
-Velocity.methods['velocity/reset'] = function (name) {
+Velocity.Methods['velocity/reset'] = function (name) {
   check(name, String);
   VelocityInternals.reset(name);
 };

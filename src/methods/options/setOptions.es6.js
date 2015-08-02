@@ -4,7 +4,7 @@
  * @method velocity/setOptions
  * @param options Hash with options (name: value).
  */
-Velocity.methods['velocity/setOptions'] = function (options) {
+Velocity.Methods['velocity/setOptions'] = function (options) {
   check(options, Object);
 
   for (var name in options) {

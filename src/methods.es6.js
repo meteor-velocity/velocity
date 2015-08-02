@@ -1,1 +1,1 @@
-Meteor.methods(Velocity.methods);
+Meteor.methods(Velocity.Methods);

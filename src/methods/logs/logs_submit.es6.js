@@ -10,7 +10,7 @@
  *   @param {String} [options.level] Log level.  Ex. 'error'. Default: 'info'
  *   @param {Date} [options.timestamp]
  */
-Velocity.methods['velocity/logs/submit'] = function (options) {
+Velocity.Methods['velocity/logs/submit'] = function (options) {
   check(options, {
     framework: String,
     message: String,

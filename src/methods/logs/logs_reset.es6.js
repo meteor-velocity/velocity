@@ -7,7 +7,7 @@
  *   @param {String} [options.framework] The name of a specific framework
  *                                       to clear logs for.  Ex. 'mocha'
  */
-Velocity.methods['velocity/logs/reset'] = function (options) {
+Velocity.Methods['velocity/logs/reset'] = function (options) {
   options = options || {};
   check(options, {
     framework: Match.Optional(String)

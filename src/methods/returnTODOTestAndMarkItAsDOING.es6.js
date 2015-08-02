@@ -7,7 +7,7 @@
  * @param {Object} options
  *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
  */
-Velocity.methods['velocity/returnTODOTestAndMarkItAsDOING'] = function(options) {
+Velocity.Methods['velocity/returnTODOTestAndMarkItAsDOING'] = function(options) {
   check(options, {
     framework: String
   });

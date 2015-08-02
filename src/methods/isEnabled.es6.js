@@ -7,7 +7,7 @@
  *                   false if VELOCITY environment variable is falsy.
  *                   Default: true
  */
-Velocity.methods['velocity/isEnabled'] = function () {
+Velocity.Methods['velocity/isEnabled'] = function () {
   var type = typeof process.env.VELOCITY;
 
   switch (type) {

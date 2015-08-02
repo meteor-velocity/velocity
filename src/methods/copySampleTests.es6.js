@@ -11,7 +11,7 @@ var mkdirp = Meteor.wrapAsync(fs.mkdirp, fs);
  * @param {Object} options
  *   @param {String} options.framework Framework name. Ex. 'jasmine', 'mocha'
  */
-Velocity.methods['velocity/copySampleTests'] = function (options) {
+Velocity.Methods['velocity/copySampleTests'] = function (options) {
   var sampleTestGenerator,
     sampleTests;
 

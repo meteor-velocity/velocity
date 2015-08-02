@@ -49,7 +49,7 @@ Velocity.mirrorMeteorToolRelease =
  *                                          like workers. The default is true
  *
  */
-Velocity.methods['velocity/mirrors/request'] = function (options) {
+Velocity.Methods['velocity/mirrors/request'] = function (options) {
   check(options, {
     framework: String,
     testsPath: Match.Optional(String),

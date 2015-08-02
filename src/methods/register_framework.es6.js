@@ -20,7 +20,7 @@
  *                      contents - String - contents to put in the test file
  *                                          at the corresponding path
  */
-Velocity.methods['velocity/register/framework'] = function (name, options) {
+Velocity.Methods['velocity/register/framework'] = function (name, options) {
   options = options || {};
   check(name, String);
   check(options, {

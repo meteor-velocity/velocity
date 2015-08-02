@@ -38,7 +38,7 @@
  *   @param {String} [data.failureStackTrace] The stack trace associated with
  *                                            the failure
  */
-Velocity.methods['velocity/reports/submit'] = function (data) {
+Velocity.Methods['velocity/reports/submit'] = function (data) {
   check(data, Match.ObjectIncluding({
     name: String,
     framework: String,

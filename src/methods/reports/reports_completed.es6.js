@@ -6,7 +6,7 @@
  * @param {Object} data
  *   @param {String} data.framework Name of a test framework.  Ex. 'jasmine'
  */
-Velocity.methods['velocity/reports/completed'] = function (data) {
+Velocity.Methods['velocity/reports/completed'] = function (data) {
   check(data, {
     framework: String
   });

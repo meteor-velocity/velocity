@@ -5,7 +5,7 @@
  * @param {String} name The name of the option.
  * @return {*} The value of the option or null.
  */
-Velocity.methods['velocity/getOption'] = function (name) {
+Velocity.Methods['velocity/getOption'] = function (name) {
   check(name, String);
 
   var option = Velocity.Collections.Options.findOne({name: name});

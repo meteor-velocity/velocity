@@ -19,7 +19,7 @@ Velocity = {
    * @class Velocity.Collections
    */
   Collections: {},
-  methods: {}
+  Methods: {}
 };
 
 VelocityInternals = {};
