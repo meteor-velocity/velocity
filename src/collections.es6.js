@@ -13,7 +13,7 @@
  * @property Velocity.Collections.TestFiles
  * @type Mongo.Collection
  */
-Velocity.Collections.TestFiles = new Mongo.Collection('velocityTestFiles', collectionOptions);
+Velocity.Collections.TestFiles = VelocityInternals.createCollection('velocityTestFiles');
 /**
  * @type Mongo.Collection
  * @deprecated Use `Velocity.Collections.TestFiles`
