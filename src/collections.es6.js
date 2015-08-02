@@ -9,7 +9,8 @@
 /**
  * TODO: Needs description and example records
  *
- * @property Velocity.Collections.FixtureFiles
+ * @property FixtureFiles
+ * @for Velocity.Collections
  * @type Mongo.Collection
  */
 Velocity.Collections.FixtureFiles = VelocityInternals.createCollection('velocityFixtureFiles');
@@ -23,7 +24,8 @@ VelocityFixtureFiles = Velocity.Collections.FixtureFiles;
 /**
  * TODO: Needs description and example records
  *
- * @property Velocity.Collections.AggregateReports
+ * @property AggregateReports
+ * @for Velocity.Collections
  * @type Mongo.Collection
  */
 Velocity.Collections.AggregateReports = VelocityInternals.createCollection('velocityAggregateReports');
@@ -37,7 +39,8 @@ VelocityAggregateReports = Velocity.Collections.AggregateReports;
 /**
  * TODO: Needs description and example records
  *
- * @property Velocity.Collections.Logs
+ * @property Logs
+ * @for Velocity.Collections
  * @type Mongo.Collection
  */
 Velocity.Collections.Logs = VelocityInternals.createCollection('velocityLogs');
@@ -51,7 +54,8 @@ VelocityLogs = Velocity.Collections.Logs;
 /**
  * TODO: Needs description and example records
  *
- * @property Velocity.Collections.Mirrors
+ * @property Mirrors
+ * @for Velocity.Collections
  * @type Mongo.Collection
  */
 Velocity.Collections.Mirrors = VelocityInternals.createCollection('velocityMirrors');
@@ -65,7 +69,8 @@ VelocityMirrors = Velocity.Collections.Mirrors;
 /**
  * TODO: Needs description and example records
  *
- * @property Velocity.Collections.Options
+ * @property Options
+ * @for Velocity.Collections
  * @type Mongo.Collection
  */
 Velocity.Collections.Options = VelocityInternals.createCollection('velocityOptions');
