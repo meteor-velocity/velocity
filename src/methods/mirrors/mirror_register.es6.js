@@ -37,7 +37,7 @@ Velocity.methods['velocity/mirrors/register'] = function (options) {
       framework: options.framework,
       port: parseInt(options.port)
     };
-    VelocityMirrors.update(_updateQuery, {
+    Velocity.Collections.Mirrors.update(_updateQuery, {
       $set: {
         state: 'ready',
         lastModified: Date.now()

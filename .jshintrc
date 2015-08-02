@@ -28,7 +28,9 @@
     "Npm": false,
     "Random": false,
     "Package": false,
+    "Assets": false,
     "Mongo": false,
+    "MongoInternals": false,
     "DEBUG": false,
     "Velocity": false,
     "VelocityInternals": false,
@@ -58,7 +60,8 @@
     "_": false,
     "sanjo": false,
     "VelocityMeteorInternals": false,
-    "MeteorFilesHelpers": false
+    "MeteorFilesHelpers": false,
+    "chokidar": false
   },
   // Deactivate https://jslinterrors.com/expected-an-assignment-or-function-call
   "-W030": true

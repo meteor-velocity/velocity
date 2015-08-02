@@ -14,7 +14,7 @@ describe('Velocity Methods', function () {
       var report;
 
       Meteor.call('velocity/register/framework', 'foo');
-      report = VelocityAggregateReports.findOne({name: 'foo'});
+      report = Velocity.Collections.AggregateReports.findOne({name: 'foo'});
       expect(report.result).toBe('pending');
     });
   });
@@ -32,7 +32,7 @@ describe('Velocity Methods', function () {
           record;
 
       Meteor.call('velocity/logs/submit', entry);
-      record = VelocityLogs.findOne({framework: 'logSubmitTest'});
+      record = Velocity.Collections.Logs.findOne({framework: 'logSubmitTest'});
       expect(record.message).toBe('Test message');
     });
   });
@@ -46,11 +46,11 @@ describe('Velocity Methods', function () {
                                            message: 'Test1' });
       Meteor.call('velocity/logs/submit', {framework: framework,
                                            message: 'Test2' });
-      count = VelocityLogs.find({framework: framework}).count();
+      count = Velocity.Collections.Logs.find({framework: framework}).count();
       expect(count).toBe(2);
 
       Meteor.call('velocity/logs/reset', {framework: framework});
-      count = VelocityLogs.find({framework: framework}).count();
+      count = Velocity.Collections.Logs.find({framework: framework}).count();
       expect(count).toBe(0);
     });
   });
@@ -70,7 +70,7 @@ describe('Velocity Methods', function () {
           record;
 
       Meteor.call('velocity/reports/submit', entry);
-      record = VelocityTestReports.findOne({framework: framework});
+      record = Velocity.Collections.TestReports.findOne({framework: framework});
       expect(record.name).toBe('Test1');
       expect(record.result).toBe('passed');
     });
@@ -89,7 +89,7 @@ describe('Velocity Methods', function () {
 
     afterEach(function () {
       this.jasmineReports.forEach(function (entry) {
-        VelocityAggregateReports.insert(entry);
+        Velocity.Collections.AggregateReports.insert(entry);
       });
     });
     */
@@ -106,10 +106,10 @@ describe('Velocity Methods', function () {
       Meteor.call('velocity/reports/submit', entry);
       Meteor.call('velocity/reports/completed', {framework: framework});
 
-      record = VelocityAggregateReports.findOne({'name': framework});
+      record = Velocity.Collections.AggregateReports.findOne({'name': framework});
       expect(record.result).toBe('completed');
 
-      //console.log(VelocityAggregateReports.find({}).fetch());
+      //console.log(Velocity.Collections.AggregateReports.find({}).fetch());
     });
   });
 
@@ -122,7 +122,7 @@ describe('Velocity Methods', function () {
    * @private
    */
   //function _removeJasmineReports () {
-  //  var collection = VelocityAggregateReports,
+  //  var collection = Velocity.Collections.AggregateReports,
   //      query,
   //      records;
   //
@@ -150,11 +150,11 @@ describe('Velocity Methods', function () {
       Meteor.call('velocity/reports/submit', entry);
       entry.name = 'Test2';
       Meteor.call('velocity/reports/submit', entry);
-      count = VelocityTestReports.find({framework: framework}).count();
+      count = Velocity.Collections.TestReports.find({framework: framework}).count();
       expect(count).toBe(2);
 
       Meteor.call('velocity/reports/reset', {framework: framework});
-      count = VelocityTestReports.find({framework: framework}).count();
+      count = Velocity.Collections.TestReports.find({framework: framework}).count();
       expect(count).toBe(0);
     });
   });
@@ -179,15 +179,15 @@ describe('Velocity Methods', function () {
       var changedEntry = JSON.parse(JSON.stringify(entry));
       changedEntry.status = changedStatus;
 
-      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      filesWithOriginalStatus = Velocity.Collections.TestFiles.find(entry).count();
       expect(filesWithOriginalStatus, 0);
 
-      VelocityTestFiles.insert(entry);
+      Velocity.Collections.TestFiles.insert(entry);
 
-      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      filesWithOriginalStatus = Velocity.Collections.TestFiles.find(entry).count();
       expect(filesWithOriginalStatus, 1);
 
-      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      filesWithChangedStatus = Velocity.Collections.TestFiles.find(changedEntry).count();
       expect(filesWithChangedStatus).toBe(0);
 
       var _returnedFile = Meteor.call('velocity/returnTODOTestAndMarkItAsDOING', {framework: framework});
@@ -195,11 +195,11 @@ describe('Velocity Methods', function () {
       expect(_returnedFile).toBeDefined();
       expect(_returnedFile.status).toBe(originalStatus);
 
-      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      filesWithChangedStatus = Velocity.Collections.TestFiles.find(changedEntry).count();
       expect(filesWithChangedStatus).toBe(1);
 
 
-      VelocityTestFiles.remove(changedEntry);
+      Velocity.Collections.TestFiles.remove(changedEntry);
     });
   });
 
@@ -222,24 +222,24 @@ describe('Velocity Methods', function () {
       var changedEntry = JSON.parse(JSON.stringify(entry));
       changedEntry.status = changedStatus;
 
-      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      filesWithOriginalStatus = Velocity.Collections.TestFiles.find(entry).count();
       expect(filesWithOriginalStatus, 0);
 
-      VelocityTestFiles.insert(entry);
+      Velocity.Collections.TestFiles.insert(entry);
 
-      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      filesWithOriginalStatus = Velocity.Collections.TestFiles.find(entry).count();
       expect(filesWithOriginalStatus, 1);
 
-      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      filesWithChangedStatus = Velocity.Collections.TestFiles.find(changedEntry).count();
       expect(filesWithChangedStatus).toBe(0);
 
       Meteor.call('velocity/featureTestDone', {featureId: featureId});
 
-      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      filesWithChangedStatus = Velocity.Collections.TestFiles.find(changedEntry).count();
       expect(filesWithChangedStatus).toBe(1);
 
 
-      VelocityTestFiles.remove(changedEntry);
+      Velocity.Collections.TestFiles.remove(changedEntry);
 
 
     });
@@ -263,23 +263,23 @@ describe('Velocity Methods', function () {
       var changedEntry = JSON.parse(JSON.stringify(entry));
       changedEntry.status = changedStatus;
 
-      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      filesWithOriginalStatus = Velocity.Collections.TestFiles.find(entry).count();
       expect(filesWithOriginalStatus, 0);
 
-      VelocityTestFiles.insert(entry);
+      Velocity.Collections.TestFiles.insert(entry);
 
-      filesWithOriginalStatus = VelocityTestFiles.find(entry).count();
+      filesWithOriginalStatus = Velocity.Collections.TestFiles.find(entry).count();
       expect(filesWithOriginalStatus, 1);
 
-      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      filesWithChangedStatus = Velocity.Collections.TestFiles.find(changedEntry).count();
       expect(filesWithChangedStatus).toBe(0);
 
       Meteor.call('velocity/featureTestFailed', {featureId: featureId});
 
-      filesWithChangedStatus = VelocityTestFiles.find(changedEntry).count();
+      filesWithChangedStatus = Velocity.Collections.TestFiles.find(changedEntry).count();
       expect(filesWithChangedStatus).toBe(1);
 
-      VelocityTestFiles.remove(changedEntry);
+      Velocity.Collections.TestFiles.remove(changedEntry);
 
     });
 
@@ -299,17 +299,17 @@ describe('Velocity Methods', function () {
       delete changedEntry.status;
       changedEntry.brokenPreviously = true;
 
-      VelocityTestFiles.insert(entry);
+      Velocity.Collections.TestFiles.insert(entry);
 
-      filesBrokenPreviously = VelocityTestFiles.find(changedEntry).count();
+      filesBrokenPreviously = Velocity.Collections.TestFiles.find(changedEntry).count();
       expect(filesBrokenPreviously, 0);
 
       Meteor.call('velocity/featureTestFailed', {featureId: featureId});
 
-      filesBrokenPreviously = VelocityTestFiles.find(changedEntry).count();
+      filesBrokenPreviously = Velocity.Collections.TestFiles.find(changedEntry).count();
       expect(filesBrokenPreviously).toBe(1);
 
-      VelocityTestFiles.remove(changedEntry);
+      Velocity.Collections.TestFiles.remove(changedEntry);
 
     });
 
@@ -328,7 +328,7 @@ describe('Velocity Methods', function () {
       name = 'foo';
       value = 'bar';
       Meteor.call('velocity/setOption', name, value);
-      actual = VelocityOptions.findOne({name: name});
+      actual = Velocity.Collections.Options.findOne({name: name});
       expect(actual.value).toEqual(value);
     });
   });
@@ -357,13 +357,13 @@ describe('Velocity Methods', function () {
           actual;
 
       Meteor.call('velocity/setOptions', options);
-      actual = VelocityOptions.findOne({name: 'foo'});
+      actual = Velocity.Collections.Options.findOne({name: 'foo'});
       expect(actual.value).toEqual('bar');
 
-      actual = VelocityOptions.findOne({name: 'foo2'});
+      actual = Velocity.Collections.Options.findOne({name: 'foo2'});
       expect(actual.value).toEqual('baz');
 
-      actual = VelocityOptions.findOne({name: 'number'});
+      actual = Velocity.Collections.Options.findOne({name: 'number'});
       expect(actual.value).toEqual(1);
     });
   });

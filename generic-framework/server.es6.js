@@ -1,5 +1,3 @@
-/*jshint -W030, -W020, -W117 */
-
 (function () {
 
   'use strict';
@@ -35,7 +33,7 @@
       });
 
       var init = function () {
-        VelocityTestFiles.find({targetFramework: FRAMEWORK_NAME}).observe({
+        Velocity.Collections.TestFiles.find({targetFramework: FRAMEWORK_NAME}).observe({
           added: _rerunTests,
           removed: _rerunTests,
           changed: _rerunTests
@@ -43,7 +41,7 @@
       };
 
       var initOnce = _.once(Meteor.bindEnvironment(init));
-      VelocityMirrors.find({framework: FRAMEWORK_NAME, state: 'ready'}).observe({
+      Velocity.Collections.Mirrors.find({framework: FRAMEWORK_NAME, state: 'ready'}).observe({
         added: initOnce,
         changed: initOnce
       });

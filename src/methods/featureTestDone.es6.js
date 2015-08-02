@@ -11,7 +11,7 @@ Velocity.methods['velocity/featureTestDone'] = function (options) {
     featureId: String
   });
 
-  VelocityTestFiles.update({
+  Velocity.Collections.TestFiles.update({
     _id: options.featureId
   }, {
     $set: {status: 'DONE'}

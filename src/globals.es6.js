@@ -15,6 +15,10 @@
  * @class Velocity
  */
 Velocity = {
+  /**
+   * @class Velocity.Collections
+   */
+  Collections: {},
   methods: {}
 };
 

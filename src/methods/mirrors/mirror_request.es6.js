@@ -26,7 +26,7 @@ Velocity.mirrorMeteorToolRelease =
  * Starts a new mirror if it has not already been started, and reuses an
  * existing one if it is already started.
  *
- * This method will update the `VelocityMirrors` collection with once the mirror is ready.
+ * This method will update the `Velocity.Collections.Mirrors` collection with once the mirror is ready.
  *
  * @method velocity/mirrors/request
  * @for Meteor.methods
@@ -40,7 +40,7 @@ Velocity.mirrorMeteorToolRelease =
  * @param {Object} [options.env]            Additional environment variables that the mirror is called with.
  * @param {Number} [options.port]           Use a specific port.  Default is random, free port.
  * @param {String} [options.rootUrlPath]    Adds this string to the end of the root url in the
- *                                          VelocityMirrors collection. eg. `/?jasmine=true`
+ *                                          Velocity.Collections.Mirrors collection. eg. `/?jasmine=true`
  * @param {Number} [options.nodes]          The number of mirrors required. This is used by
  *                                          distributable frameworks. Default is 1
  * @param {Boolean} [options.handshake]     Specifies whether or not this mirror should perform
@@ -261,7 +261,7 @@ function _getMirrorUrl (port) {
  *   @param {String} options.rootUrl The root url of this mirror, which also
  *                           includes the path and params
  *   @param {String} options.rootUrlPath Adds this string to the end of
- *                           the root url in the VelocityMirrors
+ *                           the root url in the Velocity.Collections.Mirrors
  *                           collection. To be used by test frameworks to
  *                           recognize when they are executing in a mirror.
  *                           eg. `/?jasmine=true`

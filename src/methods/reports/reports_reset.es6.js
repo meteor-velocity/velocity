@@ -21,7 +21,7 @@ Velocity.methods['velocity/reports/reset'] = function (options) {
 
   if (options.framework) {
     query.framework = options.framework;
-    VelocityAggregateReports.upsert({name: options.framework},
+    Velocity.Collections.AggregateReports.upsert({name: options.framework},
       {$set: {result: 'pending'}});
   }
 
@@ -29,7 +29,7 @@ Velocity.methods['velocity/reports/reset'] = function (options) {
     query = _.assign(query, {_id: {$nin: options.notIn}});
   }
 
-  VelocityTestReports.remove(query);
+  Velocity.Collections.TestReports.remove(query);
 
   VelocityInternals.updateAggregateReports();
 };

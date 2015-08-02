@@ -1,4 +1,3 @@
-/*jshint -W117, -W097 */
 'use strict';
 
 Package.describe({

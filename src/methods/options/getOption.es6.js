@@ -8,6 +8,6 @@
 Velocity.methods['velocity/getOption'] = function (name) {
   check(name, String);
 
-  var option = VelocityOptions.findOne({name: name});
+  var option = Velocity.Collections.Options.findOne({name: name});
   return option ? option.value : null;
 };

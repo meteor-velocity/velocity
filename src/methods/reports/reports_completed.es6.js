@@ -11,7 +11,7 @@ Velocity.methods['velocity/reports/completed'] = function (data) {
     framework: String
   });
 
-  VelocityAggregateReports.upsert({'name': data.framework},
+  Velocity.Collections.AggregateReports.upsert({'name': data.framework},
     {$set: {'result': 'completed'}});
   VelocityInternals.updateAggregateReports();
 };

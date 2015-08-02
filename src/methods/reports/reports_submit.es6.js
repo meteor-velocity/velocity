@@ -56,7 +56,7 @@ Velocity.methods['velocity/reports/submit'] = function (data) {
   data.timestamp = data.timestamp ? new Date(data.timestamp) : new Date();
   data.id = data.id || Random.id();
 
-  VelocityTestReports.upsert(data.id, {$set: data});
+  Velocity.Collections.TestReports.upsert(data.id, {$set: data});
 
   VelocityInternals.updateAggregateReports();
 };

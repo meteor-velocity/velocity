@@ -1,6 +1,6 @@
-/*jshint -W117, -W030, -W016, -W084 */
-/* global
- DEBUG:true
+/* globals
+ DEBUG: true,
+ CONTINUOUS_INTEGRATION: true
  */
 
 DEBUG = !!process.env.VELOCITY_DEBUG;
@@ -189,7 +189,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       DEBUG && console.log('[velocity] Register framework ' + name + ' with regex ' + options.regex);
       VelocityInternals.frameworkConfigs[name] = VelocityInternals.parseTestingFrameworkOptions(name, options);
       // make sure the appropriate aggregate records are added
-      VelocityAggregateReports.insert({
+      Velocity.Collections.AggregateReports.insert({
         name: name,
         result: 'pending'
       });
@@ -203,10 +203,10 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @param {String} name Name of framework to unregister
      */
     unregisterTestingFramework: function (name) {
-      VelocityTestReports.remove({framework: name});
-      VelocityLogs.remove({framework: name});
-      VelocityAggregateReports.remove({name: name});
-      VelocityTestFiles.remove({targetFramework: name});
+      Velocity.Collections.TestReports.remove({framework: name});
+      Velocity.Collections.Logs.remove({framework: name});
+      Velocity.Collections.AggregateReports.remove({name: name});
+      Velocity.Collections.TestFiles.remove({targetFramework: name});
 
       delete VelocityInternals.frameworkConfigs[name];
     }
@@ -220,8 +220,9 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   function _triggerVelocityStartupFunctions () {
     _velocityStarted = true;
     DEBUG && console.log('[velocity] Triggering queued startup functions');
-    var func;
-    while (func = _velocityStartupFunctions.pop()) {
+
+    while (_velocityStartupFunctions.length) {
+      var func = _velocityStartupFunctions.pop();
       func();
     }
   }
@@ -265,8 +266,8 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     var paths,
         packagesPath;
 
-    VelocityTestFiles.remove({});
-    VelocityFixtureFiles.remove({});
+    Velocity.Collections.TestFiles.remove({});
+    Velocity.Collections.FixtureFiles.remove({});
 
     paths = [Velocity.getTestsPath()];
     packagesPath = Velocity.getPackagesPath();
@@ -300,7 +301,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       // if this is a fixture file, put it in the fixtures collection
       if (FIXTURE_REG_EXP.test(relativePath)) {
         DEBUG && console.log('[velocity] Found fixture file', relativePath);
-        VelocityFixtureFiles.insert({
+        Velocity.Collections.FixtureFiles.insert({
           _id: filePath,
           absolutePath: filePath,
           relativePath: relativePath,
@@ -333,7 +334,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
           lastModified: Date.now()
         };
 
-        VelocityTestFiles.insert(data);
+        Velocity.Collections.TestFiles.insert(data);
       } else {
         DEBUG && console.log('[velocity] No framework registered for', relativePath);
       }
@@ -346,7 +347,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       // we don't have to worry about inadvertently updating records for files
       // we don't care about.
       filePath = files.convertToStandardPath(files.pathNormalize(filePath));
-      VelocityTestFiles.update(filePath, {$set: {lastModified: Date.now()}});
+      Velocity.Collections.TestFiles.update(filePath, {$set: {lastModified: Date.now()}});
     }));
 
     _watcher.on('unlink', Meteor.bindEnvironment(function (filePath) {
@@ -354,7 +355,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       DEBUG && console.log('[velocity] File removed:',
         _getRelativePath(filePath));
 
-      VelocityTestFiles.remove(filePath);
+      Velocity.Collections.TestFiles.remove(filePath);
     }));
 
     _watcher.on('ready', Meteor.bindEnvironment(function () {
@@ -382,11 +383,11 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   VelocityInternals.reset = function (name) {
     DEBUG && console.log('[velocity] resetting', name);
 
-    VelocityLogs.remove({framework: name});
-    VelocityTestReports.remove({framework: name});
-    VelocityAggregateReports.remove({name: name});
+    Velocity.Collections.Logs.remove({framework: name});
+    Velocity.Collections.TestReports.remove({framework: name});
+    Velocity.Collections.AggregateReports.remove({name: name});
 
-    VelocityAggregateReports.insert({
+    Velocity.Collections.AggregateReports.insert({
       name: name,
       result: 'pending'
     });
@@ -416,12 +417,12 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     DEBUG && console.log('[velocity] frameworks with disable auto reset:',
       frameworksToIgnore);
 
-    VelocityAggregateReports.remove({});
-    VelocityLogs.remove({framework: {$nin: frameworksToIgnore}});
-    VelocityTestReports.remove({framework: {$nin: frameworksToIgnore}});
+    Velocity.Collections.AggregateReports.remove({});
+    Velocity.Collections.Logs.remove({framework: {$nin: frameworksToIgnore}});
+    Velocity.Collections.TestReports.remove({framework: {$nin: frameworksToIgnore}});
 
     _.forEach(allFrameworks, function (testFramework) {
-      VelocityAggregateReports.insert({
+      Velocity.Collections.AggregateReports.insert({
         name: testFramework,
         result: 'pending'
       });
@@ -439,38 +440,38 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         completedFrameworksCount,
         allFrameworks = _getTestFrameworkNames();
 
-    VelocityAggregateReports.upsert({name: 'aggregateResult'},
+    Velocity.Collections.AggregateReports.upsert({name: 'aggregateResult'},
       {$set: {result: 'pending'}});
-    VelocityAggregateReports.upsert({name: 'aggregateComplete'},
+    Velocity.Collections.AggregateReports.upsert({name: 'aggregateComplete'},
       {$set: {result: 'pending'}});
 
     // if all of our test reports have valid results
-    if (!VelocityTestReports.findOne({result: ''})) {
+    if (!Velocity.Collections.TestReports.findOne({result: ''})) {
 
       // pessimistically set passed state, ensuring all other states
       // take precedence in order below
       aggregateResult =
-        VelocityTestReports.findOne({result: 'failed'}) ||
-        VelocityTestReports.findOne({result: 'undefined'}) ||
-        VelocityTestReports.findOne({result: 'skipped'}) ||
-        VelocityTestReports.findOne({result: 'pending'}) ||
-        VelocityTestReports.findOne({result: 'passed'}) ||
+        Velocity.Collections.TestReports.findOne({result: 'failed'}) ||
+        Velocity.Collections.TestReports.findOne({result: 'undefined'}) ||
+        Velocity.Collections.TestReports.findOne({result: 'skipped'}) ||
+        Velocity.Collections.TestReports.findOne({result: 'pending'}) ||
+        Velocity.Collections.TestReports.findOne({result: 'passed'}) ||
         {result: 'pending'};
 
       // update the global status
-      VelocityAggregateReports.update({name: 'aggregateResult'},
+      Velocity.Collections.AggregateReports.update({name: 'aggregateResult'},
         {$set: {result: aggregateResult.result}});
     }
 
 
     // Check if all test frameworks have completed successfully
-    completedFrameworksCount = VelocityAggregateReports.find({
+    completedFrameworksCount = Velocity.Collections.AggregateReports.find({
       name: {$in: allFrameworks},
       result: 'completed'
     }).count();
 
     if (allFrameworks.length === completedFrameworksCount) {
-      VelocityAggregateReports.update({name: 'aggregateComplete'},
+      Velocity.Collections.AggregateReports.update({name: 'aggregateComplete'},
         {$set: {'result': 'completed'}});
       _.each(Velocity.postProcessors, function (processor) {
         processor();
@@ -494,18 +495,18 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
   function _removeTerminatedMirrors() {
     // Remove terminated mirrors from previous runs
     // This is needed for `meteor --test` to work properly
-    VelocityMirrors.find({}).forEach(function(mirror) {
+    Velocity.Collections.Mirrors.find({}).forEach(function(mirror) {
       try {
         process.kill(mirror.pid, 0);
       } catch (error) {
-        VelocityMirrors.remove({pid: mirror.pid});
+        Velocity.Collections.Mirrors.remove({pid: mirror.pid});
       }
     });
   }
 
   function _setReusableMirrors() {
     Velocity.reusableMirrors = [];
-    VelocityMirrors.find({}).forEach(function(mirror) {
+    Velocity.Collections.Mirrors.find({}).forEach(function(mirror) {
       mirror.reused = false;
       Velocity.reusableMirrors.push(mirror);
     });

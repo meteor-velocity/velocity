@@ -17,5 +17,5 @@ Velocity.methods['velocity/logs/reset'] = function (options) {
   if (options.framework) {
     query.framework = options.framework;
   }
-  VelocityLogs.remove(query);
+  Velocity.Collections.Logs.remove(query);
 };

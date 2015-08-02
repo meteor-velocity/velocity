@@ -22,7 +22,7 @@ Velocity.methods['velocity/returnTODOTestAndMarkItAsDOING'] = function(options) 
   };
 
 
-  var collectionObj = VelocityTestFiles.rawCollection();
+  var collectionObj = Velocity.Collections.TestFiles.rawCollection();
   var wrappedFunc = Meteor.wrapAsync(collectionObj.findAndModify,
     collectionObj);
   var _TODOtest = wrappedFunc(_query, {}, _update, {});

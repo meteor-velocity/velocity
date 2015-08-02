@@ -14,7 +14,7 @@
  *   @param {String} options.rootUrl The root url of this mirror, which also
  *                           includes the path and params
  *   @param {String} options.rootUrlPath Adds this string to the end of
- *                           the root url in the VelocityMirrors
+ *                           the root url in the Velocity.Collections.Mirrors
  *                           collection. To be used by test frameworks to
  *                           recognize when they are executing in a mirror.
  *                           eg. `/?jasmine=true`
@@ -48,6 +48,6 @@ Velocity.methods['velocity/mirrors/init'] = function (options, extra) {
     state: 'starting'
   });
 
-  VelocityMirrors.upsert(_upsertQuery,
+  Velocity.Collections.Mirrors.upsert(_upsertQuery,
     _options);
 };

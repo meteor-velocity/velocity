@@ -11,7 +11,7 @@ Velocity.methods['velocity/featureTestFailed'] = function (options) {
     featureId: String
   });
 
-  VelocityTestFiles.update({
+  Velocity.Collections.TestFiles.update({
     _id: options.featureId
   }, {
     $set: {

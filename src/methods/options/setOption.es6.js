@@ -10,7 +10,7 @@ Velocity.methods['velocity/setOption'] = function (name, value) {
   check(name, String);
   check(value, Match.Any);
 
-  VelocityOptions.upsert(
+  Velocity.Collections.Options.upsert(
     {name: name},
     {$set: {name: name, value: value}}
   );

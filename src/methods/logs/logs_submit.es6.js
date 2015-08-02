@@ -18,7 +18,7 @@ Velocity.methods['velocity/logs/submit'] = function (options) {
     timestamp: Match.Optional(Match.OneOf(Date, String))
   });
 
-  VelocityLogs.insert({
+  Velocity.Collections.Logs.insert({
     framework: options.framework,
     message: options.message,
     level: options.level || 'info',

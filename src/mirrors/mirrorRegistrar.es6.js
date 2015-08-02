@@ -1,4 +1,3 @@
-/*jshint -W030 */
 /* globals
  DEBUG: true,
  WebApp: false
