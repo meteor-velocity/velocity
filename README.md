@@ -2,7 +2,6 @@
 
 The reactive test-runner for Meteor. [Learn how to use Velocity](https://velocity.readme.io/).
 
-![CodeShip](https://codeship.com/projects/ed973200-b7a3-0132-ec13-7eb16f937591/status?branch=develop)
 [![Join the chat at https://gitter.im/meteor-velocity/velocity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/meteor-velocity/velocity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Get the Book
