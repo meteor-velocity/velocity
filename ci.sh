@@ -27,6 +27,7 @@ cd tests/cucumber
 npm install
 cd ../..
 
+export VELOCITY_CI=1
 export JASMINE_CLIENT_UNIT=0
 export JASMINE_CLIENT_INTEGRATION=0
 export JASMINE_SERVER_UNIT=0
