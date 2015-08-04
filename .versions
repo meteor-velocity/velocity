@@ -39,7 +39,7 @@ tracker@1.0.7
 ui@1.0.6
 underscore@1.0.3
 velocity:chokidar@1.0.3_1
-velocity:core@0.9.2
+velocity:core@0.9.3
 velocity:meteor-internals@1.1.0_7
 velocity:source-map-support@0.3.2_1
 webapp@1.2.0
