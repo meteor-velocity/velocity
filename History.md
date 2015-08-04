@@ -1,3 +1,8 @@
+## v0.9.2
+
+* Updates Velocity Meteor command line tool and some packages.
+  This fixes some edge case issues and improves error logging in CI.
+
 ## v0.9.1
 
 * Source maps support for server stack traces
