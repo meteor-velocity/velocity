@@ -1,3 +1,8 @@
+## v0.9.3
+
+* Reverts breaking change from velocity:METEOR
+  (.meteor/packages file was no longer available in the mirror folder)
+
 ## v0.9.2
 
 * Updates Velocity Meteor command line tool and some packages.
