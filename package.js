@@ -29,11 +29,11 @@ Package.on_use(function (api) {
   api.use('mongo');
   api.use('check');
   api.use('underscore'); // Used for the Function.bind polyfill
-  api.use('velocity:chokidar@1.0.1_1', 'server');
+  api.use('velocity:chokidar@1.0.3_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_7');
   api.use('velocity:source-map-support@0.3.2_1');
-  api.use('sanjo:long-running-child-process@1.0.3', 'server');
-  api.use('sanjo:meteor-files-helpers@1.1.0_4', 'server');
+  api.use('sanjo:long-running-child-process@1.1.3', 'server');
+  api.use('sanjo:meteor-files-helpers@1.1.0_7', 'server');
 
   api.export('Velocity', BOTH);
   api.export('VelocityTestFiles', BOTH);

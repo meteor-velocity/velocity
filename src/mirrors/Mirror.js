@@ -20,11 +20,11 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
   // Specifies the Meteor release that we use for mirrors
   Velocity.mirrorMeteorReleaseName = 'velocity:METEOR';
-  Velocity.mirrorMeteorVersion = '1.1.0.2_3';
+  Velocity.mirrorMeteorVersion = '1.1.0.3_1';
   Velocity.mirrorMeteorRelease =
     Velocity.mirrorMeteorReleaseName + '@' + Velocity.mirrorMeteorVersion;
   Velocity.mirrorMeteorToolReleaseName = 'velocity:meteor-tool';
-  Velocity.mirrorMeteorToolVersion = '1.1.3_4';
+  Velocity.mirrorMeteorToolVersion = '1.1.4_1';
   Velocity.mirrorMeteorToolRelease =
     Velocity.mirrorMeteorToolReleaseName + '@' + Velocity.mirrorMeteorToolVersion;
 
@@ -311,6 +311,15 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
     if (!process.env.VELOCITY_USE_CHECKED_OUT_METEOR) {
       args.push('--release', Velocity.mirrorMeteorRelease);
     }
+
+    console.log('Spawn mirror', {
+      command: command,
+      args: args,
+      options: {
+        cwd: process.env.VELOCITY_APP_PATH || process.env.PWD,
+        env: environment
+      }
+    });
 
     mirrorChild.spawn({
       command: command,
