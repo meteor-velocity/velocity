@@ -3,7 +3,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.9.3',
+  version: '0.10.0-rc.1',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
@@ -23,7 +23,7 @@ Package.on_use(function (api) {
       CLIENT = 'client',
       BOTH = [CLIENT, SERVER];
 
-  api.versionsFrom('METEOR@1.1.0.2');
+  api.versionsFrom('METEOR@1.2-rc.14');
   api.use('grigio:babel@0.1.6');
   api.use('webapp');
   api.use('mongo');
