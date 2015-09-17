@@ -24,7 +24,7 @@ Package.on_use(function (api) {
       BOTH = [CLIENT, SERVER];
 
   api.versionsFrom('METEOR@1.2-rc.14');
-  api.use('grigio:babel@0.1.6');
+  api.use('ecmascript');
   api.use('webapp');
   api.use('mongo');
   api.use('check');
@@ -44,37 +44,37 @@ Package.on_use(function (api) {
   api.export('VelocityMirrors', BOTH);
   api.export('VelocityOptions', BOTH);
 
-  api.add_files('src/source_map_support.es6.js', BOTH);
-  api.add_files('src/polyfills.es6.js', BOTH);
-  api.add_files('src/globals.es6.js', BOTH);
-  api.add_files('src/collections.es6.js', BOTH);
-  api.add_files('src/helpers.es6.js', SERVER);
+  api.add_files('src/source_map_support.js', BOTH);
+  api.add_files('src/polyfills.js', BOTH);
+  api.add_files('src/globals.js', BOTH);
+  api.add_files('src/collections.js', BOTH);
+  api.add_files('src/helpers.js', SERVER);
 
   // Methods
-  api.add_files('src/methods/logs/logs_reset.es6.js', SERVER);
-  api.add_files('src/methods/logs/logs_submit.es6.js', SERVER);
-  api.add_files('src/methods/mirrors/mirror_init.es6.js', SERVER);
-  api.add_files('src/methods/mirrors/mirror_register.es6.js', SERVER);
-  api.add_files('src/methods/mirrors/mirror_request.es6.js', SERVER);
-  api.add_files('src/methods/mirrors/parentHandshake.es6.js', SERVER);
-  api.add_files('src/methods/options/getOption.es6.js', BOTH);
-  api.add_files('src/methods/options/setOption.es6.js', BOTH);
-  api.add_files('src/methods/options/setOptions.es6.js', BOTH);
-  api.add_files('src/methods/reports/reports_completed.es6.js', SERVER);
-  api.add_files('src/methods/reports/reports_reset.es6.js', SERVER);
-  api.add_files('src/methods/reports/reports_submit.es6.js', SERVER);
-  api.add_files('src/methods/copySampleTests.es6.js', SERVER);
-  api.add_files('src/methods/featureTestDone.es6.js', SERVER);
-  api.add_files('src/methods/featureTestFailed.es6.js', SERVER);
-  api.add_files('src/methods/isEnabled.es6.js', SERVER);
-  api.add_files('src/methods/isMirror.es6.js', SERVER);
-  api.add_files('src/methods/register_framework.es6.js', SERVER);
-  api.add_files('src/methods/reset.es6.js', SERVER);
-  api.add_files('src/methods/returnTODOTestAndMarkItAsDOING.es6.js', SERVER);
-  api.add_files('src/methods.es6.js', BOTH);
+  api.add_files('src/methods/logs/logs_reset.js', SERVER);
+  api.add_files('src/methods/logs/logs_submit.js', SERVER);
+  api.add_files('src/methods/mirrors/mirror_init.js', SERVER);
+  api.add_files('src/methods/mirrors/mirror_register.js', SERVER);
+  api.add_files('src/methods/mirrors/mirror_request.js', SERVER);
+  api.add_files('src/methods/mirrors/parentHandshake.js', SERVER);
+  api.add_files('src/methods/options/getOption.js', BOTH);
+  api.add_files('src/methods/options/setOption.js', BOTH);
+  api.add_files('src/methods/options/setOptions.js', BOTH);
+  api.add_files('src/methods/reports/reports_completed.js', SERVER);
+  api.add_files('src/methods/reports/reports_reset.js', SERVER);
+  api.add_files('src/methods/reports/reports_submit.js', SERVER);
+  api.add_files('src/methods/copySampleTests.js', SERVER);
+  api.add_files('src/methods/featureTestDone.js', SERVER);
+  api.add_files('src/methods/featureTestFailed.js', SERVER);
+  api.add_files('src/methods/isEnabled.js', SERVER);
+  api.add_files('src/methods/isMirror.js', SERVER);
+  api.add_files('src/methods/register_framework.js', SERVER);
+  api.add_files('src/methods/reset.js', SERVER);
+  api.add_files('src/methods/returnTODOTestAndMarkItAsDOING.js', SERVER);
+  api.add_files('src/methods.js', BOTH);
 
-  api.add_files('src/core.es6.js', SERVER);
-  api.add_files('src/core-shared.es6.js', BOTH);
-  api.add_files('src/mirrors/mirrorRegistrar.es6.js', SERVER);
+  api.add_files('src/core.js', SERVER);
+  api.add_files('src/core-shared.js', BOTH);
+  api.add_files('src/mirrors/mirrorRegistrar.js', SERVER);
 
 });
