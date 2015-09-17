@@ -30,7 +30,7 @@ http@1.1.1-rc.1
 id-map@1.0.4-rc.0
 jquery@1.11.4-rc.0
 launch-screen@1.0.3-rc.1
-less@2.5.0-rc.4_1
+less@2.5.0-rc.6_1
 livedata@1.0.14-rc.0
 logging@1.0.8-rc.1
 meteor@1.1.7-rc.2
@@ -69,8 +69,8 @@ ui@1.0.7-rc.0
 underscore@1.0.4-rc.0
 url@1.0.5-rc.0
 velocity:chokidar@1.0.3_1
-velocity:core@0.10.0-rc.2
-velocity:html-reporter@0.9.0-rc.2
+velocity:core@0.10.0-rc.4
+velocity:html-reporter@0.9.0-rc.3
 velocity:meteor-internals@1.1.0_7
 velocity:meteor-stubs@1.1.0
 velocity:shim@0.1.0
