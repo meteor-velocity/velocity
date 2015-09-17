@@ -13,11 +13,11 @@ Npm.require('colors');
 
 // Specifies the Meteor release that we use for mirrors
 Velocity.mirrorMeteorReleaseName = 'velocity:METEOR';
-Velocity.mirrorMeteorVersion = '1.2-rc.15_1';
+Velocity.mirrorMeteorVersion = '1.2-rc.15_2';
 Velocity.mirrorMeteorRelease =
   Velocity.mirrorMeteorReleaseName + '@' + Velocity.mirrorMeteorVersion;
 Velocity.mirrorMeteorToolReleaseName = 'velocity:meteor-tool';
-Velocity.mirrorMeteorToolVersion = '1.1.7-rc.14_1';
+Velocity.mirrorMeteorToolVersion = '1.1.7-rc.14_3';
 Velocity.mirrorMeteorToolRelease =
   Velocity.mirrorMeteorToolReleaseName + '@' + Velocity.mirrorMeteorToolVersion;
 
