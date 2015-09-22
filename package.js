@@ -23,7 +23,7 @@ Package.on_use(function (api) {
       CLIENT = 'client',
       BOTH = [CLIENT, SERVER];
 
-  api.versionsFrom('METEOR@1.2-rc.15');
+  api.versionsFrom('METEOR@1.2.0.1');
   api.use('ecmascript');
   api.use('webapp');
   api.use('mongo');
