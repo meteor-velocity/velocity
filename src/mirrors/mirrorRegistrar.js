@@ -1,4 +1,3 @@
-/*jshint -W030 */
 /* globals
  DEBUG: true,
  WebApp: false
@@ -8,25 +7,6 @@ DEBUG = !!process.env.VELOCITY_DEBUG;
 
 (function () {
   'use strict';
-
-  // between this line and the velocity/parentHandshake, is the time the mirror
-  // starts initializing and is ready
-
-  Meteor.methods({
-
-    /**
-     * This is the best indicator of the mirror's ready status, so it's used
-     * to inform the user when there may be delays
-     *
-     * @method velocity/parentHandshake
-     * @for Meteor.methods
-     */
-    'velocity/parentHandshake': function () {
-      console.log('[velocity] Established connection with Velocity.');
-    }
-
-  });
-
 
   //////////////////////////////////////////////////////////////////////
   // This code will run inside a mirror and connects the mirror to

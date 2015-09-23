@@ -1,5 +1,3 @@
-/*jshint -W117 */
-
 (function () {
   'use strict';
 
@@ -53,88 +51,6 @@
     Velocity.getOption = function (name) {
       return Meteor.call('velocity/getOption', name);
     };
-  }
-
-
-  Meteor.methods({
-    /**
-     * Set an option.
-     *
-     * @method velocity/setOption
-     * @for Meteor.methods
-     * @param {String} name The name of the option.
-     * @param {*} value The value of the option.
-     */
-    'velocity/setOption': function (name, value) {
-      check(name, String);
-      check(value, Match.Any);
-
-      VelocityOptions.upsert(
-        {name: name},
-        {$set: {name: name, value: value}}
-      );
-    },
-
-    /**
-     * Set multiple options.
-     *
-     * @method velocity/setOptions
-     * @param options Hash with options (name: value).
-     */
-    'velocity/setOptions': function (options) {
-      check(options, Object);
-
-      for (var name in options) {
-        if (options.hasOwnProperty(name)) {
-          Meteor.call('velocity/setOption', name, options[name]);
-        }
-      }
-    },
-
-    /**
-     * Get an option
-     *
-     * @method velocity/getOption
-     * @param {String} name The name of the option.
-     * @return {*} The value of the option or null.
-     */
-    'velocity/getOption': function (name) {
-      check(name, String);
-
-      var option = VelocityOptions.findOne({name: name});
-      return option ? option.value : null;
-    },
-  });
-
-
-  if (Meteor.isServer) {
-    Meteor.methods({
-      /**
-       * Exposes the VELOCITY environment variable.
-       *
-       * @method velocity/isEnabled
-       * @for Meteor.methods
-       * @return {Boolean} true if VELOCITY environment variable is truthy.
-       *                   false if VELOCITY environment variable is falsy.
-       *                   Default: true
-       */
-      'velocity/isEnabled': function () {
-        var type = typeof process.env.VELOCITY;
-
-        switch (type) {
-          case 'undefined':
-            return true;
-          case 'string':
-            if (process.env.VELOCITY.toLowerCase() === 'false' ||
-                parseInt(process.env.VELOCITY) === 0) {
-              return false;
-            }
-            return true;
-          default:
-            return !!process.env.VELOCITY;
-        }
-      }
-    });
   }
 
 })();
