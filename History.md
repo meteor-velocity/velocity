@@ -1,3 +1,7 @@
+## v0.10.0
+
+* Compatibility with Meteor 1.2
+
 ## v0.9.3
 
 * Reverts breaking change from velocity:METEOR
