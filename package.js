@@ -28,6 +28,7 @@ Package.on_use(function (api) {
   api.use('webapp');
   api.use('mongo');
   api.use('check');
+  api.use('random');
   api.use('underscore'); // Used for the Function.bind polyfill
   api.use('velocity:chokidar@1.0.3_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_7');
