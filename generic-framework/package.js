@@ -24,9 +24,9 @@
       'velocity:html-reporter@0.4.1'
     ], 'client');
 
-    api.add_files([
+    api.addAssets([
       'sample-tests/sample.js'
-    ], 'server', {isAsset: true});
+    ], 'server');
 
     api.addFiles(['server.es6.js'], 'server');
 
