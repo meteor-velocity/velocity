@@ -1,3 +1,7 @@
+## v0.10.1
+
+* Use Meteor 1.2.0.2 for mirrors
+
 ## v0.10.0
 
 * Compatibility with Meteor 1.2
