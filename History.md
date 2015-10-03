@@ -1,3 +1,9 @@
+## v0.10.2
+
+* Performance improvements
+* A way to specify a different Meteor release for mirrors
+  See: https://velocity.readme.io/v1.0/docs/use-with-older-meteor-release
+
 ## v0.10.1
 
 * Use Meteor 1.2.0.2 for mirrors
