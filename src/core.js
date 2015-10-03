@@ -37,18 +37,20 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     process.env.VELOCITY !== '0' &&
     !process.env.IS_MIRROR
   ) {
-    Meteor.startup(function initializeVelocity () {
-      DEBUG && console.log('[velocity] Server startup');
-      DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
-      DEBUG && console.log('[velocity] config =', JSON.stringify(VelocityInternals.frameworkConfigs, null, 2));
+    Meteor.startup(function () {
+      Meteor.defer(function initializeVelocity () {
+        DEBUG && console.log('[velocity] Server startup');
+        DEBUG && console.log('[velocity] app dir', Velocity.getAppPath());
+        DEBUG && console.log('[velocity] config =', JSON.stringify(VelocityInternals.frameworkConfigs, null, 2));
 
-      //kick-off everything
-      _resetAll();
+        //kick-off everything
+        _resetAll();
 
-      _initFileWatcher(VelocityInternals.frameworkConfigs, _triggerVelocityStartupFunctions);
+        _initFileWatcher(VelocityInternals.frameworkConfigs, _triggerVelocityStartupFunctions);
 
-      _launchContinuousIntegration(VelocityInternals.frameworkConfigs);
+        _launchContinuousIntegration(VelocityInternals.frameworkConfigs);
 
+      });
     });
   }
 
@@ -70,7 +72,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
     startup: function (func) {
       if (_velocityStarted) {
         DEBUG && console.log('[velocity] Velocity already started. Immediately calling func');
-        func();
+        Meteor.defer(func);
       } else {
         DEBUG && console.log('[velocity] Velocity not started. Queueing func');
         _velocityStartupFunctions.push(func);
@@ -83,14 +85,14 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @method getAppPath
      * @return {String} app root path
      */
-    getAppPath: function () {
+    getAppPath: _.memoize(function () {
       var appPath = files.findAppDir();
       if (appPath) {
         appPath = files.pathResolve(appPath);
       }
 
       return files.convertToOSPath(appPath);
-    },
+    }),
 
 
     /**
@@ -223,7 +225,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     while (_velocityStartupFunctions.length) {
       var func = _velocityStartupFunctions.pop();
-      func();
+      Meteor.defer(func);
     }
   }
 

@@ -15,34 +15,28 @@ Velocity.Methods['velocity/mirrors/register'] = function (options) {
     host: String
   }));
 
-  DEBUG && console.log('[velocity] Mirror registered. Handshaking with mirror...');
+  DEBUG && console.log('[velocity] Mirror registered. Handshaking with mirror...', options);
 
   this.unblock();
 
   // TODO: Should the host really include the port?
   var mirrorConnection = DDP.connect(options.host, {
-    // Don't show the user connection errors when not in debug mode.
-    // We will normally eventually connect to the mirror after
-    // a connection error has been shown.
-    _dontPrintErrors: !DEBUG
+    onConnected: function () {
+      DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
+      mirrorConnection.call('velocity/parentHandshake', function (error, response) {
+        DEBUG && console.log('[velocity] Parent Handshake response', error, response);
+        var _updateQuery = {
+          framework: options.framework,
+          port: parseInt(options.port)
+        };
+        Velocity.Collections.Mirrors.update(_updateQuery, {
+          $set: {
+            state: 'ready',
+            lastModified: Date.now()
+          }
+        });
+        mirrorConnection.disconnect();
+      });
+    }
   });
-  mirrorConnection.onReconnect = function () {
-    DEBUG && console.log('[velocity] Connected to mirror, setting state to ready', options);
-    mirrorConnection.call('velocity/parentHandshake', function(e, r) {
-      DEBUG && console.log('[velocity] Parent Handshake response', e, r);
-    });
-    mirrorConnection.disconnect();
-
-    var _updateQuery = {
-      framework: options.framework,
-      port: parseInt(options.port)
-    };
-    Velocity.Collections.Mirrors.update(_updateQuery, {
-      $set: {
-        state: 'ready',
-        lastModified: Date.now()
-      }
-    });
-
-  };
 };
