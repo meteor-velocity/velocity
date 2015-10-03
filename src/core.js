@@ -83,14 +83,14 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
      * @method getAppPath
      * @return {String} app root path
      */
-    getAppPath: function () {
+    getAppPath: _.memoize(function () {
       var appPath = files.findAppDir();
       if (appPath) {
         appPath = files.pathResolve(appPath);
       }
 
       return files.convertToOSPath(appPath);
-    },
+    }),
 
 
     /**
