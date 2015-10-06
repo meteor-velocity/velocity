@@ -48,8 +48,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
         _initFileWatcher(VelocityInternals.frameworkConfigs, _triggerVelocityStartupFunctions);
 
-        _launchContinuousIntegration(VelocityInternals.frameworkConfigs);
-
       });
     });
   }
@@ -240,21 +238,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     return options;
   };
-
-
-  // Runs each test framework once when in continous integration mode.
-  function _launchContinuousIntegration () {
-
-    if (CONTINUOUS_INTEGRATION) {
-      _.forEach(_getTestFrameworkNames(), function (testFramework) {
-        Meteor.call('velocity/logs/reset', {framework: testFramework}, function () {
-
-          Meteor.call(testFramework + '/reset', function () {});
-          Meteor.call(testFramework + '/run', function () {});
-        });
-      });
-    }
-  }
 
   /**
    * Initialize the directory/file watcher.
