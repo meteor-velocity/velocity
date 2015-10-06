@@ -1,0 +1,1 @@
+Meteor.methods(Velocity.Methods);

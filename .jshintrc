@@ -1,7 +1,7 @@
 {
   "node": true,
   "browser": false,
-  "esnext": false,
+  "esnext": true,
   "bitwise": true,
   "camelcase": false,
   "curly": true,
@@ -14,8 +14,8 @@
   "quotmark": "single",
   "undef": true,
   "unused": true,
-  "strict": true,
-  "globalstrict": true,
+  "strict": false,
+  "globalstrict": false,
   "trailing": true,
   "smarttabs": true,
   "globals": {
@@ -28,7 +28,9 @@
     "Npm": false,
     "Random": false,
     "Package": false,
+    "Assets": false,
     "Mongo": false,
+    "MongoInternals": false,
     "DEBUG": false,
     "Velocity": false,
     "VelocityInternals": false,
@@ -58,6 +60,9 @@
     "_": false,
     "sanjo": false,
     "VelocityMeteorInternals": false,
-    "MeteorFilesHelpers": false
-  }
+    "MeteorFilesHelpers": false,
+    "chokidar": false
+  },
+  // Deactivate https://jslinterrors.com/expected-an-assignment-or-function-call
+  "-W030": true
 }

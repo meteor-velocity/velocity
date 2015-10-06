@@ -11,9 +11,9 @@ jshint .
 echo "JSHint checks were successful"
 
 # Make sure our documentation is clean
-echo "Checking Yuidoc syntax"
-yuidoc --lint
-echo "Yuidoc checks were successful"
+#echo "Checking Yuidoc syntax"
+#yuidoc --lint
+#echo "Yuidoc checks were successful"
 
 echo "Killing node and phantomjs processes"
 pkill -9 phantomjs || true
@@ -27,6 +27,7 @@ cd tests/cucumber
 npm install
 cd ../..
 
+export VELOCITY_CI=1
 export JASMINE_CLIENT_UNIT=0
 export JASMINE_CLIENT_INTEGRATION=0
 export JASMINE_SERVER_UNIT=0

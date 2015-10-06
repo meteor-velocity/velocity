@@ -14,6 +14,12 @@
  *
  * @class Velocity
  */
-Velocity = {};
+Velocity = {
+  /**
+   * @class Velocity.Collections
+   */
+  Collections: {},
+  Methods: {}
+};
 
 VelocityInternals = {};

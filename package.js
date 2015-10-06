@@ -1,10 +1,9 @@
-/*jshint -W117, -W097 */
 'use strict';
 
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.7.0',
+  version: '0.10.3',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
@@ -24,14 +23,18 @@ Package.on_use(function (api) {
       CLIENT = 'client',
       BOTH = [CLIENT, SERVER];
 
-  api.versionsFrom('METEOR@1.1.0.2');
+  api.versionsFrom('METEOR@1.2.0.2');
+  api.use('ecmascript');
   api.use('webapp');
   api.use('mongo');
   api.use('check');
-  api.use('velocity:chokidar@1.0.1_1', 'server');
+  api.use('random');
+  api.use('underscore'); // Used for the Function.bind polyfill
+  api.use('velocity:chokidar@1.2.0_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_7');
-  api.use('sanjo:long-running-child-process@1.0.3', 'server');
-  api.use('sanjo:meteor-files-helpers@1.1.0_4', 'server');
+  api.use('velocity:source-map-support@0.3.2_1');
+  api.use('sanjo:long-running-child-process@1.1.3', 'server');
+  api.use('sanjo:meteor-files-helpers@1.1.0_7', 'server');
 
   api.export('Velocity', BOTH);
   api.export('VelocityTestFiles', BOTH);
@@ -42,13 +45,37 @@ Package.on_use(function (api) {
   api.export('VelocityMirrors', BOTH);
   api.export('VelocityOptions', BOTH);
 
-  api.add_files('src/globals.js', BOTH);
-  api.add_files('src/collections.js', BOTH);
-  api.add_files('src/helpers.js', SERVER);
-  api.add_files('src/core.js', SERVER);
-  api.add_files('src/core-shared.js', BOTH);
+  api.addFiles('src/source_map_support.js', BOTH);
+  api.addFiles('src/polyfills.js', BOTH);
+  api.addFiles('src/globals.js', BOTH);
+  api.addFiles('src/collections.js', BOTH);
+  api.addFiles('src/helpers.js', SERVER);
 
-  api.add_files('src/mirrors/Mirror.js', SERVER);
-  api.add_files('src/mirrors/mirrorRegistrar.js', SERVER);
+  // Methods
+  api.addFiles('src/methods/logs/logs_reset.js', SERVER);
+  api.addFiles('src/methods/logs/logs_submit.js', SERVER);
+  api.addFiles('src/methods/mirrors/mirror_init.js', SERVER);
+  api.addFiles('src/methods/mirrors/mirror_register.js', SERVER);
+  api.addFiles('src/methods/mirrors/mirror_request.js', SERVER);
+  api.addFiles('src/methods/mirrors/parentHandshake.js', SERVER);
+  api.addFiles('src/methods/options/getOption.js', BOTH);
+  api.addFiles('src/methods/options/setOption.js', BOTH);
+  api.addFiles('src/methods/options/setOptions.js', BOTH);
+  api.addFiles('src/methods/reports/reports_completed.js', SERVER);
+  api.addFiles('src/methods/reports/reports_reset.js', SERVER);
+  api.addFiles('src/methods/reports/reports_submit.js', SERVER);
+  api.addFiles('src/methods/copySampleTests.js', SERVER);
+  api.addFiles('src/methods/featureTestDone.js', SERVER);
+  api.addFiles('src/methods/featureTestFailed.js', SERVER);
+  api.addFiles('src/methods/isEnabled.js', SERVER);
+  api.addFiles('src/methods/isMirror.js', SERVER);
+  api.addFiles('src/methods/register_framework.js', SERVER);
+  api.addFiles('src/methods/reset.js', SERVER);
+  api.addFiles('src/methods/returnTODOTestAndMarkItAsDOING.js', SERVER);
+  api.addFiles('src/methods.js', BOTH);
+
+  api.addFiles('src/core.js', SERVER);
+  api.addFiles('src/core-shared.js', BOTH);
+  api.addFiles('src/mirrors/mirrorRegistrar.js', SERVER);
 
 });

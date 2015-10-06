@@ -25,7 +25,7 @@ describe('Velocity', function () {
     name = 'foo';
     value = 'bar';
     Velocity.setOption(name, value);
-    actual = VelocityOptions.findOne({name: name});
+    actual = Velocity.Collections.Options.findOne({name: name});
     expect(actual.value).toEqual(value);
   });
 
@@ -41,7 +41,7 @@ describe('Velocity', function () {
           report;
 
       Velocity.registerTestingFramework('foo', options);
-      report = VelocityAggregateReports.findOne({name: 'foo'});
+      report = Velocity.Collections.AggregateReports.findOne({name: 'foo'});
       expect(report.result).toBe('pending');
     });
   });

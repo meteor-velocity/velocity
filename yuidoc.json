@@ -1,7 +1,7 @@
 {
   "name": "Velocity",
   "description": "Test runner for Meteor apps",
-  "version": "0.7.0",
+  "version": "0.10.3",
   "logo": "http://velocity.meteor.com/images/velocity_logo.svg",
   "options": {
     "outdir": "./docs",

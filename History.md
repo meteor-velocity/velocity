@@ -1,3 +1,48 @@
+## v0.10.3
+
+* Runs mirror with --once flag on CI
+
+## v0.10.2
+
+* Performance improvements
+* A way to specify a different Meteor release for mirrors
+  See: https://velocity.readme.io/v1.0/docs/use-with-older-meteor-release
+
+## v0.10.1
+
+* Use Meteor 1.2.0.2 for mirrors
+
+## v0.10.0
+
+* Compatibility with Meteor 1.2
+
+## v0.9.3
+
+* Reverts breaking change from velocity:METEOR
+  (.meteor/packages file was no longer available in the mirror folder)
+
+## v0.9.2
+
+* Updates Velocity Meteor command line tool and some packages.
+  This fixes some edge case issues and improves error logging in CI.
+
+## v0.9.1
+
+* Source maps support for server stack traces
+
+## v0.9.0
+
+* Source maps support for client stack traces
+
+## v0.8.0
+
+* Support for remote databases and multiple apps running at the same time
+  ([Documentation](https://velocity.readme.io/docs/use-different-mongodb-server))
+
+## v0.7.1
+
+* Added Function.bind polyfill for PhantomJS
+
 ## v0.7.0
 
 * Parallel execution support
