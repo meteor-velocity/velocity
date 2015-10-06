@@ -151,6 +151,10 @@ function _startMirror (options) {
     args.push('--include-tests', files.convertToStandardPath(options.testsPath));
   }
 
+  if (VelocityInternals.isEnvironmentVariableTrue(process.env.VELOCITY_CI, false)) {
+    args.push('--once');
+  }
+
   if (Meteor.settings) {
     var settingsPath = _generateSettingsFile();
     args.push('--settings', settingsPath);
