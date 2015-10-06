@@ -1,3 +1,7 @@
+## v0.10.4
+
+* Removes deprecated CI logic
+
 ## v0.10.3
 
 * Runs mirror with --once flag on CI
