@@ -168,6 +168,7 @@ function _startMirror (options) {
   if (
     process.env.VELOCITY_DEBUG_MIRROR &&
     process.env.VELOCITY_DEBUG_MIRROR === environment.FRAMEWORK &&
+    process.env.VELOCITY_DEBUG_MIRROR !==  "webstorm" &&
     !_.contains(options.args, '--debug-port')
   ) {
     var debugPort = '5858';
@@ -302,6 +303,17 @@ function _getEnvironmentVariables (options) {
   }
 
   _.defaults(env, process.env);
+
+  //if the debug variable is not set, remove the debug enviroment from the mirror
+  if (process.env.VELOCITY_DEBUG_MIRROR !== environment.FRAMEWORK &&
+    process.env.VELOCITY_DEBUG_MIRROR !== "webstorm") {
+    env.NODE_OPTIONS = null
+  }
+
+  //if the debug variable is set to webstorm, allow a remote node debugging session to initiate without the break
+  else if(process.env.VELOCITY_DEBUG_MIRROR === "webstorm") {
+    env.NODE_OPTIONS = "--debug=5858"
+  }
 
   return env;
 }
