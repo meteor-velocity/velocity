@@ -168,6 +168,7 @@ function _startMirror (options) {
   if (
     process.env.VELOCITY_DEBUG_MIRROR &&
     process.env.VELOCITY_DEBUG_MIRROR === environment.FRAMEWORK &&
+    process.env.VELOCITY_DEBUG_MIRROR !==  "webstorm" &&
     !_.contains(options.args, '--debug-port')
   ) {
     var debugPort = '5858';
@@ -294,7 +295,8 @@ function _getEnvironmentVariables (options) {
     IS_MIRROR: true,
     HANDSHAKE: options.handshake,
     VELOCITY_MAIN_APP_PATH: Velocity.getAppPath(),
-    METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings))
+    METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings)),
+    NODE_OPTIONS: ""
   };
 
   if (options.env) {
@@ -302,6 +304,11 @@ function _getEnvironmentVariables (options) {
   }
 
   _.defaults(env, process.env);
+
+  //if the debug variable is set to webstorm, allow a remote node debugging session to initiate without the break
+  if(process.env.VELOCITY_DEBUG_MIRROR === "webstorm") {
+    env.NODE_OPTIONS = "--debug=5858"
+  }
 
   return env;
 }
