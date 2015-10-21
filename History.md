@@ -1,3 +1,7 @@
+## v0.10.6
+
+* Adds Velocity.startup to mirrors
+
 ## v0.10.5
 
 * Fixes debugging with Webstorm
