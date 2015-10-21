@@ -6,5 +6,6 @@
  * @for Meteor.methods
  */
 Velocity.Methods['velocity/parentHandshake'] = function () {
-  console.log('[velocity] Established connection with Velocity.');
+  console.log('[velocity] Mirror has established connection with Velocity.');
+  Velocity.triggerVelocityStartupFunctions();
 };

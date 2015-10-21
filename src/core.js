@@ -46,7 +46,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         //kick-off everything
         _resetAll();
 
-        _initFileWatcher(VelocityInternals.frameworkConfigs, _triggerVelocityStartupFunctions);
+        _initFileWatcher(VelocityInternals.frameworkConfigs, Velocity.triggerVelocityStartupFunctions);
 
       });
     });
@@ -209,23 +209,25 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       Velocity.Collections.TestFiles.remove({targetFramework: name});
 
       delete VelocityInternals.frameworkConfigs[name];
+    },
+
+
+    triggerVelocityStartupFunctions: function  () {
+      _velocityStarted = true;
+      DEBUG && console.log('[velocity] Triggering queued startup functions');
+
+      while (_velocityStartupFunctions.length) {
+        var func = _velocityStartupFunctions.pop();
+        Meteor.defer(func);
+      }
     }
+
   });
 
 
 //////////////////////////////////////////////////////////////////////
 // Private functions
 //
-
-  function _triggerVelocityStartupFunctions () {
-    _velocityStarted = true;
-    DEBUG && console.log('[velocity] Triggering queued startup functions');
-
-    while (_velocityStartupFunctions.length) {
-      var func = _velocityStartupFunctions.pop();
-      Meteor.defer(func);
-    }
-  }
 
    VelocityInternals.parseTestingFrameworkOptions = function (name, options) {
     options = options || {};
