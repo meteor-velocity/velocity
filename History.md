@@ -1,3 +1,7 @@
+## v0.10.5
+
+* Fixes debugging with Webstorm
+
 ## v0.10.4
 
 * Removes deprecated CI logic
