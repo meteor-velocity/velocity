@@ -167,16 +167,24 @@ function _startMirror (options) {
   // Make it possible to debug a mirror
   if (
     process.env.VELOCITY_DEBUG_MIRROR &&
-    process.env.VELOCITY_DEBUG_MIRROR === environment.FRAMEWORK &&
-    !_.contains(options.args, '--debug-port')
+    process.env.VELOCITY_DEBUG_MIRROR === environment.FRAMEWORK
   ) {
-    var debugPort = '5858';
-    args.push('--debug-port', debugPort);
     console.log('[velocity] Your mirror is now paused and ready for debugging!');
     console.log();
-    console.log('[velocity] To debug the server process using a graphical debugging interface,');
-    console.log('[velocity] visit this URL in your web browser:');
-    console.log('[velocity] http://localhost:8080/debug?port=' + debugPort);
+
+    var debugPort = '5858';
+    if (VelocityInternals.isEnvironmentVariableTrue(
+      process.env.VELOCITY_DEBUG_MIRROR_WEBSTORM, false
+    )) {
+      environment.NODE_OPTIONS = '--debug=' + debugPort;
+      console.log('[velocity] To debug the server process use a Node.js Remote Debug configuration,');
+      console.log('[velocity] in Webstorm and connect to port ' + debugPort + '.');
+    } else {
+      args.push('--debug-port', debugPort);
+      console.log('[velocity] To debug the server process using a graphical debugging interface,');
+      console.log('[velocity] visit this URL in your web browser:');
+      console.log('[velocity] http://localhost:8080/debug?port=' + debugPort);
+    }
   }
 
   // Allow to use checked out meteor for spawning mirrors
@@ -294,7 +302,8 @@ function _getEnvironmentVariables (options) {
     IS_MIRROR: true,
     HANDSHAKE: options.handshake,
     VELOCITY_MAIN_APP_PATH: Velocity.getAppPath(),
-    METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings))
+    METEOR_SETTINGS: JSON.stringify(_.extend({}, Meteor.settings)),
+    NODE_OPTIONS: ''
   };
 
   if (options.env) {

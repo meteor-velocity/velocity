@@ -1,3 +1,15 @@
+## v0.10.6
+
+* Adds Velocity.startup to mirrors
+
+## v0.10.5
+
+* Fixes debugging with Webstorm
+
+## v0.10.4
+
+* Removes deprecated CI logic
+
 ## v0.10.3
 
 * Runs mirror with --once flag on CI

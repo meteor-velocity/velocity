@@ -17,7 +17,7 @@ git remote set-branches --add origin gh-pages
 git fetch
 git checkout gh-pages
 # Remove everything but .git
-rm -r *
+rm -rf *
 mv /tmp/docs/* ./
 git add --all .
 git commit --message "Update docs [skip ci]"

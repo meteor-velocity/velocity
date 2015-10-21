@@ -46,9 +46,7 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
         //kick-off everything
         _resetAll();
 
-        _initFileWatcher(VelocityInternals.frameworkConfigs, _triggerVelocityStartupFunctions);
-
-        _launchContinuousIntegration(VelocityInternals.frameworkConfigs);
+        _initFileWatcher(VelocityInternals.frameworkConfigs, Velocity.triggerVelocityStartupFunctions);
 
       });
     });
@@ -211,23 +209,25 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
       Velocity.Collections.TestFiles.remove({targetFramework: name});
 
       delete VelocityInternals.frameworkConfigs[name];
+    },
+
+
+    triggerVelocityStartupFunctions: function  () {
+      _velocityStarted = true;
+      DEBUG && console.log('[velocity] Triggering queued startup functions');
+
+      while (_velocityStartupFunctions.length) {
+        var func = _velocityStartupFunctions.pop();
+        Meteor.defer(func);
+      }
     }
+
   });
 
 
 //////////////////////////////////////////////////////////////////////
 // Private functions
 //
-
-  function _triggerVelocityStartupFunctions () {
-    _velocityStarted = true;
-    DEBUG && console.log('[velocity] Triggering queued startup functions');
-
-    while (_velocityStartupFunctions.length) {
-      var func = _velocityStartupFunctions.pop();
-      Meteor.defer(func);
-    }
-  }
 
    VelocityInternals.parseTestingFrameworkOptions = function (name, options) {
     options = options || {};
@@ -240,21 +240,6 @@ CONTINUOUS_INTEGRATION = process.env.VELOCITY_CI;
 
     return options;
   };
-
-
-  // Runs each test framework once when in continous integration mode.
-  function _launchContinuousIntegration () {
-
-    if (CONTINUOUS_INTEGRATION) {
-      _.forEach(_getTestFrameworkNames(), function (testFramework) {
-        Meteor.call('velocity/logs/reset', {framework: testFramework}, function () {
-
-          Meteor.call(testFramework + '/reset', function () {});
-          Meteor.call(testFramework + '/run', function () {});
-        });
-      });
-    }
-  }
 
   /**
    * Initialize the directory/file watcher.
