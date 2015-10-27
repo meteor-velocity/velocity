@@ -121,6 +121,7 @@ var _generateSettingsFile = _.memoize(function () {
 function _startMirror (options) {
 
   // TODO, options is passed as a reference, maybe we should pass a copy instead
+  DEBUG && console.log('[velocity] starting mirror', options);
 
   options.handshake = options.handshake === undefined ? true : options.handshake;
   options.rootUrlPath = (options.rootUrlPath || '');
@@ -137,6 +138,7 @@ function _startMirror (options) {
 
   var mirrorChild = _getMirrorChild(environment.FRAMEWORK, processName);
   if (mirrorChild.isRunning()) {
+    DEBUG && console.log('[velocity] mirror child is running');
     return;
   }
 
@@ -193,20 +195,21 @@ function _startMirror (options) {
     args.push('--release', Velocity.mirrorMeteorRelease);
   }
 
-  mirrorChild.spawn({
+  var spawnOptions = {
     command: command,
     args: args,
     options: {
       cwd: process.env.VELOCITY_APP_PATH || process.env.PWD,
       env: environment
     }
-  });
+  };
+  DEBUG && console.log('[velocity] spawning the mirror child', spawnOptions);
+  mirrorChild.spawn(spawnOptions);
 
   DEBUG && console.log(
     '[velocity] Mirror process forked with pid',
     mirrorChild.getPid()
   );
-
 
   console.log(('[velocity] ' +
     environment.FRAMEWORK + ' is starting a mirror at ' +
@@ -332,9 +335,11 @@ function _getMongoUrl (database) {
 
 
 function _getMirrorChild (framework, processName) {
+  DEBUG && console.log('[velocity] getting mirror child', framework, processName);
   var _processName = processName || framework;
   var mirrorChild = _mirrorChildProcesses[_processName];
   if (!mirrorChild) {
+    DEBUG && console.log('[velocity] mirror child not found, creating new long running child process');
     mirrorChild = new sanjo.LongRunningChildProcess(_processName);
     _mirrorChildProcesses[_processName] = mirrorChild;
   }
