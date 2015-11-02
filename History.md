@@ -1,3 +1,11 @@
+## v0.10.8
+
+* Update for Meteor 1.2.1
+
+## v0.10.7
+
+* Adds extra logging to mirror starting 
+
 ## v0.10.6
 
 * Adds Velocity.startup to mirrors

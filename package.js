@@ -3,7 +3,7 @@
 Package.describe({
   name: 'velocity:core',
   summary: 'Velocity, a Meteor specific test-runner',
-  version: '0.10.6',
+  version: '0.10.8',
   git: 'https://github.com/meteor-velocity/velocity.git',
   debugOnly: true
 });
@@ -13,7 +13,7 @@ Npm.depends({
   'fs-extra': '0.18.0',
   'freeport':'1.0.4',
   'mongodb-uri': '0.9.7',
-  'colors': '1.0.3',
+  'colors': '1.1.2',
   'tmp': '0.0.25'
 });
 
@@ -23,7 +23,7 @@ Package.on_use(function (api) {
       CLIENT = 'client',
       BOTH = [CLIENT, SERVER];
 
-  api.versionsFrom('METEOR@1.2.0.2');
+  api.versionsFrom('METEOR@1.2.1');
   api.use('ecmascript');
   api.use('webapp');
   api.use('mongo');
