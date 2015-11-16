@@ -15,4 +15,4 @@ To learn more about testing with Meteor, consider [The Meteor Testing Manual](ht
 [![](http://www.meteortesting.com/img/tmtm.gif)](http://www.meteortesting.com/?utm_source=Cucumber&utm_medium=banner&utm_campaign=velocity_core)
 
 ## Need Premium Support?
-Xol.vio are the Meteor testing experts and offer [Meteor Testing Support](http://xolv.io/services/meteor-testing-support).
+Xolv.io are the Meteor testing experts and offer [Meteor Testing Support](http://xolv.io/services/meteor-testing-support).
