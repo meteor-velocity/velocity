@@ -1,26 +1,18 @@
 # Velocity
+Xolv.io handed the ownership of Meteor testing back to the MDG. [Read the announcement](http://xolv.io/velocity-announcement) for more details.
 
-The reactive test-runner for Meteor. Learn how to use Velocity on the [documentation site](https://velocity.readme.io/).
+## Looking for the Jasmine, Cucumber or Mocha documentation?
 
-[![Join the chat at https://gitter.im/meteor-velocity/velocity](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/meteor-velocity/velocity?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[sanjo:jasmine](https://meteor-testing.readme.io/docs/getting-started)
 
-## Get Support
+[xolvio:cucumber](https://chimp.readme.io/docs/getting-started-with-meteor-cucumber)
 
-#### Free Support
-
-You can get help on all these channels both from the authors of Velocity and the community.
-
-* [Stack Overflow - meteor-velocity tag](http://stackoverflow.com/questions/tagged/meteor-velocity)
-* [Meteor Forums - Testing](https://forums.meteor.com/c/testing)
-* [Velocity Gitter Channel](https://gitter.im/meteor-velocity/velocity)
-
-#### Premium Support
-If need a faster response or have some urgent feature requests, we offer a [premium support service](http://xolv.io/services/velocity-premium-support/).
+[mike:mocha](https://github.com/mad-eye/meteor-mocha-web/)
 
 ## Get the Book
-
-To learn more about testing with Meteor, consider purchasing our book [The Meteor Testing Manual](http://www.meteortesting.com/?utm_source=Cucumber&utm_medium=banner&utm_campaign=Velocity).
+To learn more about testing with Meteor, consider [The Meteor Testing Manual](http://www.meteortesting.com/?utm_source=Cucumber&utm_medium=banner&utm_campaign=Velocity).
 
 [![](http://www.meteortesting.com/img/tmtm.gif)](http://www.meteortesting.com/?utm_source=Cucumber&utm_medium=banner&utm_campaign=velocity_core)
 
-Your support helps us continue our work on Velocity.
+## Need Premium Support?
+Xol.vio are the Meteor testing experts and offer [Meteor Testing Support](http://xolv.io/services/meteor-testing-support).
