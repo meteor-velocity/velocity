@@ -1,3 +1,13 @@
+## v0.10.9
+
+* Improves mirror caching
+  * New mirrors now get the complete hot cache of the app.
+    -> Same start speed for mirrors as for the already cached app.
+  * Mirrors are cached in .meteor/local/mirrors.
+    -> Mirrors never need to be built from scratch after the first start.
+       This is also nice for CI mirror caching.
+       Just cache `.meteor/local/mirrors`, and you get cached mirrors on CI.
+
 ## v0.10.8
 
 * Update for Meteor 1.2.1
