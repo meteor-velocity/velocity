@@ -1,3 +1,8 @@
+## v0.10.10
+
+* Removes velocity:source-map-support dependency
+  It breaks file links in Chrome for stack traces.
+
 ## v0.10.9
 
 * Improves mirror caching
