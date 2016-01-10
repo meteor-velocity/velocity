@@ -32,7 +32,6 @@ Package.on_use(function (api) {
   api.use('underscore'); // Used for the Function.bind polyfill
   api.use('velocity:chokidar@1.2.0_1', 'server');
   api.use('velocity:meteor-internals@1.1.0_7');
-  api.use('velocity:source-map-support@0.3.2_1');
   api.use('sanjo:long-running-child-process@1.1.3', 'server');
   api.use('sanjo:meteor-files-helpers@1.1.0_7', 'server');
 
@@ -45,7 +44,6 @@ Package.on_use(function (api) {
   api.export('VelocityMirrors', BOTH);
   api.export('VelocityOptions', BOTH);
 
-  api.addFiles('src/source_map_support.js', BOTH);
   api.addFiles('src/polyfills.js', BOTH);
   api.addFiles('src/globals.js', BOTH);
   api.addFiles('src/collections.js', BOTH);
